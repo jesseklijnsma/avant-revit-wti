@@ -30,7 +30,7 @@ namespace Avant.WTI
 
             // BUTTON FOR THE SINGLE-THREADED WPF OPTION
             if (panel.AddItem(
-                new PushButtonData("WTI", "WTI", thisAssemblyPath,
+                new PushButtonData("WTI", "Generate WTI", thisAssemblyPath,
                     "Avant.WTI.Drip.DripCommand")) is PushButton button)
             {
                 // defines the tooltip displayed when the button is hovered over in Revit's ribbon
@@ -79,7 +79,7 @@ namespace Avant.WTI
 
         public RibbonPanel RibbonPanel(UIControlledApplication a)
         {
-            string tab = "Template"; // Tab name
+            string tab = "Avant"; // Tab name
             // Empty ribbon panel 
             RibbonPanel ribbonPanel = null;
             // Try to create ribbon tab. 
@@ -95,7 +95,7 @@ namespace Avant.WTI
             // Try to create ribbon panel.
             try
             {
-                RibbonPanel panel = a.CreateRibbonPanel(tab, "Develop");
+                RibbonPanel panel = a.CreateRibbonPanel(tab, "WTI");
             }
             catch (Exception ex)
             {
@@ -104,7 +104,7 @@ namespace Avant.WTI
 
             // Search existing tab for your panel.
             List<RibbonPanel> panels = a.GetRibbonPanels(tab);
-            foreach (RibbonPanel p in panels.Where(p => p.Name == "Develop"))
+            foreach (RibbonPanel p in panels.Where(p => p.Name == "WTI"))
             {
                 ribbonPanel = p;
             }
