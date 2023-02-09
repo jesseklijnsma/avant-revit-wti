@@ -15,7 +15,8 @@ namespace RevitTemplate
     public class DripData
     {
 
-        // In
+        // Input data
+        //  All these fields need to be valid in order to show the window
         public Document doc;
         public UIDocument uidoc;
 
@@ -48,7 +49,8 @@ namespace RevitTemplate
             return true;
         }
 
-        // Out
+        // Output data
+        //  All these outputs need to be valid in order to run the drip generator
         public List<Pipe> pipelines = new List<Pipe>();
         public Dictionary<Area, Pipe> areapipemap = new Dictionary<Area, Pipe>();
         public PipeType pipetype = null;
@@ -73,10 +75,15 @@ namespace RevitTemplate
         public bool convertPlaceholders = true;
 
 
+        // Misc.
         public List<Line> previewGeometry = new List<Line>();
-        public List<XYZ> debugPoints = new List<XYZ>();
+        public List<XYZ> previewPoints = new List<XYZ>();
         public List<Line> debugLines = new List<Line>();
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns>A boolean indicating whether all output data is valid</returns>
         public bool isValidOutput()
         {
             if (pipetype == null) return false;

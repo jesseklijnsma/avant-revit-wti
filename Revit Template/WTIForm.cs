@@ -15,8 +15,6 @@ namespace RevitTemplate
     public partial class WTIForm : System.Windows.Forms.Form
     {
 
-        private const bool DEBUG = true;
-
         private DripData data;
         private System.Drawing.RectangleF maxBounds;
         private System.Drawing.RectangleF bounds;
@@ -117,7 +115,7 @@ namespace RevitTemplate
 
         public void reloadPreview()
         {
-            dripGenerator.generatePreviewGeometry();
+            dripGenerator.GeneratePreviewGeometry();
             this.canvas.Invalidate();
         }
 
@@ -159,12 +157,9 @@ namespace RevitTemplate
                 }
             }
 
-            if (DEBUG)
+            foreach (XYZ p in this.data.previewPoints)
             {
-                foreach (XYZ p in this.data.debugPoints)
-                {
-                    drawPoint(p, System.Drawing.Color.White, 3);
-                }
+                drawPoint(p, System.Drawing.Color.White, 3);
             }
 
             bg.Render();
@@ -420,7 +415,7 @@ namespace RevitTemplate
 
         private void button1_Click(object sender, EventArgs e)
         {
-            dripGenerator.generateDrip();
+            dripGenerator.GenerateDrip();
             this.Close();
         }
 

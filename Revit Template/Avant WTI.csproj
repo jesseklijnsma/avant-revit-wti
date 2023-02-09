@@ -115,7 +115,6 @@
     <Compile Include="DripData.cs" />
     <Compile Include="DripGenerator.cs" />
     <Compile Include="WTIElementCollector.cs" />
-    <Compile Include="EntryCommandSeparateThread.cs" />
     <Compile Include="DripCommand.cs" />
     <Compile Include="GeomUtils.cs" />
     <Compile Include="ValveUtils.cs" />
@@ -140,9 +139,6 @@
     <Compile Include="Util.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="License.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Resource Include="Resources\cloud-small.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>

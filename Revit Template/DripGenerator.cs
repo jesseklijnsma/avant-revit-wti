@@ -1,35 +1,31 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
-using Microsoft.Scripting.Ast;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Forms;
-using System.Windows.Media;
 
 namespace RevitTemplate
 {
     internal class DripGenerator
     {
 
-        private DripData data;
-
+        private readonly DripData data;
 
         public DripGenerator(DripData data)
         {
             this.data = data;
         }
 
-        private List<ElementId> convertPlaceholders(List<Pipe> placeholders)
+        private List<ElementId> ConvertPlaceholders(List<Pipe> placeholders)
         {
             List<ElementId> ids = new List<ElementId>();
-            foreach (Pipe p in placeholders) ids.Add(p.Id);
+            foreach (Pipe p in placeholders)
+            {
+                if (p.IsPlaceholder) ids.Add(p.Id);
+            }
+            if (ids.Count == 0) return new List<ElementId>();
             try
             {
                 List<ElementId> newIds = (List<ElementId>)PlumbingUtils.ConvertPipePlaceholders(this.data.doc, ids);
@@ -37,13 +33,13 @@ namespace RevitTemplate
             }
             catch (Exception)
             {
-                // TODO add informative error message
+                MessageBox.Show("Placeholder to pipe conversion failed.", "", MessageBoxButtons.OK);
             }
             return new List<ElementId>();
         }
 
 
-        private XYZ findValvePoint(List<XYZ> columnpoints, XYZ areacenter, XYZ rootVector, XYZ perpendicularVector, Line sourceline)
+        private XYZ FindValvePoint(List<XYZ> columnpoints, XYZ areacenter, XYZ rootVector, XYZ perpendicularVector, Line sourceline)
         {
             if (columnpoints.Count == 0) return XYZ.Zero;
 
@@ -71,11 +67,11 @@ namespace RevitTemplate
             return sortedClosestPoints[0];
         }
 
-        public void generatePreviewGeometry()
+        public void GeneratePreviewGeometry()
         {
             this.data.previewGeometry.Clear();
             this.data.debugLines.Clear();
-            this.data.debugPoints.Clear();
+            this.data.previewPoints.Clear();
             foreach (Area area in this.data.areas)
             {
                 Pipe pipe = null;
@@ -83,24 +79,20 @@ namespace RevitTemplate
                 if (pipe == null) pipe = Util.findClosestPipe(this.data.pipelines, area);
                 if (pipe == null) continue;
 
-                generateAreaBranch(pipe, area, this.data.columnpoints, true);
+                GenerateAreaBranch(pipe, area, this.data.columnpoints, preview: true);
             }
         }
 
-        public void generateDrip()
+        public void GenerateDrip()
         {
 
             if (!this.data.isValidOutput())
             {
                 string message = "The inputs are not valid!";
                 string caption = "";
-                MessageBoxButtons buttons = MessageBoxButtons.OK;
-                DialogResult result;
-
-                result = MessageBox.Show(message, caption, buttons);
+                MessageBox.Show(message, caption, MessageBoxButtons.OK);
                 return;
             }
-
 
             Transaction t = new Transaction(this.data.doc);
             t.Start("Drip generation");
@@ -109,46 +101,47 @@ namespace RevitTemplate
             fho.SetForcedModalHandling(false);
             t.SetFailureHandlingOptions(fho);
 
-            //try
-            //{
-            List<Pipe> placeholders = new List<Pipe>();
-            HashSet<Pipe> sources = new HashSet<Pipe>();
-            foreach (Area area in this.data.areas)
+            try
             {
-                Pipe pipe = null;
-                if (this.data.areapipemap.ContainsKey(area)) pipe = this.data.areapipemap[area];
-                if (pipe == null) pipe = Util.findClosestPipe(this.data.pipelines, area);
-                if (pipe == null) continue;
+                List<Pipe> placeholders = new List<Pipe>();
+                HashSet<Pipe> sources = new HashSet<Pipe>();
+                foreach (Area area in this.data.areas)
+                {
+                    Pipe pipe = null;
+                    if (this.data.areapipemap.ContainsKey(area)) pipe = this.data.areapipemap[area];
+                    if (pipe == null) pipe = Util.findClosestPipe(this.data.pipelines, area);
+                    if (pipe == null) continue;
 
-                sources.Add(pipe);
+                    sources.Add(pipe);
 
-                List<Pipe> pipes = generateAreaBranch(pipe, area, this.data.columnpoints, false);
-                if (pipes == null) continue;
-                placeholders.AddRange(pipes);
+                    List<Pipe> pipes = GenerateAreaBranch(pipe, area, this.data.columnpoints, false);
+                    if (pipes == null) continue;
+                    placeholders.AddRange(pipes);
+                }
+
+                placeholders.AddRange(sources);
+
+
+                if (this.data.convertPlaceholders)
+                {
+                    List<ElementId> newpipes = ConvertPlaceholders(placeholders);
+                }
+
+                t.Commit();
             }
-
-            placeholders.AddRange(sources);
-
-
-            if (this.data.convertPlaceholders)
+            catch (Exception e)
             {
-                List<ElementId> newpipes = convertPlaceholders(placeholders);
+                string message = "An exception has occured";
+                string caption = e.Message + "\n" + e.StackTrace;
+
+                MessageBoxButtons buttons = MessageBoxButtons.OK;
+                MessageBox.Show(message, caption, buttons, MessageBoxIcon.Warning);
+                t.RollBack();
+                throw;
             }
-
-            t.Commit();
-            //}catch (Exception)
-            //{
-            //    t.RollBack();
-            //    throw;
-            //}
-
-
-
-
-
         }
 
-        private List<Pipe> generateAreaBranch(Pipe source, Area area, List<XYZ> columnpoints, bool preview = false)
+        private List<Pipe> GenerateAreaBranch(Pipe source, Area area, List<XYZ> columnpoints, bool preview = false)
         {
             RectangleF arearect = AreaUtils.getAreaRectangle(area);
             XYZ center = Util.rectangleGetCenter(arearect);
@@ -174,16 +167,16 @@ namespace RevitTemplate
             XYZ rootVector = VectorUtils.vector_mask(branchinwardvector, areavector);
             XYZ perpendicularVector = VectorUtils.vector_mask(branchinwardvector.CrossProduct(XYZ.BasisZ), areavector);
 
-            return generateBranch(source, arearect, rootVector, perpendicularVector, areaColumnPoints, preview);
+            return GenerateBranch(source, arearect, rootVector, perpendicularVector, areaColumnPoints, preview);
         }
 
-        private List<Pipe> generateBranch(Pipe source, RectangleF areaRect, XYZ rootVector, XYZ perpendicularVector, List<XYZ> columnpoints, bool previewOnly = false)
+        private List<Pipe> GenerateBranch(Pipe source, RectangleF areaRect, XYZ rootVector, XYZ perpendicularVector, List<XYZ> columnpoints, bool previewOnly = false)
         {
             Line sourcepipeline = ((LocationCurve)source.Location).Curve as Line;
             XYZ center = Util.rectangleGetCenter(areaRect);
 
 
-            XYZ valveColumnPoint = findValvePoint(columnpoints, center, rootVector, perpendicularVector, sourcepipeline);
+            XYZ valveColumnPoint = FindValvePoint(columnpoints, center, rootVector, perpendicularVector, sourcepipeline);
             if (valveColumnPoint == null)
             {
                 Console.WriteLine("Error: No valve point found");
@@ -194,7 +187,7 @@ namespace RevitTemplate
             XYZ valvePoint = valveColumnPoint.Add(rootVector.Normalize().Multiply(this.data.valvecolumnDistance / 304.8));
             valvePoint = VectorUtils.vector_setZ(valvePoint, this.data.valveheight);
 
-            this.data.debugPoints.Add(valvePoint);
+            this.data.previewPoints.Add(valvePoint);
 
             Line centerline = Line.CreateBound(center, VectorUtils.vector_setZ(GeomUtils.getClosestPoint(sourcepipeline, center), 0));
 
@@ -218,7 +211,7 @@ namespace RevitTemplate
 
             bool valveConnect = valve_in_c != null && valve_out_c != null;
 
-            if(!previewOnly && !valveConnect)
+            if (!previewOnly && !valveConnect)
             {
 
             }

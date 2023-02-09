@@ -41,15 +41,15 @@ namespace RevitTemplate
             }
 
             // BUTTON FOR THE MULTI-THREADED WPF OPTION
-            if (panel.AddItem(
-                new PushButtonData("WPF Template\nMulti-Thread", "WPF Template\nMulti-Thread", thisAssemblyPath,
-                    "RevitTemplate.EntryCommandSeparateThread")) is PushButton button2)
-            {
-                button2.ToolTip = "Visual interface for debugging applications.";
-                Uri uriImage = new Uri("pack://application:,,,/RevitTemplate;component/Resources/avant.png");
-                BitmapImage largeImage = new BitmapImage(uriImage);
-                button2.LargeImage = largeImage;
-            }
+            //if (panel.AddItem(
+            //    new PushButtonData("WPF Template\nMulti-Thread", "WPF Template\nMulti-Thread", thisAssemblyPath,
+            //        "RevitTemplate.EntryCommandSeparateThread")) is PushButton button2)
+            //{
+            //    button2.ToolTip = "Visual interface for debugging applications.";
+            //    Uri uriImage = new Uri("pack://application:,,,/RevitTemplate;component/Resources/avant.png");
+            //    BitmapImage largeImage = new BitmapImage(uriImage);
+            //    button2.LargeImage = largeImage;
+            //}
 
 
             // listeners/watchers for external events (if you choose to use them)
