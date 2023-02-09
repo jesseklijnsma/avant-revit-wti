@@ -48,12 +48,6 @@ namespace RevitTemplate
             return true;
         }
 
-
-        // Derived Data
-        public Dictionary<Area, RectangleF> areaRectMap = new Dictionary<Area, RectangleF>();
-
-
-
         // Out
         public List<Pipe> pipelines = new List<Pipe>();
         public Dictionary<Area, Pipe> areapipemap = new Dictionary<Area, Pipe>();

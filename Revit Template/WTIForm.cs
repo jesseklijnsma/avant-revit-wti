@@ -22,8 +22,6 @@ namespace RevitTemplate
         private System.Drawing.RectangleF bounds;
         private Graphics g;
 
-        private Transform transform;
-
         private Dictionary<Area, List<Line>> areaLineMap = new Dictionary<Area, List<Line>>();
         private Dictionary<Pipe, Line> pipe_lineMap = new Dictionary<Pipe, Line>();
 
@@ -37,38 +35,19 @@ namespace RevitTemplate
         public WTIForm(DripData data)
         {
             InitializeComponent();
-            //if (!data.isValidInput()) throw new ArgumentException();
+            if (!data.isValidInput()) throw new ArgumentException();
             this.data = data;
             this.bounds = Util.calculateBounds(data);
             this.maxBounds = this.bounds;
-            calculateTransform();
-
 
             foreach (Area area in this.data.areas)
             {
                 RectangleF arearect = AreaUtils.getAreaRectangle(area);
-                this.data.areaRectMap.Add(area, arearect);
                 areaLineMap.Add(area, Util.rectangleToLines(arearect));
             }
 
-            //List<ComboBoxItem> pipetypeItems = new List<ComboBoxItem>();
-            //foreach (PipeType pt in this.data.pipetypes) pipetypeItems.Add(new ComboBoxItem(pt.Name, pt));
-            //this.combo_pipetype.DataSource = pipetypeItems;
-            //this.combo_pipetype.DisplayMember = "Name";
-            //this.combo_pipetype.ValueMember = "Value";
-
-            //List<ComboBoxItem> pipingsystemItems = new List<ComboBoxItem>();
-            //foreach (PipingSystemType pst in this.data.systemtypes) pipingsystemItems.Add(new ComboBoxItem(pst.Name, pst));
-            //this.combo_transportsystem.DataSource = pipingsystemItems;
-            //this.combo_transportsystem.DisplayMember = "Name";
-            //this.combo_transportsystem.ValueMember = "Value";
-            //this.combo_distributionsystem.DataSource = pipingsystemItems;
-            //this.combo_distributionsystem.DisplayMember = "Name";
-            //this.combo_distributionsystem.ValueMember = "Value";
-
-
-
             reloadData();
+
 
             dripGenerator = new DripGenerator(this.data);
 
@@ -142,17 +121,6 @@ namespace RevitTemplate
             this.canvas.Invalidate();
         }
 
-        private void calculateTransform()
-        {
-
-
-            transform = Transform.CreateTranslation(new XYZ(-this.bounds.X, -this.bounds.Y, 0));
-            float xScale = this.canvas.Width / this.bounds.Width;
-            float yScale = this.canvas.Height / this.bounds.Height;
-            transform.BasisX *= xScale;
-            transform.BasisY *= yScale;
-        }
-
         private void canvas_paint(object sender, PaintEventArgs e)
         {
             Graphics gr = e.Graphics;
@@ -222,22 +190,21 @@ namespace RevitTemplate
             g.FillEllipse(brush, new RectangleF((float)(p.X - radius), (float)(p.Y - radius), radius * 2, radius * 2));
         }
 
-        
+
 
         private void canvas_mousewheel(object sender, MouseEventArgs e)
         {
             int n = e.Delta / 120;
             float rscale = (float)Math.Pow(2, -0.5 * n);
 
-            float newgeomX = (e.X * this.bounds.Width) / (this.canvas.Width * 1) + this.bounds.X;
-            float newgeomY = ((this.canvas.Height - e.Y) * this.bounds.Height) / (this.canvas.Height * 1) + this.bounds.Y;
+            float dx = e.X * this.bounds.Width * (1 - rscale) / this.canvas.Width;
+            float dy = (this.canvas.Height - e.Y) * this.bounds.Height * (1 - rscale) / (this.canvas.Height);
 
             this.bounds.Width *= rscale;
             this.bounds.Height *= rscale;
 
-            this.bounds.X = newgeomX - (e.X * this.bounds.Width) / this.canvas.Width;
-            this.bounds.Y = newgeomY - ((this.canvas.Height - e.Y) * this.bounds.Height) / this.canvas.Height;
-
+            this.bounds.X += dx;
+            this.bounds.Y += dy;
 
             canvas_checkBounds();
 
@@ -260,7 +227,7 @@ namespace RevitTemplate
 
         private void canvas_mousedown(object sender, MouseEventArgs e)
         {
-            if(e.Button == MouseButtons.Middle)
+            if (e.Button == MouseButtons.Middle)
             {
                 canvas_buttondown = true;
                 canvas_mouse_location = e.Location;
@@ -295,7 +262,6 @@ namespace RevitTemplate
         }
         private void canvas_resize(object sender, EventArgs e)
         {
-            calculateTransform();
             canvas.Invalidate();
         }
 
