@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<RevitAddIns>
+  <AddIn Type="Application">
+    <Name>Avant Water Technical Installation</Name>
+    <Assembly>AvantWTI.dll</Assembly>
+    <AddInId>604b1052-f742-4127-8576-c821d1193102</AddInId>
+    <FullClassName>Avant.WTI.App</FullClassName>
+    <VendorId>Jesse Klijnsma</VendorId>
+    <VendorDescription>https://github.com/jesseklijnsma</VendorDescription>
+  </AddIn>
+</RevitAddIns>

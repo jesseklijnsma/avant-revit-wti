@@ -7,8 +7,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Autodesk.Revit.UI;
 using Autodesk.Revit.UI.Events;
+using Avant.WTI.Util;
 
-namespace RevitTemplate
+namespace Avant.WTI
 {
     /// <summary>
     /// This is the main class which defines the Application, and inherits from Revit's
@@ -30,12 +31,12 @@ namespace RevitTemplate
             // BUTTON FOR THE SINGLE-THREADED WPF OPTION
             if (panel.AddItem(
                 new PushButtonData("WTI", "WTI", thisAssemblyPath,
-                    "RevitTemplate.DripCommand")) is PushButton button)
+                    "Avant.WTI.Drip.DripCommand")) is PushButton button)
             {
                 // defines the tooltip displayed when the button is hovered over in Revit's ribbon
                 button.ToolTip = "Visual interface for debugging applications.";
                 // defines the icon for the button in Revit's ribbon - note the string formatting
-                Uri uriImage = new Uri("pack://application:,,,/RevitTemplate;component/Resources/avant.png");
+                Uri uriImage = new Uri("pack://application:,,,/AvantWTI;component/Resources/avant.png");
                 BitmapImage largeImage = new BitmapImage(uriImage);
                 button.LargeImage = largeImage;
             }
@@ -100,7 +101,7 @@ namespace RevitTemplate
             }
             catch (Exception ex)
             {
-                Util.HandleError(ex);
+                Utils.HandleError(ex);
             }
 
             // Try to create ribbon panel.
@@ -110,7 +111,7 @@ namespace RevitTemplate
             }
             catch (Exception ex)
             {
-                Util.HandleError(ex);
+                Utils.HandleError(ex);
             }
 
             // Search existing tab for your panel.

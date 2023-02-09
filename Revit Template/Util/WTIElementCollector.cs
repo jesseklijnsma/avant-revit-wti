@@ -3,7 +3,7 @@ using Autodesk.Revit.DB.Plumbing;
 using System;
 using System.Collections.Generic;
 
-namespace RevitTemplate
+namespace Avant.WTI.Util
 {
     internal class WTIElementCollector
     {

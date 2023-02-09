@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace RevitTemplate
+namespace Avant.WTI.Drip.Form
 {
     partial class WTIForm
     {
@@ -97,12 +97,12 @@ namespace RevitTemplate
             this.canvas.Name = "canvas";
             this.canvas.Size = new System.Drawing.Size(982, 707);
             this.canvas.TabIndex = 1;
-            this.canvas.Paint += new System.Windows.Forms.PaintEventHandler(this.canvas_paint);
-            this.canvas.MouseDown += new System.Windows.Forms.MouseEventHandler(this.canvas_mousedown);
-            this.canvas.MouseMove += new System.Windows.Forms.MouseEventHandler(this.canvas_mousemove);
-            this.canvas.MouseUp += new System.Windows.Forms.MouseEventHandler(this.canvas_mouseup);
-            this.canvas.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.canvas_mousewheel);
-            this.canvas.Resize += new System.EventHandler(this.canvas_resize);
+            this.canvas.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvas_paint);
+            this.canvas.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousedown);
+            this.canvas.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousemove);
+            this.canvas.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Canvas_mouseup);
+            this.canvas.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousewheel);
+            this.canvas.Resize += new System.EventHandler(this.Canvas_resize);
             // 
             // flowLayoutPanel1
             // 
@@ -145,7 +145,7 @@ namespace RevitTemplate
             this.selectButton.TabIndex = 1;
             this.selectButton.Text = "Select";
             this.selectButton.UseVisualStyleBackColor = true;
-            this.selectButton.Click += new System.EventHandler(this.selectSourceLines);
+            this.selectButton.Click += new System.EventHandler(this.selectButton_Click);
             // 
             // pipetypelabel
             // 
@@ -166,7 +166,7 @@ namespace RevitTemplate
             this.combo_pipetype.Name = "combo_pipetype";
             this.combo_pipetype.Size = new System.Drawing.Size(343, 25);
             this.combo_pipetype.TabIndex = 3;
-            this.combo_pipetype.SelectedIndexChanged += new System.EventHandler(this.combo_pipetype_SelectedIndexChanged);
+            this.combo_pipetype.SelectedIndexChanged += new System.EventHandler(this.Combo_pipetype_SelectedIndexChanged);
             // 
             // transportsystemtypelabel
             // 
@@ -187,7 +187,7 @@ namespace RevitTemplate
             this.combo_transportsystem.Name = "combo_transportsystem";
             this.combo_transportsystem.Size = new System.Drawing.Size(343, 25);
             this.combo_transportsystem.TabIndex = 5;
-            this.combo_transportsystem.SelectedIndexChanged += new System.EventHandler(this.combo_transportsystem_SelectedIndexChanged);
+            this.combo_transportsystem.SelectedIndexChanged += new System.EventHandler(this.Combo_transportsystem_SelectedIndexChanged);
             // 
             // distributionsystemtypelabel
             // 
@@ -208,7 +208,7 @@ namespace RevitTemplate
             this.combo_distributionsystem.Name = "combo_distributionsystem";
             this.combo_distributionsystem.Size = new System.Drawing.Size(343, 25);
             this.combo_distributionsystem.TabIndex = 7;
-            this.combo_distributionsystem.SelectedIndexChanged += new System.EventHandler(this.combo_distributionsystem_SelectedIndexChanged);
+            this.combo_distributionsystem.SelectedIndexChanged += new System.EventHandler(this.Combo_distributionsystem_SelectedIndexChanged);
             // 
             // valvelabel
             // 
@@ -228,7 +228,7 @@ namespace RevitTemplate
             this.combo_valvefamily.Name = "combo_valvefamily";
             this.combo_valvefamily.Size = new System.Drawing.Size(343, 25);
             this.combo_valvefamily.TabIndex = 9;
-            this.combo_valvefamily.SelectedIndexChanged += new System.EventHandler(this.combo_valvefamily_SelectedIndexChanged);
+            this.combo_valvefamily.SelectedIndexChanged += new System.EventHandler(this.Combo_valvefamily_SelectedIndexChanged);
             // 
             // groupBox2
             // 
@@ -290,7 +290,7 @@ namespace RevitTemplate
             this.combo_distributiondiameter.Name = "combo_distributiondiameter";
             this.combo_distributiondiameter.Size = new System.Drawing.Size(158, 25);
             this.combo_distributiondiameter.TabIndex = 17;
-            this.combo_distributiondiameter.SelectedIndexChanged += new System.EventHandler(this.combo_distributiondiameter_SelectedIndexChanged);
+            this.combo_distributiondiameter.SelectedIndexChanged += new System.EventHandler(this.Combo_distributiondiameter_SelectedIndexChanged);
             // 
             // label6
             // 
@@ -347,7 +347,7 @@ namespace RevitTemplate
             0,
             0,
             0});
-            this.num_pipecolumndistance.ValueChanged += new System.EventHandler(this.num_pipecolumndistance_ValueChanged);
+            this.num_pipecolumndistance.ValueChanged += new System.EventHandler(this.Num_pipecolumndistance_ValueChanged);
             // 
             // label3
             // 
@@ -377,7 +377,7 @@ namespace RevitTemplate
             0,
             0,
             0});
-            this.num_valvecolumndistance.ValueChanged += new System.EventHandler(this.num_valvecolumndistance_ValueChanged);
+            this.num_valvecolumndistance.ValueChanged += new System.EventHandler(this.Num_valvecolumndistance_ValueChanged);
             // 
             // label2
             // 
@@ -407,7 +407,7 @@ namespace RevitTemplate
             0,
             0,
             0});
-            this.num_backwalldistance.ValueChanged += new System.EventHandler(this.num_backwalldistance_ValueChanged);
+            this.num_backwalldistance.ValueChanged += new System.EventHandler(this.Num_backwalldistance_ValueChanged);
             // 
             // label1
             // 
@@ -438,7 +438,7 @@ namespace RevitTemplate
             0,
             0,
             0});
-            this.num_interdistance.ValueChanged += new System.EventHandler(this.num_interdistance_ValueChanged);
+            this.num_interdistance.ValueChanged += new System.EventHandler(this.Num_interdistance_ValueChanged);
             // 
             // transporteheightlabel
             // 
@@ -468,7 +468,7 @@ namespace RevitTemplate
             this.num_distributionheight.Name = "num_distributionheight";
             this.num_distributionheight.Size = new System.Drawing.Size(158, 25);
             this.num_distributionheight.TabIndex = 13;
-            this.num_distributionheight.ValueChanged += new System.EventHandler(this.num_distributionheight_ValueChanged);
+            this.num_distributionheight.ValueChanged += new System.EventHandler(this.Num_distributionheight_ValueChanged);
             // 
             // distributionheightlabel
             // 
@@ -503,7 +503,7 @@ namespace RevitTemplate
             0,
             0,
             -2147483648});
-            this.num_transportheight.ValueChanged += new System.EventHandler(this.num_transportheight_ValueChanged);
+            this.num_transportheight.ValueChanged += new System.EventHandler(this.Num_transportheight_ValueChanged);
             // 
             // combo_transportdiameter
             // 
@@ -514,7 +514,7 @@ namespace RevitTemplate
             this.combo_transportdiameter.Name = "combo_transportdiameter";
             this.combo_transportdiameter.Size = new System.Drawing.Size(158, 25);
             this.combo_transportdiameter.TabIndex = 15;
-            this.combo_transportdiameter.SelectedIndexChanged += new System.EventHandler(this.combo_transportdiameter_SelectedIndexChanged);
+            this.combo_transportdiameter.SelectedIndexChanged += new System.EventHandler(this.Combo_transportdiameter_SelectedIndexChanged);
             // 
             // groupBox1
             // 
@@ -537,7 +537,7 @@ namespace RevitTemplate
             this.button1.TabIndex = 4;
             this.button1.Text = "Generate";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // button_convertplaceholders
             // 
@@ -550,7 +550,7 @@ namespace RevitTemplate
             this.button_convertplaceholders.TabIndex = 5;
             this.button_convertplaceholders.Text = "Convert placeholders";
             this.button_convertplaceholders.UseVisualStyleBackColor = true;
-            this.button_convertplaceholders.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.button_convertplaceholders.CheckedChanged += new System.EventHandler(this.CheckBox1_CheckedChanged);
             // 
             // WTIForm
             // 
@@ -569,7 +569,6 @@ namespace RevitTemplate
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.Text = "Avant WTI";
             this.Activated += new System.EventHandler(this.WTIForm_Activated);
-            this.Load += new System.EventHandler(this.WTI_Load);
             this.flowLayoutPanel1.ResumeLayout(false);
             this.flowLayoutPanel1.PerformLayout();
             this.groupBox2.ResumeLayout(false);

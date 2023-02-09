@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-namespace RevitTemplate
+namespace Avant.WTI.Drip
 {
     /// <summary>
     /// This class serves as all input data for the WTI Form. 

@@ -6,7 +6,7 @@ using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace RevitTemplate
+namespace Avant.WTI.Util
 {
     internal class GeomUtils
     {

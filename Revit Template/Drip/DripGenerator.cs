@@ -1,12 +1,13 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
+using Avant.WTI.Util;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace RevitTemplate
+namespace Avant.WTI.Drip
 {
     internal class DripGenerator
     {
@@ -76,7 +77,7 @@ namespace RevitTemplate
             {
                 Pipe pipe = null;
                 if (this.data.areapipemap.ContainsKey(area)) pipe = this.data.areapipemap[area];
-                if (pipe == null) pipe = Util.findClosestPipe(this.data.pipelines, area);
+                if (pipe == null) pipe = Utils.findClosestPipe(this.data.pipelines, area);
                 if (pipe == null) continue;
 
                 GenerateAreaBranch(pipe, area, this.data.columnpoints, preview: true);
@@ -109,7 +110,7 @@ namespace RevitTemplate
                 {
                     Pipe pipe = null;
                     if (this.data.areapipemap.ContainsKey(area)) pipe = this.data.areapipemap[area];
-                    if (pipe == null) pipe = Util.findClosestPipe(this.data.pipelines, area);
+                    if (pipe == null) pipe = Utils.findClosestPipe(this.data.pipelines, area);
                     if (pipe == null) continue;
 
                     sources.Add(pipe);
@@ -144,7 +145,7 @@ namespace RevitTemplate
         private List<Pipe> GenerateAreaBranch(Pipe source, Area area, List<XYZ> columnpoints, bool preview = false)
         {
             RectangleF arearect = AreaUtils.getAreaRectangle(area);
-            XYZ center = Util.rectangleGetCenter(arearect);
+            XYZ center = Utils.rectangleGetCenter(arearect);
             XYZ areavector = new XYZ(arearect.Width, arearect.Height, 0);
 
             Line sourceline = ((LocationCurve)source.Location).Curve as Line;
@@ -157,7 +158,7 @@ namespace RevitTemplate
             List<XYZ> areaColumnPoints = new List<XYZ>();
             foreach (XYZ p in columnpoints)
             {
-                if (Util.rectangleIntersect(arearect, p, 1))
+                if (Utils.rectangleIntersect(arearect, p, 1))
                 {
                     areaColumnPoints.Add(p);
                 }
@@ -173,7 +174,7 @@ namespace RevitTemplate
         private List<Pipe> GenerateBranch(Pipe source, RectangleF areaRect, XYZ rootVector, XYZ perpendicularVector, List<XYZ> columnpoints, bool previewOnly = false)
         {
             Line sourcepipeline = ((LocationCurve)source.Location).Curve as Line;
-            XYZ center = Util.rectangleGetCenter(areaRect);
+            XYZ center = Utils.rectangleGetCenter(areaRect);
 
 
             XYZ valveColumnPoint = FindValvePoint(columnpoints, center, rootVector, perpendicularVector, sourcepipeline);
@@ -370,8 +371,8 @@ namespace RevitTemplate
             this.data.previewGeometry.AddRange(pipe_geometry);
 
             // Set pipe sizes
-            foreach (Pipe p in transport_pipes) Util.setSize(p, this.data.transport_diameter / 304.8);
-            foreach (Pipe p in distribution_pipes) Util.setSize(p, this.data.distribution_diameter / 304.8);
+            foreach (Pipe p in transport_pipes) Utils.setSize(p, this.data.transport_diameter / 304.8);
+            foreach (Pipe p in distribution_pipes) Utils.setSize(p, this.data.distribution_diameter / 304.8);
 
             return pipes;
         }

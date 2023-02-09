@@ -1,16 +1,16 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
+using Avant.WTI.Drip;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Threading;
 
-namespace RevitTemplate
+namespace Avant.WTI.Util
 {
-    public static class Util
+    public static class Utils
     {
         public static void LogThreadInfo(string name = "")
         {

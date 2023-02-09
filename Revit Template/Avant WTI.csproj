@@ -28,8 +28,8 @@
     <ProjectGuid>{80671941-95DE-4707-9C40-758E89CBD063}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>RevitTemplate</RootNamespace>
-    <AssemblyName>RevitTemplate</AssemblyName>
+    <RootNamespace>Avant.WTI</RootNamespace>
+    <AssemblyName>AvantWTI</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -45,7 +45,7 @@
     <StartProgram>C:\Program Files\Autodesk\Revit 2018\Revit.exe</StartProgram>
     <StartArguments>/language ENU</StartArguments>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
-    <DocumentationFile>bin\Debug\RevitTemplate.xml</DocumentationFile>
+    <DocumentationFile>bin\Debug\AvantWTI.xml</DocumentationFile>
     <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -59,7 +59,7 @@
     <StartProgram>C:\Program Files\Autodesk\Revit 2018\Revit.exe</StartProgram>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationManifest>RevitTemplate.addin</ApplicationManifest>
+    <ApplicationManifest>AvantWTI.addin</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.Build" />
@@ -111,18 +111,25 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
-    <Compile Include="AreaUtils.cs" />
-    <Compile Include="DripData.cs" />
-    <Compile Include="DripGenerator.cs" />
-    <Compile Include="WTIElementCollector.cs" />
-    <Compile Include="DripCommand.cs" />
-    <Compile Include="GeomUtils.cs" />
-    <Compile Include="ValveUtils.cs" />
-    <Compile Include="VectorUtils.cs" />
-    <Compile Include="WTIForm.cs">
+    <Compile Include="Drip\Form\WTIFormCanvas.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="WTIForm.Designer.cs">
+    <Compile Include="Drip\Form\WTIFormEvents.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Util\AreaUtils.cs" />
+    <Compile Include="Drip\DripData.cs" />
+    <Compile Include="Drip\DripGenerator.cs" />
+    <Compile Include="Util\FormUtils.cs" />
+    <Compile Include="Util\WTIElementCollector.cs" />
+    <Compile Include="Drip\DripCommand.cs" />
+    <Compile Include="Util\GeomUtils.cs" />
+    <Compile Include="Util\ValveUtils.cs" />
+    <Compile Include="Util\VectorUtils.cs" />
+    <Compile Include="Drip\Form\WTIForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Drip\Form\WTIForm.Designer.cs">
       <DependentUpon>WTIForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -136,16 +143,12 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
-    <Compile Include="Util.cs" />
+    <Compile Include="Util\Utils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Resources\cloud-small.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
     <Resource Include="Resources\avant.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Content Include="Resources\code-small2.png" />
     <Resource Include="Resources\revit-wire.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
@@ -155,45 +158,18 @@
     <Resource Include="Resources\revitIcon.ico">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
-    <Resource Include="Resources\code-small.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\building.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\chart_bar.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\chevron-right.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\code.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\flask.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\stethoscope.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\terminal.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
-    <Resource Include="Resources\vial.png">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Resource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="WTIForm.resx">
+    <EmbeddedResource Include="Drip\Form\WTIForm.resx">
       <DependentUpon>WTIForm.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <None Include="RevitTemplate.addin">
+    <None Include="AvantWTI.addin">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Properties\Settings.settings">
@@ -216,9 +192,10 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>Copy "$(TargetDir)RevitTemplate.dll" "$(AppData)\Autodesk\Revit\Addins\2023"
-Copy "$(TargetDir)RevitTemplate.addin" "$(AppData)\Autodesk\Revit\Addins\2023"</PostBuildEvent>
+    <PostBuildEvent>Copy "$(TargetDir)AvantWTI.dll" "$(AppData)\Autodesk\Revit\Addins\2023"
+Copy "$(TargetDir)AvantWTI.addin" "$(AppData)\Autodesk\Revit\Addins\2023"</PostBuildEvent>
   </PropertyGroup>
 </Project>
