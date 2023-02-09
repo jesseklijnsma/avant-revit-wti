@@ -2,6 +2,7 @@
 using Autodesk.Revit.DB.Plumbing;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Avant.WTI.Util
 {
@@ -55,6 +56,16 @@ namespace Avant.WTI.Util
                 pipetypes.Add(pt);
             }
 
+            pipetypes = pipetypes.OrderBy(pst => {
+                int n = pst.Name.IndexOf("PN", StringComparison.OrdinalIgnoreCase);
+                return n == -1 ? int.MaxValue : n;
+            }).ToList();
+
+            pipetypes = pipetypes.OrderBy(pst => {
+                int n = pst.Name.IndexOf("PVC", StringComparison.OrdinalIgnoreCase);
+                return n == -1 ? int.MaxValue : n;
+            }).ToList();
+
             return pipetypes;
         }
 
@@ -72,6 +83,12 @@ namespace Avant.WTI.Util
                 pipingSystemTypes.Add(pst);
             }
 
+            // Order by the location of "Drip" in the name
+            pipingSystemTypes = pipingSystemTypes.OrderBy(pst => {
+                int n = pst.Name.IndexOf("Drip", StringComparison.OrdinalIgnoreCase);
+                return n == -1 ? int.MaxValue : n;
+            }).ToList();
+
             return pipingSystemTypes;
         }
 
@@ -88,6 +105,12 @@ namespace Avant.WTI.Util
                 FamilySymbol f = (FamilySymbol)e;
                 families.Add(f);
             }
+
+            // Order by the location of "VS" in the name
+            families = families.OrderBy(pst => {
+                int n = pst.Name.IndexOf("VS", StringComparison.OrdinalIgnoreCase);
+                return n == -1 ? int.MaxValue : n;
+            }).ToList();
 
             return families;
         }

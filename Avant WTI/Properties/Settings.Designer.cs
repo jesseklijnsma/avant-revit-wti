@@ -23,6 +23,162 @@ namespace Avant.WTI.Properties {
             }
         }
         
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Drip irrigation system")]
+        public string PreviousTransportSystem {
+            get {
+                return ((string)(this["PreviousTransportSystem"]));
+            }
+            set {
+                this["PreviousTransportSystem"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Drip irrigation system")]
+        public string PreviousDistributionSystem {
+            get {
+                return ((string)(this["PreviousDistributionSystem"]));
+            }
+            set {
+                this["PreviousDistributionSystem"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("VS90S20A")]
+        public string PreviousValveFamily {
+            get {
+                return ((string)(this["PreviousValveFamily"]));
+            }
+            set {
+                this["PreviousValveFamily"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("PVC - PN10")]
+        public string PreviousPipeType {
+            get {
+                return ((string)(this["PreviousPipeType"]));
+            }
+            set {
+                this["PreviousPipeType"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public double PreviousIntermediateDistance {
+            get {
+                return ((double)(this["PreviousIntermediateDistance"]));
+            }
+            set {
+                this["PreviousIntermediateDistance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1000")]
+        public double PreviousBackwallDistance {
+            get {
+                return ((double)(this["PreviousBackwallDistance"]));
+            }
+            set {
+                this["PreviousBackwallDistance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public double PreviousValveColumnDistance {
+            get {
+                return ((double)(this["PreviousValveColumnDistance"]));
+            }
+            set {
+                this["PreviousValveColumnDistance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public double PreviousPipeColumnDistance {
+            get {
+                return ((double)(this["PreviousPipeColumnDistance"]));
+            }
+            set {
+                this["PreviousPipeColumnDistance"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("-400")]
+        public double PreviousTransportHeight {
+            get {
+                return ((double)(this["PreviousTransportHeight"]));
+            }
+            set {
+                this["PreviousTransportHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public double PreviousTransportDiameter {
+            get {
+                return ((double)(this["PreviousTransportDiameter"]));
+            }
+            set {
+                this["PreviousTransportDiameter"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double PreviousDistributionHeight {
+            get {
+                return ((double)(this["PreviousDistributionHeight"]));
+            }
+            set {
+                this["PreviousDistributionHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
+        public double PreviousDistributionDiameter {
+            get {
+                return ((double)(this["PreviousDistributionDiameter"]));
+            }
+            set {
+                this["PreviousDistributionDiameter"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool PreviousDoConvertPlaceholders {
+            get {
+                return ((bool)(this["PreviousDoConvertPlaceholders"]));
+            }
+            set {
+                this["PreviousDoConvertPlaceholders"] = value;
+            }
+        }
+        
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.SpecialSettingAttribute(global::System.Configuration.SpecialSetting.ConnectionString)]

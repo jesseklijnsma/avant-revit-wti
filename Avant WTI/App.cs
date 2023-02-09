@@ -18,11 +18,11 @@ namespace Avant.WTI
     class App : IExternalApplication
     {
         // class instance
-        public static App ThisApp;
+        public static App AvantWTIApp;
 
         public Result OnStartup(UIControlledApplication a)
         {
-            ThisApp = this; // static access to this application instance
+            AvantWTIApp = this; // static access to this application instance
 
             // Method to add Tab and Panel 
             RibbonPanel panel = RibbonPanel(a);
@@ -40,18 +40,6 @@ namespace Avant.WTI
                 BitmapImage largeImage = new BitmapImage(uriImage);
                 button.LargeImage = largeImage;
             }
-
-            // BUTTON FOR THE MULTI-THREADED WPF OPTION
-            //if (panel.AddItem(
-            //    new PushButtonData("WPF Template\nMulti-Thread", "WPF Template\nMulti-Thread", thisAssemblyPath,
-            //        "RevitTemplate.EntryCommandSeparateThread")) is PushButton button2)
-            //{
-            //    button2.ToolTip = "Visual interface for debugging applications.";
-            //    Uri uriImage = new Uri("pack://application:,,,/RevitTemplate;component/Resources/avant.png");
-            //    BitmapImage largeImage = new BitmapImage(uriImage);
-            //    button2.LargeImage = largeImage;
-            //}
-
 
             // listeners/watchers for external events (if you choose to use them)
             a.ApplicationClosing += a_ApplicationClosing; //Set Application to Idling

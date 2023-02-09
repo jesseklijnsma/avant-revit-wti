@@ -27,14 +27,6 @@ namespace Avant.WTI.Drip
         private UIDocument uidoc;
         private HashSet<Document> allDocuments;
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="commandData"></param>
-        /// <param name="message"></param>
-        /// <param name="elements"></param>
-        /// <returns></returns>
         public virtual Result Execute(ExternalCommandData commandData, ref string message, ElementSet elements)
         {
             try
@@ -44,6 +36,7 @@ namespace Avant.WTI.Drip
                 uidoc = commandData.Application.ActiveUIDocument;
                 allDocuments = Utils.getAllDocuments(doc);
 
+                // Initialize data model
                 DripData data = new DripData(doc, uidoc);
 
                 WTIElementCollector collector = new WTIElementCollector(doc, allDocuments);
@@ -58,22 +51,21 @@ namespace Avant.WTI.Drip
 
                 data.pipesizeMap = data.pipetypes.ToDictionary(x => x, x => collector.getPipeSizes(x));
 
-
+                // Show the input form
                 Application.Run(new WTIForm(data));
                 return Result.Succeeded;
             }
             catch (Exception ex)
             {
-                message = ex.Message;
-                throw;
-                //return Result.Failed;
+                string caption = ex.Message + "\n" + ex.StackTrace;
+
+                MessageBox.Show("An exception has occured", caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+
+                return Result.Failed;
             }
         }
 
-
-
-
-
-
     }
+
 }

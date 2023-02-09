@@ -11,43 +11,58 @@ using System.Windows.Forms;
 namespace Avant.WTI.Drip.Form
 {
     /// <summary>
-    /// 
+    ///  GUI for the Drip Irrigation generator
     /// </summary>
     public partial class WTIForm : System.Windows.Forms.Form
     {
 
-        private readonly DripData data;
-        private System.Drawing.RectangleF maxBounds;
-        private System.Drawing.RectangleF bounds;
+        private const float CANVAS_ZOOM_SPEED = -0.5f;
+        private const float MAX_ZOOM_SIZE_MM = 10.0f;
+        private const MouseButtons PAN_BUTTON = MouseButtons.Middle;
+
+
         private Graphics g;
 
+        private readonly DripData data;
+        private readonly DripGenerator dripGenerator;
+
+        private System.Drawing.RectangleF maxBounds;
+        private System.Drawing.RectangleF bounds;
         private readonly Dictionary<Area, List<Line>> areaLineMap = new Dictionary<Area, List<Line>>();
         private readonly Dictionary<Pipe, Line> pipe_lineMap = new Dictionary<Pipe, Line>();
 
-
-        private readonly DripGenerator dripGenerator;
-
-
-        /// <summary>
-        /// 
-        /// </summary>
         public WTIForm(DripData data)
         {
             InitializeComponent();
             if (!data.isValidInput()) throw new ArgumentException();
             this.data = data;
+
+            // Calculate bounds of the revit model based on grid lines
             this.bounds = Utils.calculateBounds(data);
             this.maxBounds = this.bounds;
 
+            // Convert areas into geometry for displaying
             foreach (Area area in this.data.areas)
             {
                 RectangleF arearect = AreaUtils.getAreaRectangle(area);
                 areaLineMap.Add(area, Utils.rectangleToLines(arearect));
             }
 
+            // Initialize the drip generator
+            dripGenerator = new DripGenerator(this.data);
+
+            isLoading = true;
+
+            this.data.LoadPrevious();
+
+            // Load all input data into the form
             ReloadData();
 
-            dripGenerator = new DripGenerator(this.data);
+            isLoading = false;
+
+            //isLoading = false;
+            // Load all settings from previous run
+            //LoadPrevious();
 
             // Enable double buffering for the canvas
             this.canvas.GetType().GetProperty(
@@ -57,18 +72,70 @@ namespace Avant.WTI.Drip.Form
 
         }
 
+        private void LoadPrevious()
+        {
+            PipeType pt = this.data.pipetypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
+            if (pt != null) this.combo_pipetype.SelectedValue = pt;
+
+            PipingSystemType transportpst = this.data.systemtypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
+            if (transportpst != null) this.combo_transportsystem.SelectedValue = transportpst;
+
+            PipingSystemType distributionpst = this.data.systemtypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
+            if (distributionpst != null) this.combo_distributionsystem.SelectedValue = distributionpst;
+
+            FamilySymbol valvefamily = this.data.valvefamilies.First(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
+            if (distributionpst != null) this.combo_transportsystem.SelectedValue = distributionpst;
+
+            num_interdistance.Value = (decimal)Properties.Settings.Default.PreviousIntermediateDistance;
+            num_backwalldistance.Value = (decimal)Properties.Settings.Default.PreviousBackwallDistance;
+
+            num_valvecolumndistance.Value = (decimal)Properties.Settings.Default.PreviousValveColumnDistance;
+            num_pipecolumndistance.Value = (decimal)Properties.Settings.Default.PreviousPipeColumnDistance;
+
+            num_transportheight.Value = (decimal)Properties.Settings.Default.PreviousTransportHeight;
+            num_distributionheight.Value = (decimal)Properties.Settings.Default.PreviousDistributionHeight;
+
+            button_convertplaceholders.Checked = Properties.Settings.Default.PreviousDoConvertPlaceholders;
+
+            // Load sizes for the selected pipe type
+            UpdateSizes();
+
+            combo_transportdiameter.SelectedValue = Properties.Settings.Default.PreviousTransportDiameter;
+            combo_distributiondiameter.SelectedValue = Properties.Settings.Default.PreviousDistributionDiameter;
+
+
+        }
+
+        /// <summary>
+        /// Reloads all data from the data model into the form control
+        /// </summary>
         private void ReloadData()
         {
+            // Bind pipetypes and their display values
             Dictionary<PipeType, string> pipetypes = this.data.pipetypes.ToDictionary(x => x, x => x.Name);
             Util.FormUtils.Combobox_bindItems(this.combo_pipetype, pipetypes);
+            if (this.data.pipetype != null) this.combo_pipetype.SelectedValue = this.data.pipetype;
+            else this.data.pipetype = (PipeType)this.combo_pipetype.SelectedValue;
+
+            // Bind system types and their display values
             Dictionary<PipingSystemType, string> systemtypes = this.data.systemtypes.ToDictionary(x => x, x => x.Name);
             Util.FormUtils.Combobox_bindItems(this.combo_transportsystem, systemtypes);
-            Util.FormUtils.Combobox_bindItems(this.combo_distributionsystem, systemtypes);
+            if (this.data.transportSystemType != null) this.combo_transportsystem.SelectedValue = this.data.transportSystemType;
+            else this.data.transportSystemType = (PipingSystemType)this.combo_transportsystem.SelectedValue;
 
+            Util.FormUtils.Combobox_bindItems(this.combo_distributionsystem, systemtypes);
+            if (this.data.distributionSystemType != null) this.combo_distributionsystem.SelectedValue = this.data.distributionSystemType;
+            else this.data.distributionSystemType = (PipingSystemType)this.combo_distributionsystem.SelectedValue;
+
+
+
+            // Bind valve family symbols and their display values
             Dictionary<FamilySymbol, string> valvefamilies = this.data.valvefamilies.ToDictionary(x => x, x => x.Name);
             Util.FormUtils.Combobox_bindItems(this.combo_valvefamily, valvefamilies);
+            if (this.data.valvefamily != null) this.combo_valvefamily.SelectedValue = this.data.valvefamily;
+            else this.data.valvefamily = (FamilySymbol)this.combo_valvefamily.SelectedValue;
 
-
+            // Load all primitive values
             num_interdistance.Value = this.data.intermediateDistance;
             num_backwalldistance.Value = this.data.backwallDistance;
 
@@ -80,85 +147,68 @@ namespace Avant.WTI.Drip.Form
 
             button_convertplaceholders.Checked = this.data.convertPlaceholders;
 
-            UpdateSizes();
+            // Load sizes for the selected pipe type
+            List<double> sizes = UpdateSizes();
+            if (sizes.Contains(this.data.transport_diameter)) combo_transportdiameter.SelectedValue = this.data.transport_diameter;
+            else
+            {
+                if (sizes.Count == 0) this.combo_transportdiameter.SelectedIndex = -1;
+                else this.combo_transportdiameter.SelectedIndex = 0;
+                this.data.transport_diameter = (double)this.combo_transportdiameter.SelectedValue;
+            }
+
+            if (sizes.Contains(this.data.distribution_diameter)) combo_distributiondiameter.SelectedValue = this.data.distribution_diameter;
+            else
+            {
+                if (sizes.Count == 0) this.combo_distributiondiameter.SelectedIndex = -1;
+                else this.combo_distributiondiameter.SelectedIndex = 0;
+                this.data.distribution_diameter = (double)this.combo_distributiondiameter.SelectedValue;
+            }
         }
 
+        /// <summary>
+        /// Generates and renders new preview lines
+        /// </summary>
         public void ReloadPreview()
         {
             dripGenerator.GeneratePreviewGeometry();
+            // rerender
             this.canvas.Invalidate();
         }
 
-        private void Canvas_paint(object sender, PaintEventArgs e)
+        
+        /// <summary>
+        /// Loads the available pipe sizes of the selected pipetype into the size comboboxes
+        /// </summary>
+        private List<double> UpdateSizes()
         {
-            Graphics gr = e.Graphics;
-            System.Drawing.Rectangle rect = this.canvas.ClientRectangle;
-            BufferedGraphicsContext bgm = BufferedGraphicsManager.Current;
-            BufferedGraphics bg = bgm.Allocate(gr, rect);
-            g = bg.Graphics;
-            g.SetClip(new RectangleF(new PointF(), this.canvas.Size));
-
-            g.Clear(System.Drawing.Color.FromArgb(54, 54, 54));
-
-            foreach (Line line in this.data.lines)
-            {
-                DrawLine(line, System.Drawing.Color.Black, false);
-            }
-
-
-            foreach (List<Line> linelist in areaLineMap.Values)
-            {
-                foreach (Line l in linelist)
-                {
-                    DrawLine(l, System.Drawing.Color.Green, true);
-                }
-            }
-
-            foreach (Line line in pipe_lineMap.Values)
-            {
-                DrawLine(line, System.Drawing.Color.Yellow, false);
-            }
-
-            if (this.data.previewGeometry != null)
-            {
-                foreach (Line l in this.data.previewGeometry)
-                {
-                    DrawLine(l, System.Drawing.Color.Aqua, false);
-                }
-            }
-
-            foreach (XYZ p in this.data.previewPoints)
-            {
-                DrawPoint(p, System.Drawing.Color.White, 3);
-            }
-
-            bg.Render();
-            bg.Dispose();
-        }
-
-        private void UpdateSizes()
-        {
+            // Remove old sizes
             this.combo_transportdiameter.DataSource = null;
             this.combo_distributiondiameter.DataSource = null;
 
-            if (this.data.pipetype == null) return;
-            if (!this.data.pipesizeMap.ContainsKey(this.data.pipetype)) return;
+            // Get pipe sizes
+            if (this.data.pipetype == null) return new List<double>();
+            if (!this.data.pipesizeMap.ContainsKey(this.data.pipetype)) return new List<double>();
             List<double> sizes = this.data.pipesizeMap[this.data.pipetype];
 
+            // Binds the sizes and their display value to the comboboxes
             Dictionary<double, string> sizeItems = sizes.ToDictionary(x => x, x => x.ToString() + " mm");
             Util.FormUtils.Combobox_bindItems(this.combo_transportdiameter, sizeItems);
             Util.FormUtils.Combobox_bindItems(this.combo_distributiondiameter, sizeItems);
 
+            return sizes;
         }
 
+        /// <summary>
+        /// Lets user select pipe placeholders in the Revit model
+        /// </summary>
         private void SelectSourceLines()
         {
-
             List<Pipe> pipelines = new List<Pipe>();
 
             PipePlaceholderSelectionFilter selfilter = new PipePlaceholderSelectionFilter();
-            pipe_lineMap.Clear();
 
+            pipe_lineMap.Clear();
             try
             {
                 IList<Reference> refs = this.data.uidoc.Selection.PickObjects(ObjectType.Element, selfilter);
@@ -166,23 +216,34 @@ namespace Avant.WTI.Drip.Form
                 {
                     Pipe p = (Pipe)this.data.doc.GetElement(r.ElementId);
                     pipelines.Add(p);
+
+                    // Try to add the line of the pipe to the list of lines
+                    // Check if the pipe is a curve and not a point (for whatever reason)
                     if (p.Location.GetType() == typeof(LocationCurve))
                     {
                         LocationCurve lc = (LocationCurve)p.Location;
+                        // Check if the curve is a line
                         if (lc.Curve.GetType() == typeof(Line))
                         {
                             pipe_lineMap[p] = (Line)lc.Curve;
                         }
                     }
                 }
+                
+                // Set the pipes
                 this.data.pipelines = pipelines;
             }
-            catch (Exception) { }
-
+            catch (OperationCanceledException) { }
+            
             ReloadPreview();
+
+            // Make sure the form is back in focus
             this.Activate();
         }
 
+        /// <summary>
+        /// Filter that returns only pipe placeholders
+        /// </summary>
         private class PipePlaceholderSelectionFilter : ISelectionFilter
         {
             public bool AllowElement(Element elem)

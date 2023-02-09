@@ -75,15 +75,11 @@ namespace Avant.WTI.Drip
         public bool convertPlaceholders = true;
 
 
-        // Misc.
-        public List<Line> previewGeometry = new List<Line>();
-        public List<XYZ> previewPoints = new List<XYZ>();
-        public List<Line> debugLines = new List<Line>();
+        // Misc
+        public readonly List<Line> previewGeometry = new List<Line>();
+        public readonly List<XYZ> previewPoints = new List<XYZ>();
+        public readonly List<Line> debugLines = new List<Line>();
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>A boolean indicating whether all output data is valid</returns>
         public bool isValidOutput()
         {
             if (pipetype == null) return false;
@@ -93,11 +89,35 @@ namespace Avant.WTI.Drip
             return true;
         }
 
-
         public DripData(Document document, UIDocument uidoc)
         {
             this.doc = document;
             this.uidoc = uidoc;
+        }
+
+
+        public void LoadPrevious()
+        {
+            this.pipetype =  this.pipetypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
+            this.transportSystemType = this.systemtypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
+            this.distributionSystemType = this.systemtypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
+
+            this.valvefamily = this.valvefamilies.First(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
+
+
+            this.intermediateDistance = (int)Properties.Settings.Default.PreviousIntermediateDistance;
+            this.backwallDistance = (int)Properties.Settings.Default.PreviousBackwallDistance;
+
+            this.valvecolumnDistance = (int) Properties.Settings.Default.PreviousValveColumnDistance;
+            this.pipecolumnDistance = (int)Properties.Settings.Default.PreviousPipeColumnDistance;
+
+            this.transportlineheight = (int)Properties.Settings.Default.PreviousTransportHeight;
+            this.distributionlineheight = (int)Properties.Settings.Default.PreviousDistributionHeight;
+
+            this.convertPlaceholders = Properties.Settings.Default.PreviousDoConvertPlaceholders;
+
+            this.transport_diameter = Properties.Settings.Default.PreviousTransportDiameter;
+            this.distribution_diameter = Properties.Settings.Default.PreviousDistributionDiameter;
         }
 
     }

@@ -64,7 +64,7 @@ namespace Avant.WTI.Drip.Form
             this.num_transportheight = new System.Windows.Forms.NumericUpDown();
             this.combo_transportdiameter = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
-            this.button1 = new System.Windows.Forms.Button();
+            this.generateButton = new System.Windows.Forms.Button();
             this.button_convertplaceholders = new System.Windows.Forms.CheckBox();
             this.flowLayoutPanel1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -145,7 +145,7 @@ namespace Avant.WTI.Drip.Form
             this.selectButton.TabIndex = 1;
             this.selectButton.Text = "Select";
             this.selectButton.UseVisualStyleBackColor = true;
-            this.selectButton.Click += new System.EventHandler(this.selectButton_Click);
+            this.selectButton.Click += new System.EventHandler(this.SelectButton_Click);
             // 
             // pipetypelabel
             // 
@@ -166,7 +166,7 @@ namespace Avant.WTI.Drip.Form
             this.combo_pipetype.Name = "combo_pipetype";
             this.combo_pipetype.Size = new System.Drawing.Size(343, 25);
             this.combo_pipetype.TabIndex = 3;
-            this.combo_pipetype.SelectedIndexChanged += new System.EventHandler(this.Combo_pipetype_SelectedIndexChanged);
+            this.combo_pipetype.SelectedValueChanged += new System.EventHandler(this.Combo_pipetype_SelectedValueChanged);
             // 
             // transportsystemtypelabel
             // 
@@ -187,7 +187,7 @@ namespace Avant.WTI.Drip.Form
             this.combo_transportsystem.Name = "combo_transportsystem";
             this.combo_transportsystem.Size = new System.Drawing.Size(343, 25);
             this.combo_transportsystem.TabIndex = 5;
-            this.combo_transportsystem.SelectedIndexChanged += new System.EventHandler(this.Combo_transportsystem_SelectedIndexChanged);
+            this.combo_transportsystem.SelectedValueChanged += new System.EventHandler(this.Combo_transportsystem_SelectedValueChanged);
             // 
             // distributionsystemtypelabel
             // 
@@ -208,7 +208,7 @@ namespace Avant.WTI.Drip.Form
             this.combo_distributionsystem.Name = "combo_distributionsystem";
             this.combo_distributionsystem.Size = new System.Drawing.Size(343, 25);
             this.combo_distributionsystem.TabIndex = 7;
-            this.combo_distributionsystem.SelectedIndexChanged += new System.EventHandler(this.Combo_distributionsystem_SelectedIndexChanged);
+            this.combo_distributionsystem.SelectedValueChanged += new System.EventHandler(this.Combo_distributionsystem_SelectedValueChanged);
             // 
             // valvelabel
             // 
@@ -228,7 +228,7 @@ namespace Avant.WTI.Drip.Form
             this.combo_valvefamily.Name = "combo_valvefamily";
             this.combo_valvefamily.Size = new System.Drawing.Size(343, 25);
             this.combo_valvefamily.TabIndex = 9;
-            this.combo_valvefamily.SelectedIndexChanged += new System.EventHandler(this.Combo_valvefamily_SelectedIndexChanged);
+            this.combo_valvefamily.SelectedValueChanged += new System.EventHandler(this.Combo_valvefamily_SelectedValueChanged);
             // 
             // groupBox2
             // 
@@ -290,7 +290,7 @@ namespace Avant.WTI.Drip.Form
             this.combo_distributiondiameter.Name = "combo_distributiondiameter";
             this.combo_distributiondiameter.Size = new System.Drawing.Size(158, 25);
             this.combo_distributiondiameter.TabIndex = 17;
-            this.combo_distributiondiameter.SelectedIndexChanged += new System.EventHandler(this.Combo_distributiondiameter_SelectedIndexChanged);
+            this.combo_distributiondiameter.SelectedValueChanged += new System.EventHandler(this.Combo_distributiondiameter_SelectedValueChanged);
             // 
             // label6
             // 
@@ -514,7 +514,7 @@ namespace Avant.WTI.Drip.Form
             this.combo_transportdiameter.Name = "combo_transportdiameter";
             this.combo_transportdiameter.Size = new System.Drawing.Size(158, 25);
             this.combo_transportdiameter.TabIndex = 15;
-            this.combo_transportdiameter.SelectedIndexChanged += new System.EventHandler(this.Combo_transportdiameter_SelectedIndexChanged);
+            this.combo_transportdiameter.SelectedValueChanged += new System.EventHandler(this.Combo_transportdiameter_SelectedValueChanged);
             // 
             // groupBox1
             // 
@@ -528,16 +528,16 @@ namespace Avant.WTI.Drip.Form
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "WTI Settings";
             // 
-            // button1
+            // generateButton
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(1199, 702);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(158, 58);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Generate";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.Button1_Click);
+            this.generateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.generateButton.Location = new System.Drawing.Point(1199, 702);
+            this.generateButton.Name = "generateButton";
+            this.generateButton.Size = new System.Drawing.Size(158, 58);
+            this.generateButton.TabIndex = 4;
+            this.generateButton.Text = "Generate";
+            this.generateButton.UseVisualStyleBackColor = true;
+            this.generateButton.Click += new System.EventHandler(this.GenerateButton_Click);
             // 
             // button_convertplaceholders
             // 
@@ -558,7 +558,7 @@ namespace Avant.WTI.Drip.Form
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1369, 772);
             this.Controls.Add(this.button_convertplaceholders);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.generateButton);
             this.Controls.Add(this.groupBox1);
             this.Controls.Add(this.titleLabel);
             this.Controls.Add(this.canvas);
@@ -621,7 +621,7 @@ namespace Avant.WTI.Drip.Form
         private NumericUpDown num_interdistance;
         private Label label4;
         private NumericUpDown num_pipecolumndistance;
-        private Button button1;
+        private Button generateButton;
         private Label label5;
         private ComboBox combo_distributiondiameter;
         private Label label6;

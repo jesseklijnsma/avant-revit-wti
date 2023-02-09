@@ -19,6 +19,11 @@ namespace Avant.WTI.Drip
             this.data = data;
         }
 
+        /// <summary>
+        ///  Converts placeholder into pipes
+        /// </summary>
+        /// <param name="placeholders">Placeholders to convert</param>
+        /// <returns></returns>
         private List<ElementId> ConvertPlaceholders(List<Pipe> placeholders)
         {
             List<ElementId> ids = new List<ElementId>();
@@ -39,29 +44,43 @@ namespace Avant.WTI.Drip
             return new List<ElementId>();
         }
 
-
+        /// <summary>
+        /// Finds a point in the area closest to the source pipe and the center of the area
+        /// </summary>
+        /// <param name="columnpoints">All potential points</param>
+        /// <param name="areacenter">Center of the area</param>
+        /// <param name="rootVector">Vector in the direction from the source pipe to the center of the area</param>
+        /// <param name="perpendicularVector">Vector perpendicular to the rootVector</param>
+        /// <param name="sourceline">Source pipe line</param>
+        /// <returns></returns>
         private XYZ FindValvePoint(List<XYZ> columnpoints, XYZ areacenter, XYZ rootVector, XYZ perpendicularVector, Line sourceline)
         {
             if (columnpoints.Count == 0) return XYZ.Zero;
 
+            // Calculate point closest point on the source line to the center
             XYZ sourcepoint = VectorUtils.vector_setZ(GeomUtils.getClosestPoint(sourceline, areacenter), 0);
 
             // Get points in front of source point
             List<XYZ> pointsInFront = new List<XYZ>();
             foreach (XYZ p in columnpoints)
             {
+                // Check if the vector from the source point to the current point
+                // has an angle smaller than 90 degrees to the rootVector
                 if (p.Subtract(sourcepoint).DotProduct(rootVector) > 0.0)
                 {
                     pointsInFront.Add(VectorUtils.vector_setZ(p, 0));
                 }
             }
 
+            // Create line from source to center
             Line centerLine = Line.CreateBound(VectorUtils.vector_setZ(areacenter, 0), sourcepoint);
 
+            // Find the row of points that are together the clostest to the center line
             List<XYZ> centerLineClosePoints = GeomUtils.getClosestPoints(centerLine, pointsInFront, 1);
+            // Find the row of points that are together the clostest to the source line
             List<XYZ> closestPoints = GeomUtils.getClosestPoints(sourceline, centerLineClosePoints, 1);
 
-            // Sort by distance to origin
+            // Sort points by distance to origin
             List<XYZ> sortedClosestPoints = closestPoints.OrderBy(p => VectorUtils.vector_mask(p, perpendicularVector).GetLength()).ToList();
 
             if (sortedClosestPoints.Count == 0) return null;
@@ -75,6 +94,7 @@ namespace Avant.WTI.Drip
             this.data.previewPoints.Clear();
             foreach (Area area in this.data.areas)
             {
+                // Try to get corresponding type to area
                 Pipe pipe = null;
                 if (this.data.areapipemap.ContainsKey(area)) pipe = this.data.areapipemap[area];
                 if (pipe == null) pipe = Utils.findClosestPipe(this.data.pipelines, area);
@@ -86,7 +106,7 @@ namespace Avant.WTI.Drip
 
         public void GenerateDrip()
         {
-
+            // Check if inputs are valid
             if (!this.data.isValidOutput())
             {
                 string message = "The inputs are not valid!";
@@ -95,9 +115,11 @@ namespace Avant.WTI.Drip
                 return;
             }
 
+            // Create transaction
             Transaction t = new Transaction(this.data.doc);
             t.Start("Drip generation");
 
+            // Set Revit model errors to non blocking dialogs
             FailureHandlingOptions fho = t.GetFailureHandlingOptions();
             fho.SetForcedModalHandling(false);
             t.SetFailureHandlingOptions(fho);
@@ -105,14 +127,18 @@ namespace Avant.WTI.Drip
             try
             {
                 List<Pipe> placeholders = new List<Pipe>();
+
+                // List of unique source pipes
                 HashSet<Pipe> sources = new HashSet<Pipe>();
                 foreach (Area area in this.data.areas)
                 {
+                    // Try to get corresponding type to area
                     Pipe pipe = null;
                     if (this.data.areapipemap.ContainsKey(area)) pipe = this.data.areapipemap[area];
                     if (pipe == null) pipe = Utils.findClosestPipe(this.data.pipelines, area);
                     if (pipe == null) continue;
 
+                    // Add source pipe to the sources
                     sources.Add(pipe);
 
                     List<Pipe> pipes = GenerateAreaBranch(pipe, area, this.data.columnpoints, false);
@@ -120,14 +146,16 @@ namespace Avant.WTI.Drip
                     placeholders.AddRange(pipes);
                 }
 
+                // Add the unique source pipes to all placeholders
                 placeholders.AddRange(sources);
 
 
                 if (this.data.convertPlaceholders)
                 {
-                    List<ElementId> newpipes = ConvertPlaceholders(placeholders);
+                    ConvertPlaceholders(placeholders);
                 }
 
+                // We managed to make it to the end without any exceptions
                 t.Commit();
             }
             catch (Exception e)
@@ -138,7 +166,10 @@ namespace Avant.WTI.Drip
                 MessageBoxButtons buttons = MessageBoxButtons.OK;
                 MessageBox.Show(message, caption, buttons, MessageBoxIcon.Warning);
                 t.RollBack();
+
+#if DEBUG
                 throw;
+#endif
             }
         }
 

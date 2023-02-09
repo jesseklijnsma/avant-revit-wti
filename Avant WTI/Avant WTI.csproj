@@ -117,6 +117,7 @@
     <Compile Include="Drip\Form\WTIFormEvents.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Settings.cs" />
     <Compile Include="Util\AreaUtils.cs" />
     <Compile Include="Drip\DripData.cs" />
     <Compile Include="Drip\DripGenerator.cs" />
@@ -169,6 +170,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="AvantWTI.addin">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
