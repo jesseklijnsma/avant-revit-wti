@@ -1,12 +1,6 @@
 # Water Technical Installation Generator for Revit
-Made by Jesse Klijnsma for [Avant Projects](https://avantprojects.nl)
+<sup>Made by Jesse Klijnsma for [Avant Projects](https://avantprojects.nl)</sup>
 
-
-
-
-## Images
-
-![Window](assets/window1.png)
 
 ## Usage
 
@@ -16,6 +10,10 @@ Made by Jesse Klijnsma for [Avant Projects](https://avantprojects.nl)
  - Copy the contents of the zip file to '**%appdata%\\Autodesk\\Revit\\Addins**\\*year*\\'
  - (Re)Start Revit
  - Enable Add-in in popup
+
+### Images
+
+![Window](assets/window1.png)
 
 ## Development
 To make changes to the code, open the Solution in Visual Studio
