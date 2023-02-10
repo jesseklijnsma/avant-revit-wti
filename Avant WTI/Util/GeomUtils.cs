@@ -55,5 +55,15 @@ namespace Avant.WTI.Util
             return result;
         }
 
+        /// <summary>
+        ///  Gets the center of a boundingbox
+        /// </summary>
+        /// <param name="bb">Boundingbox</param>
+        /// <returns>Center point</returns>
+        public static XYZ boundingBoxGetCenter(BoundingBoxXYZ bb)
+        {
+            return (bb.Max + bb.Min) / 2;
+        }
+
     }
 }

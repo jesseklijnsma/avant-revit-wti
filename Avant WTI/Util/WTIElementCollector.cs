@@ -226,17 +226,19 @@ namespace Avant.WTI.Util
                     .OfCategory(BuiltInCategory.OST_StructuralColumns)
                     .WhereElementIsNotElementType()
                     .ToElements() as List<Element>;
-                foreach (Element e in columns)
+
+                // Group element by the Z coordinate of the center of their boundingbox
+                var groupedByZ = from c in columns group c by GeomUtils.boundingBoxGetCenter(c.get_BoundingBox(null)).Z into g select new { height = g.Key, columns = g.ToList()};
+                if (groupedByZ.Count() == 0) continue;
+
+                // Get group of elements with the most elements and with the lowest height
+                List<Element> mostOccurringHeight = groupedByZ.OrderBy(a => a.height).OrderByDescending(a => a.columns.Count).First().columns;                    
+                foreach (Element e in mostOccurringHeight)
                 {
-                    //TODO dont use foundation depth
-                    Parameter param = e.LookupParameter("Base Level");
-                    if (param == null) continue;
-                    if (param.AsValueString() == "Foundation Depth") continue;
                     if (e.Location.GetType() != typeof(LocationPoint)) continue;
 
                     LocationPoint lp = (LocationPoint)e.Location;
-                    points.Add(lp.Point);
-
+                    points.Add(VectorUtils.Vector_setZ(lp.Point, 0));
                 }
             }
 
