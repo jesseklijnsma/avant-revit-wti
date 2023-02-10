@@ -6,6 +6,10 @@ using System.Linq;
 
 namespace Avant.WTI.Util
 {
+
+    /// <summary>
+    /// Functions as an interface for the revit model
+    /// </summary>
     internal class WTIElementCollector
     {
 
@@ -20,7 +24,12 @@ namespace Avant.WTI.Util
             this.doc = mainDocument;
         }
 
-        public List<Area> getAreas()
+
+        /// <summary>
+        /// Gets all areas in all documents
+        /// </summary>
+        /// <returns>All Areas</returns>
+        public List<Area> GetAreas()
         {
             List<Area> areas = new List<Area>();
 
@@ -32,17 +41,19 @@ namespace Avant.WTI.Util
                 .ToElements() as List<Element>;
                 foreach (Element e in elements)
                 {
-                    if (e.GetType() == typeof(Area))
-                    {
-                        areas.Add((Area)e);
-                    }
+                    areas.Add((Area)e);
                 }
             }
 
             return areas;
         }
 
-        public List<PipeType> getPipeTypes()
+
+        /// <summary>
+        /// Gets all available pipe types in the current document
+        /// </summary>
+        /// <returns>All pipetypes</returns>
+        public List<PipeType> GetPipeTypes()
         {
             List<PipeType> pipetypes = new List<PipeType>();
 
@@ -56,6 +67,7 @@ namespace Avant.WTI.Util
                 pipetypes.Add(pt);
             }
 
+            // Sort the pipe types by likelyhood of being used
             pipetypes = pipetypes.OrderBy(pst => {
                 int n = pst.Name.IndexOf("PN", StringComparison.OrdinalIgnoreCase);
                 return n == -1 ? int.MaxValue : n;
@@ -69,7 +81,11 @@ namespace Avant.WTI.Util
             return pipetypes;
         }
 
-        public List<PipingSystemType> getPipingSystemTypes()
+        /// <summary>
+        /// Get all piping system types in the current document
+        /// </summary>
+        /// <returns>All piping system types</returns>
+        public List<PipingSystemType> GetPipingSystemTypes()
         {
             List<PipingSystemType> pipingSystemTypes = new List<PipingSystemType>();
 
@@ -92,7 +108,11 @@ namespace Avant.WTI.Util
             return pipingSystemTypes;
         }
 
-        public List<FamilySymbol> getValveFamilies()
+        /// <summary>
+        /// Get all pipe accessory families in the current document
+        /// </summary>
+        /// <returns>List of pipe accessory families</returns>
+        public List<FamilySymbol> GetValveFamilies()
         {
             List<FamilySymbol> families = new List<FamilySymbol>();
 
@@ -115,7 +135,12 @@ namespace Avant.WTI.Util
             return families;
         }
 
-        public List<Line> getGridLines()
+
+        /// <summary>
+        /// Get all grid lines in all documents
+        /// </summary>
+        /// <returns>List of lines</returns>
+        public List<Line> GetGridLines()
         {
             List<Line> gridlines = new List<Line>();
 
@@ -127,13 +152,10 @@ namespace Avant.WTI.Util
                 .ToElements() as List<Element>;
                 foreach (Element e in grids)
                 {
-                    if (e.GetType() == typeof(Grid))
+                    Grid g = (Grid)e;
+                    if (g.Curve.GetType() == typeof(Line))
                     {
-                        Grid g = (Grid)e;
-                        if (g.Curve.GetType() == typeof(Line))
-                        {
-                            gridlines.Add((Line)g.Curve);
-                        }
+                        gridlines.Add((Line)g.Curve);
                     }
                 }
             }
@@ -141,31 +163,37 @@ namespace Avant.WTI.Util
             return gridlines;
         }
 
-        public Level getGroundLevel()
-        {
-            if (doc == null) return null;
 
+        /// <summary>
+        /// Gets the level at elevation 0
+        /// </summary>
+        /// <returns>Ground level</returns>
+        public Level GetGroundLevel()
+        {
             List<Element> levels = (new FilteredElementCollector(doc))
             .OfCategory(BuiltInCategory.OST_Levels)
             .WhereElementIsNotElementType()
             .ToElements() as List<Element>;
             foreach (Element e in levels)
             {
-                if (e.GetType() == typeof(Level))
+                Level l = (Level)e;
+                if (l.Elevation == 0)
                 {
-                    Level l = (Level)e;
-                    if (l.Elevation == 0)
-                    {
-                        return l;
-                    }
+                    return l;
                 }
             }
             return null;
         }
 
-
-        public List<double> getPipeSizes(PipeType pipeType)
+        /// <summary>
+        /// Gets all sizes corresponding to a pipe type
+        /// </summary>
+        /// <param name="pipeType">Pipe Type</param>
+        /// <returns></returns>
+        public List<double> GetPipeSizes(PipeType pipeType)
         {
+            if (pipeType == null) throw new ArgumentNullException("pipeType");
+
             List<double> sizes = new List<double>();
 
             RoutingPreferenceManager man = pipeType.RoutingPreferenceManager;
@@ -185,10 +213,14 @@ namespace Avant.WTI.Util
             return sizes;
         }
 
-        public List<XYZ> getColumnPoints()
+        /// <summary>
+        /// Gets all points of columns
+        /// </summary>
+        /// <returns>List of points</returns>
+        public List<XYZ> GetColumnPoints()
         {
             List<XYZ> points = new List<XYZ>();
-            foreach (Autodesk.Revit.DB.Document d in allDocuments)
+            foreach (Document d in allDocuments)
             {
                 List<Element> columns = (new FilteredElementCollector(d))
                     .OfCategory(BuiltInCategory.OST_StructuralColumns)
@@ -201,6 +233,7 @@ namespace Avant.WTI.Util
                     if (param == null) continue;
                     if (param.AsValueString() == "Foundation Depth") continue;
                     if (e.Location.GetType() != typeof(LocationPoint)) continue;
+
                     LocationPoint lp = (LocationPoint)e.Location;
                     points.Add(lp.Point);
 

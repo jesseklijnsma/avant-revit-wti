@@ -75,7 +75,7 @@ namespace Avant.WTI.Drip.Form
         private void DrawLine(Line line, System.Drawing.Color c, bool dashed = false)
         {
             // Convert model coordinate space to canvas coordinates
-            Line screenLine = Utils.lineToScreenLine(line, this.bounds, this.canvas.Size);
+            Line screenLine = Utils.LineToScreenLine(line, this.bounds, this.canvas.Size);
             if (screenLine == null) return;
 
             XYZ p1 = screenLine.GetEndPoint(0);
@@ -94,7 +94,7 @@ namespace Avant.WTI.Drip.Form
         private void DrawPoint(XYZ point, System.Drawing.Color c, float radius)
         {
             // Convert model coordinate space to canvas coordinates
-            XYZ p = Utils.pointToScreenPoint(point, bounds, this.canvas.Size);
+            XYZ p = Utils.PointToScreenPoint(point, bounds, this.canvas.Size);
             SolidBrush brush = new SolidBrush(c);
             g.FillEllipse(brush, new RectangleF((float)(p.X - radius), (float)(p.Y - radius), radius * 2, radius * 2));
         }

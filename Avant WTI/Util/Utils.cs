@@ -12,11 +12,6 @@ namespace Avant.WTI.Util
 {
     public static class Utils
     {
-        public static void LogThreadInfo(string name = "")
-        {
-            Thread th = Thread.CurrentThread;
-            Debug.WriteLine($"Task Thread ID: {th.ManagedThreadId}, Thread Name: {th.Name}, Process Name: {name}");
-        }
 
         public static void HandleError(Exception ex)
         {
@@ -25,24 +20,14 @@ namespace Avant.WTI.Util
             Debug.WriteLine(ex.StackTrace);
         }
 
-        public static Line transformLine(Line line, Transform transform)
-        {
-            return Line.CreateBound(transformPoint(line.GetEndPoint(0), transform), transformPoint(line.GetEndPoint(1), transform));
-        }
-
-        public static XYZ transformPoint(XYZ p, Transform transform)
-        {
-            XYZ p2 = p.Add(transform.Origin);
-            return new XYZ(p2.X * transform.BasisX.X, p2.Y * transform.BasisY.Y, p2.Z * transform.BasisZ.Z);
-        }
-
-        //public static XYZ pointToScreenPoint(XYZ p, Transform transform, System.Drawing.Size size)
-        //{
-        //    XYZ p2 = p.Add(transform.Origin);
-        //    return new XYZ(p2.X * transform.BasisX.X, size.Height - p2.Y * transform.BasisY.Y, 0);
-        //}
-
-        public static XYZ pointToScreenPoint(XYZ p, RectangleF domain, System.Drawing.Size targetSize)
+        /// <summary>
+        /// Transforms a point in Revit model space to canvas space
+        /// </summary>
+        /// <param name="p">Point to transform</param>
+        /// <param name="domain">Full model space bounds to map to canvas coordinates</param>
+        /// <param name="targetSize">Canvas size</param>
+        /// <returns>Transformed point</returns>
+        public static XYZ PointToScreenPoint(XYZ p, RectangleF domain, System.Drawing.Size targetSize)
         {
             double x = targetSize.Width * ((p.X - domain.X) / domain.Width);
             double y = targetSize.Height - targetSize.Height * ((p.Y - domain.Y) / domain.Height);
@@ -50,17 +35,30 @@ namespace Avant.WTI.Util
             return new XYZ(x, y, 0);
         }
 
-        public static Line lineToScreenLine(Line line, RectangleF domain, System.Drawing.Size size)
+        /// <summary>
+        /// Transform a line in Revit model space to canvas space
+        /// </summary>
+        /// <param name="line">Line to transform</param>
+        /// <param name="domain">Full model space bounds to map to canvas coordinates</param>
+        /// <param name="size">Canvas size</param>
+        /// <returns>Transformed Line</returns>
+        public static Line LineToScreenLine(Line line, RectangleF domain, System.Drawing.Size size)
         {
-            XYZ p1 = pointToScreenPoint(line.GetEndPoint(0), domain, size);
-            XYZ p2 = pointToScreenPoint(line.GetEndPoint(1), domain, size);
+            XYZ p1 = PointToScreenPoint(line.GetEndPoint(0), domain, size);
+            XYZ p2 = PointToScreenPoint(line.GetEndPoint(1), domain, size);
 
+            // Can't create a line if the points are not far enough apart
             if (p1.IsAlmostEqualTo(p2)) return null;
 
             return Line.CreateBound(p1, p2);
         }
 
-        public static List<Line> rectangleToLines(RectangleF r)
+        /// <summary>
+        /// Converts RectangleF to Revit lines
+        /// </summary>
+        /// <param name="r">Rectangle</param>
+        /// <returns></returns>
+        public static List<Line> RectangleToLines(RectangleF r)
         {
             List<Line> lines = new List<Line>();
             lines.Add(Line.CreateBound(new XYZ(r.Left, r.Top, 0), new XYZ(r.Right, r.Top, 0)));
@@ -70,22 +68,34 @@ namespace Avant.WTI.Util
             return lines;
         }
 
-        public static bool rectangleIntersect(RectangleF rect, XYZ p, int margin)
+        /// <summary>
+        ///  Checks if a point is inside of a rectangle
+        /// </summary>
+        /// <param name="rect">Rectangle</param>
+        /// <param name="p">Point</param>
+        /// <param name="tolerance">Tolerance</param>
+        /// <returns>True if point is inside of a rectangle</returns>
+        public static bool RectangleIntersect(RectangleF rect, XYZ p, float tolerance)
         {
-            if (p.X < rect.Left - margin) return false;
-            if (p.X > rect.Right + margin) return false;
-            if (p.Y > rect.Bottom + margin) return false;
-            if (p.Y < rect.Top - margin) return false;
+            if (p.X < rect.Left - tolerance) return false;
+            if (p.X > rect.Right + tolerance) return false;
+            if (p.Y > rect.Bottom + tolerance) return false;
+            if (p.Y < rect.Top - tolerance) return false;
             return true;
         }
 
-        public static XYZ rectangleGetCenter(RectangleF r)
+        /// <summary>
+        /// Calculates the center of a rectangle
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public static XYZ RectangleGetCenter(RectangleF r)
         {
             return new XYZ((r.Left + r.Right) / 2.0, (r.Top + r.Bottom) / 2.0, 0);
         }
 
 
-        public static void setSize(Pipe p, double size)
+        public static void SetSize(Pipe p, double size)
         {
             if (p.GetType() != typeof(Element)) return;
             Parameter param = p.LookupParameter("Diameter");
@@ -93,7 +103,12 @@ namespace Avant.WTI.Util
             param.Set(size);
         }
 
-        public static HashSet<Document> getAllDocuments(Document doc)
+        /// <summary>
+        /// Gets all (linked) documents in the document
+        /// </summary>
+        /// <param name="doc">Current Document</param>
+        /// <returns></returns>
+        public static HashSet<Document> GetAllDocuments(Document doc)
         {
             HashSet<Document> alldocs = new HashSet<Document>();
             alldocs.Add(doc);
@@ -103,23 +118,26 @@ namespace Avant.WTI.Util
                 .ToElements() as List<Element>;
             foreach (Element el in links)
             {
-                if (el.GetType() == typeof(RevitLinkInstance))
-                {
-                    RevitLinkInstance rl = (RevitLinkInstance)el;
-                    alldocs.Add(rl.GetLinkDocument());
-                }
+                RevitLinkInstance rl = (RevitLinkInstance)el;
+                alldocs.Add(rl.GetLinkDocument());
             }
             return alldocs;
         }
 
-        public static Pipe findClosestPipe(List<Pipe> pipes, Area a)
+        /// <summary>
+        /// Picks the closest pipe to an area
+        /// </summary>
+        /// <param name="pipes"></param>
+        /// <param name="a"></param>
+        /// <returns>Closest pipe to an area</returns>
+        public static Pipe FindClosestPipe(List<Pipe> pipes, Area a)
         {
             if (pipes.Count == 0) return null;
 
-            RectangleF arearect = AreaUtils.getAreaRectangle(a);
-            XYZ center = rectangleGetCenter(arearect);
+            RectangleF arearect = AreaUtils.GetAreaRectangle(a);
+            XYZ center = RectangleGetCenter(arearect);
 
-
+            // Orders the pipes by distance to the center of the area and gets the first one.
             Pipe closest = pipes.OrderBy(p =>
             {
                 Line l = (Line)((LocationCurve)p.Location).Curve;
@@ -129,8 +147,14 @@ namespace Avant.WTI.Util
             return closest;
         }
 
-        public static System.Drawing.RectangleF calculateBounds(DripData data)
+        /// <summary>
+        /// Calculates the bounds of all grid lines
+        /// </summary>
+        /// <param name="data">DripData</param>
+        /// <returns>Bounding Rectangle</returns>
+        public static System.Drawing.RectangleF CalculateBounds(DripData data)
         {
+            // Convert lines to their end points
             List<XYZ> points = new List<XYZ>();
             foreach (Line l in data.lines)
             {
@@ -138,12 +162,14 @@ namespace Avant.WTI.Util
                 points.Add(l.GetEndPoint(1));
             }
 
+            // Check if we even have points, otherwise return default rectangle
             if (points.Count == 0) return new System.Drawing.RectangleF(0, 0, 1, 1);
 
             float left = (float)points.Min(p => p.X);
             float right = (float)points.Max(p => p.X);
             float top = (float)points.Min(p => p.Y);
             float bottom = (float)points.Max(p => p.Y);
+
             return new System.Drawing.RectangleF(left, top, right - left, bottom - top);
         }
 

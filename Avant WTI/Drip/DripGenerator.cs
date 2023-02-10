@@ -58,7 +58,7 @@ namespace Avant.WTI.Drip
             if (columnpoints.Count == 0) return XYZ.Zero;
 
             // Calculate point closest point on the source line to the center
-            XYZ sourcepoint = VectorUtils.vector_setZ(GeomUtils.getClosestPoint(sourceline, areacenter), 0);
+            XYZ sourcepoint = VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(sourceline, areacenter), 0);
 
             // Get points in front of source point
             List<XYZ> pointsInFront = new List<XYZ>();
@@ -68,20 +68,20 @@ namespace Avant.WTI.Drip
                 // has an angle smaller than 90 degrees to the rootVector
                 if (p.Subtract(sourcepoint).DotProduct(rootVector) > 0.0)
                 {
-                    pointsInFront.Add(VectorUtils.vector_setZ(p, 0));
+                    pointsInFront.Add(VectorUtils.Vector_setZ(p, 0));
                 }
             }
 
             // Create line from source to center
-            Line centerLine = Line.CreateBound(VectorUtils.vector_setZ(areacenter, 0), sourcepoint);
+            Line centerLine = Line.CreateBound(VectorUtils.Vector_setZ(areacenter, 0), sourcepoint);
 
             // Find the row of points that are together the clostest to the center line
-            List<XYZ> centerLineClosePoints = GeomUtils.getClosestPoints(centerLine, pointsInFront, 1);
+            List<XYZ> centerLineClosePoints = GeomUtils.GetClosestPoints(centerLine, pointsInFront, 1);
             // Find the row of points that are together the clostest to the source line
-            List<XYZ> closestPoints = GeomUtils.getClosestPoints(sourceline, centerLineClosePoints, 1);
+            List<XYZ> closestPoints = GeomUtils.GetClosestPoints(sourceline, centerLineClosePoints, 1);
 
             // Sort points by distance to origin
-            List<XYZ> sortedClosestPoints = closestPoints.OrderBy(p => VectorUtils.vector_mask(p, perpendicularVector).GetLength()).ToList();
+            List<XYZ> sortedClosestPoints = closestPoints.OrderBy(p => VectorUtils.Vector_mask(p, perpendicularVector).GetLength()).ToList();
 
             if (sortedClosestPoints.Count == 0) return null;
             return sortedClosestPoints[0];
@@ -97,10 +97,10 @@ namespace Avant.WTI.Drip
                 // Try to get corresponding type to area
                 Pipe pipe = null;
                 if (this.data.areapipemap.ContainsKey(area)) pipe = this.data.areapipemap[area];
-                if (pipe == null) pipe = Utils.findClosestPipe(this.data.pipelines, area);
+                if (pipe == null) pipe = Utils.FindClosestPipe(this.data.pipelines, area);
                 if (pipe == null) continue;
 
-                GenerateAreaBranch(pipe, area, this.data.columnpoints, preview: true);
+                GenerateAreaBranch(pipe, area, this.data.columnpoints, previewOnly: true);
             }
         }
 
@@ -135,7 +135,7 @@ namespace Avant.WTI.Drip
                     // Try to get corresponding type to area
                     Pipe pipe = null;
                     if (this.data.areapipemap.ContainsKey(area)) pipe = this.data.areapipemap[area];
-                    if (pipe == null) pipe = Utils.findClosestPipe(this.data.pipelines, area);
+                    if (pipe == null) pipe = Utils.FindClosestPipe(this.data.pipelines, area);
                     if (pipe == null) continue;
 
                     // Add source pipe to the sources
@@ -173,41 +173,53 @@ namespace Avant.WTI.Drip
             }
         }
 
-        private List<Pipe> GenerateAreaBranch(Pipe source, Area area, List<XYZ> columnpoints, bool preview = false)
+        /// <summary>
+        ///     Generates a drip irrigation branch on a specific area
+        /// </summary>
+        /// <param name="source">Source pipe</param>
+        /// <param name="area">Area</param>
+        /// <param name="columnpoints">All points to consider</param>
+        /// <param name="previewOnly">Whether the generated geometry should be placed into the model</param>
+        /// <returns>List of pipe placeholders</returns>
+        private List<Pipe> GenerateAreaBranch(Pipe source, Area area, List<XYZ> columnpoints, bool previewOnly = false)
         {
-            RectangleF arearect = AreaUtils.getAreaRectangle(area);
-            XYZ center = Utils.rectangleGetCenter(arearect);
+            RectangleF arearect = AreaUtils.GetAreaRectangle(area);
+            XYZ center = Utils.RectangleGetCenter(arearect);
             XYZ areavector = new XYZ(arearect.Width, arearect.Height, 0);
 
+            // Get line of source pipe
             Line sourceline = ((LocationCurve)source.Location).Curve as Line;
-            XYZ connectionPoint = GeomUtils.getClosestPoint(sourceline, center);
+            // Get closest point on source pipe line to area center
+            XYZ connectionPoint = GeomUtils.GetClosestPoint(sourceline, center);
 
+            // Gets the vector from the source point to the center
             XYZ branchinwardvector = center.Subtract(connectionPoint).Normalize();
-            branchinwardvector = VectorUtils.vector_round(branchinwardvector);
+            // Round the vector to create an axis unitvector
+            branchinwardvector = VectorUtils.Vector_round(branchinwardvector);
 
-
+            // Get all points inside of the area
             List<XYZ> areaColumnPoints = new List<XYZ>();
             foreach (XYZ p in columnpoints)
             {
-                if (Utils.rectangleIntersect(arearect, p, 1))
+                if (Utils.RectangleIntersect(arearect, p, tolerance: 1))
                 {
                     areaColumnPoints.Add(p);
                 }
             }
 
+            // Get full size area vector
+            XYZ rootVector = VectorUtils.Vector_mask(branchinwardvector, areavector);
+            XYZ perpendicularVector = VectorUtils.Vector_mask(branchinwardvector.CrossProduct(XYZ.BasisZ), areavector);
 
-            XYZ rootVector = VectorUtils.vector_mask(branchinwardvector, areavector);
-            XYZ perpendicularVector = VectorUtils.vector_mask(branchinwardvector.CrossProduct(XYZ.BasisZ), areavector);
-
-            return GenerateBranch(source, arearect, rootVector, perpendicularVector, areaColumnPoints, preview);
+            return GenerateBranch(source, arearect, rootVector, perpendicularVector, areaColumnPoints, previewOnly: previewOnly);
         }
 
         private List<Pipe> GenerateBranch(Pipe source, RectangleF areaRect, XYZ rootVector, XYZ perpendicularVector, List<XYZ> columnpoints, bool previewOnly = false)
         {
             Line sourcepipeline = ((LocationCurve)source.Location).Curve as Line;
-            XYZ center = Utils.rectangleGetCenter(areaRect);
+            XYZ center = Utils.RectangleGetCenter(areaRect);
 
-
+            // Find column to attach valve to
             XYZ valveColumnPoint = FindValvePoint(columnpoints, center, rootVector, perpendicularVector, sourcepipeline);
             if (valveColumnPoint == null)
             {
@@ -216,12 +228,13 @@ namespace Avant.WTI.Drip
             }
 
 
+            // Calculate the point to actually place the valve using an offset
             XYZ valvePoint = valveColumnPoint.Add(rootVector.Normalize().Multiply(this.data.valvecolumnDistance / 304.8));
-            valvePoint = VectorUtils.vector_setZ(valvePoint, this.data.valveheight);
+            valvePoint = VectorUtils.Vector_setZ(valvePoint, this.data.valveheight);
 
             this.data.previewPoints.Add(valvePoint);
 
-            Line centerline = Line.CreateBound(center, VectorUtils.vector_setZ(GeomUtils.getClosestPoint(sourcepipeline, center), 0));
+            Line centerline = Line.CreateBound(center, VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(sourcepipeline, center), 0));
 
             Connector valve_in_c = null;
             Connector valve_out_c = null;
@@ -233,10 +246,10 @@ namespace Avant.WTI.Drip
             {
                 // Place valve and find corresponding in and out points
                 FamilyInstance valve = this.data.doc.Create.NewFamilyInstance(valvePoint, this.data.valvefamily, this.data.groundLevel, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
-                XYZ valvedir = ValveUtils.getValveDirection(valve);
+                XYZ valvedir = ValveUtils.GetValveDirection(valve);
                 Line up = Line.CreateUnbound(valvePoint, XYZ.BasisZ);
-                valve.Location.Rotate(up, valvedir.AngleOnPlaneTo(rootVector, XYZ.BasisZ));
-                (valve_in_c, valve_out_c) = ValveUtils.getValveConnectorPair(valve);
+                valve.Location.Rotate(axis: up, valvedir.AngleOnPlaneTo(rootVector, XYZ.BasisZ));
+                (valve_in_c, valve_out_c) = ValveUtils.GetValveConnectorPair(valve);
                 valve_in_p = valve_in_c?.Origin;
                 valve_out_p = valve_out_c?.Origin;
             }
@@ -245,7 +258,7 @@ namespace Avant.WTI.Drip
 
             if (!previewOnly && !valveConnect)
             {
-
+                // TODO Add error message
             }
 
             if (previewOnly || !valveConnect)
@@ -267,11 +280,12 @@ namespace Avant.WTI.Drip
             // ROUTE SOURCE TO VALVE
             // sourcepoint -> p1 -> valve_transport_corner_p -> p2 -> valve_in_p
 
-            XYZ p2 = VectorUtils.vector_setZ(valve_in_p, this.data.transportlineheight / 304.8);
+            XYZ p2 = VectorUtils.Vector_setZ(valve_in_p, this.data.transportlineheight / 304.8);
             XYZ valve_transport_corner_p = p2.Add(perpendicularVector.Normalize().Multiply(this.data.pipecolumnDistance / 304.8));
 
-            XYZ sourcepoint = GeomUtils.getClosestPoint(sourcepipeline, valve_transport_corner_p);
-            XYZ p1 = VectorUtils.vector_setZ(sourcepoint, this.data.transportlineheight / 304.8);
+            // Calculate ACTUAL source point
+            XYZ sourcepoint = GeomUtils.GetClosestPoint(sourcepipeline, valve_transport_corner_p);
+            XYZ p1 = VectorUtils.Vector_setZ(sourcepoint, this.data.transportlineheight / 304.8);
 
 
 
@@ -282,20 +296,20 @@ namespace Avant.WTI.Drip
             //  valve_out_p -> p3 -> valve_transport_corner_out_p -> p5 -> tee
             bool offcenter = false;
 
-            XYZ p3 = VectorUtils.vector_setZ(valve_out_p, this.data.transportlineheight / 304.8);
-            XYZ valve_transport_corner_out_p = VectorUtils.vector_setZ(GeomUtils.getClosestPoint(centerline, p3), this.data.transportlineheight / 304.8);
-            if (centerline.Distance(VectorUtils.vector_setZ(p3, 0)) <= this.data.pipecolumnDistance / 304.8)
+            XYZ p3 = VectorUtils.Vector_setZ(valve_out_p, this.data.transportlineheight / 304.8);
+            XYZ valve_transport_corner_out_p = VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(centerline, p3), this.data.transportlineheight / 304.8);
+            if (centerline.Distance(VectorUtils.Vector_setZ(p3, 0)) <= this.data.pipecolumnDistance / 304.8)
             {
                 valve_transport_corner_out_p = p3.Add(perpendicularVector.Normalize().Multiply(this.data.pipecolumnDistance / 304.8));
                 offcenter = true;
             }
 
             XYZ teeOffsetFromBackWall = rootVector.Normalize().Multiply(-this.data.backwallDistance / 304.8);
-            XYZ tee = VectorUtils.vector_setZ(center.Add(rootVector.Multiply(0.5).Add(teeOffsetFromBackWall)), this.data.distributionlineheight / 304.8);
-            XYZ p5 = VectorUtils.vector_setZ(tee, this.data.transportlineheight / 304.8);
+            XYZ tee = VectorUtils.Vector_setZ(center.Add(rootVector.Multiply(0.5).Add(teeOffsetFromBackWall)), this.data.distributionlineheight / 304.8);
+            XYZ p5 = VectorUtils.Vector_setZ(tee, this.data.transportlineheight / 304.8);
 
             // Create extra elbow point in case its offcenter
-            XYZ p4 = GeomUtils.getClosestPoint(Line.CreateUnbound(valve_transport_corner_out_p, rootVector), p5);
+            XYZ p4 = GeomUtils.GetClosestPoint(Line.CreateUnbound(valve_transport_corner_out_p, rootVector), p5);
 
             // CALCULATE TEE LINE
             XYZ sidePadding = perpendicularVector.Normalize().Multiply(-0.5 * this.data.intermediateDistance / 304.8);
@@ -318,13 +332,13 @@ namespace Avant.WTI.Drip
                 Pipe l4 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, p2, valve_in_p);
                 PlumbingUtils.ConnectPipePlaceholdersAtElbow(this.data.doc, l3.Id, l4.Id);
 
-                ValveUtils.connectPipe(l4, valve_in_c);
+                ValveUtils.ConnectPipe(l4, valve_in_c);
 
                 // Route from valve to tee
                 Pipe l5 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, valve_out_p, p3);
                 Pipe l6 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, p3, valve_transport_corner_out_p);
                 PlumbingUtils.ConnectPipePlaceholdersAtElbow(this.data.doc, l5.Id, l6.Id);
-                ValveUtils.connectPipe(l5, valve_out_c);
+                ValveUtils.ConnectPipe(l5, valve_out_c);
 
                 Pipe l8;
 
@@ -402,8 +416,8 @@ namespace Avant.WTI.Drip
             this.data.previewGeometry.AddRange(pipe_geometry);
 
             // Set pipe sizes
-            foreach (Pipe p in transport_pipes) Utils.setSize(p, this.data.transport_diameter / 304.8);
-            foreach (Pipe p in distribution_pipes) Utils.setSize(p, this.data.distribution_diameter / 304.8);
+            foreach (Pipe p in transport_pipes) Utils.SetSize(p, this.data.transport_diameter / 304.8);
+            foreach (Pipe p in distribution_pipes) Utils.SetSize(p, this.data.distribution_diameter / 304.8);
 
             return pipes;
         }

@@ -34,22 +34,22 @@ namespace Avant.WTI.Drip
 
                 doc = commandData.Application.ActiveUIDocument.Document;
                 uidoc = commandData.Application.ActiveUIDocument;
-                allDocuments = Utils.getAllDocuments(doc);
+                allDocuments = Utils.GetAllDocuments(doc);
 
                 // Initialize data model
                 DripData data = new DripData(doc, uidoc);
 
                 WTIElementCollector collector = new WTIElementCollector(doc, allDocuments);
 
-                data.columnpoints = collector.getColumnPoints();
-                data.lines = collector.getGridLines();
-                data.areas = collector.getAreas();
-                data.groundLevel = collector.getGroundLevel();
-                data.pipetypes = collector.getPipeTypes();
-                data.systemtypes = collector.getPipingSystemTypes();
-                data.valvefamilies = collector.getValveFamilies();
+                data.columnpoints = collector.GetColumnPoints();
+                data.lines = collector.GetGridLines();
+                data.areas = collector.GetAreas();
+                data.groundLevel = collector.GetGroundLevel();
+                data.pipetypes = collector.GetPipeTypes();
+                data.systemtypes = collector.GetPipingSystemTypes();
+                data.valvefamilies = collector.GetValveFamilies();
 
-                data.pipesizeMap = data.pipetypes.ToDictionary(x => x, x => collector.getPipeSizes(x));
+                data.pipesizeMap = data.pipetypes.ToDictionary(x => x, x => collector.GetPipeSizes(x));
 
                 // Show the input form
                 Application.Run(new WTIForm(data));

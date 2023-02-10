@@ -11,9 +11,18 @@ namespace Avant.WTI.Util
 {
     internal class AreaUtils
     {
-        public static CurveLoop getAreaCurveloop(Area area)
+
+        /// <summary>
+        /// Gets a curveloop of a simple area
+        /// </summary>
+        /// <param name="area">Area</param>
+        /// <returns>Curveloop or null</returns>
+        public static CurveLoop GetAreaCurveloop(Area area)
         {
+            // Get boundaries
             IList<IList<BoundarySegment>> bounds = area.GetBoundarySegments(new SpatialElementBoundaryOptions());
+
+            // Convert boundaries to curves
             List<Curve> curves = new List<Curve>();
             foreach(IList<BoundarySegment> boundlist in bounds)
             {
@@ -22,10 +31,10 @@ namespace Avant.WTI.Util
                     curves.Add(b.GetCurve());
                 }
             }
+            // Convert curves to curveloop
             try
             {
                 return CurveLoop.Create(curves);
-
             }
             catch
             {
@@ -34,10 +43,14 @@ namespace Avant.WTI.Util
             }
         }
 
-
-        public static System.Drawing.RectangleF getAreaRectangle(Area area)
+        /// <summary>
+        /// Get a rectangle from the area
+        /// </summary>
+        /// <param name="area">Area</param>
+        /// <returns>Rectangle representing the area or default rectangle</returns>
+        public static System.Drawing.RectangleF GetAreaRectangle(Area area)
         {
-            CurveLoop cl = getAreaCurveloop(area);
+            CurveLoop cl = GetAreaCurveloop(area);
             if (cl == null) return new System.Drawing.RectangleF(0,0,1,1);
             
             Plane areaPlane = cl.GetPlane();
@@ -47,7 +60,10 @@ namespace Avant.WTI.Util
             double w = cl.GetRectangularWidth(areaPlane);
             double h = cl.GetRectangularHeight(areaPlane);
 
+            // Convert width and height in the areaPlane space to world space and represent as a vector
             XYZ areavector = areaPlane.XVec.Multiply(w).Add(areaPlane.YVec.Multiply(h));
+
+            // Calculate all bounding points of the area
             float x1 = (float)center.Add(areavector.Multiply(-0.5)).X;
             float x2 = (float)center.Add(areavector.Multiply(0.5)).X;
             float y1 = (float)center.Add(areavector.Multiply(0.5)).Y;

@@ -38,14 +38,14 @@ namespace Avant.WTI.Drip.Form
             this.data = data;
 
             // Calculate bounds of the revit model based on grid lines
-            this.bounds = Utils.calculateBounds(data);
+            this.bounds = Utils.CalculateBounds(data);
             this.maxBounds = this.bounds;
 
             // Convert areas into geometry for displaying
             foreach (Area area in this.data.areas)
             {
-                RectangleF arearect = AreaUtils.getAreaRectangle(area);
-                areaLineMap.Add(area, Utils.rectangleToLines(arearect));
+                RectangleF arearect = AreaUtils.GetAreaRectangle(area);
+                areaLineMap.Add(area, Utils.RectangleToLines(arearect));
             }
 
             // Initialize the drip generator

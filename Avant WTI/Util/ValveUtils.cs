@@ -12,26 +12,34 @@ namespace Avant.WTI.Util
     internal class ValveUtils
     {
 
-        public static List<Connector> getConnectors(Element e)
+
+        /// <summary>
+        ///  Gets all connectors of and element
+        /// </summary>
+        /// <param name="e">Element</param>
+        /// <returns>All connectors or empty list</returns>
+        public static List<Connector> GetConnectors(Element e)
         {
             if (e == null) return new List<Connector>();
+            
+            // Try to get connectormanager
             ConnectorManager connectorManager = null;
             if(e.GetType() == typeof(FamilyInstance))
             {
                 FamilyInstance f = (FamilyInstance)e;
                 MEPModel mep = f.MEPModel;
-                if(mep != null)
-                {
-                    connectorManager = mep.ConnectorManager;
-                }
+                connectorManager = mep?.ConnectorManager;
             }
             if(e.GetType() == typeof(MEPCurve))
             {
                 MEPCurve curve = (MEPCurve)e;
                 connectorManager = curve.ConnectorManager;
             }
+
+            // Return empty list if element has no connectors/connectormanager
             if (connectorManager == null) return new List<Connector>();
 
+            // Get connectors out of the connectormanager
             List<Connector> connectors = new List<Connector>();
             foreach(Connector c in connectorManager.Connectors)
             {
@@ -40,10 +48,18 @@ namespace Avant.WTI.Util
             return connectors;
         }
 
-        public static (Connector c_in, Connector c_out) getValveConnectorPair(FamilyInstance valve)
+        /// <summary>
+        /// Get In and Out connector of a familyinstance
+        /// </summary>
+        /// <param name="valve">Valve (any FamilyInstance)</param>
+        /// <returns>In and Out connector tuple</returns>
+        public static (Connector c_in, Connector c_out) GetValveConnectorPair(FamilyInstance valve)
         {
-            List<Connector> connectors = getConnectors(valve);
+            List<Connector> connectors = GetConnectors(valve);
+            // Check if there are enough connectors
             if (connectors.Count < 2) return (null,null);
+
+            // Try to find In and Out connectors
             Connector c_in = null;
             Connector c_out = null;
             foreach(Connector c in connectors)
@@ -51,23 +67,38 @@ namespace Avant.WTI.Util
                 if (c.Direction == FlowDirectionType.In) c_in = c;
                 else if (c.Direction == FlowDirectionType.Out) c_out = c;
             }
+
             return (c_in, c_out);
         }
 
-        public static XYZ getValveDirection(FamilyInstance valve)
+        /// <summary>
+        ///  Gets the vector from the In connector to the Out connector
+        /// </summary>
+        /// <param name="valve">Valve (any FamilyInstance)</param>
+        /// <returns>Vector from in to out connector</returns>
+        public static XYZ GetValveDirection(FamilyInstance valve)
         {
-            (Connector c_in, Connector c_out) = getValveConnectorPair(valve);
+            (Connector c_in, Connector c_out) = GetValveConnectorPair(valve);
+            // Check if the connectors are both valid
             if (c_in == null || c_out == null) return XYZ.Zero;
             XYZ dir = c_out.Origin.Subtract(c_in.Origin);
             return dir;
         }
 
-        internal static bool connectPipe(Pipe p, Connector connector)
+        /// <summary>
+        ///  Connects a (placeholder) pipe to a connector
+        /// </summary>
+        /// <param name="p">Pipe</param>
+        /// <param name="connector">Connector</param>
+        /// <returns>True if succesful</returns>
+        internal static bool ConnectPipe(Pipe p, Connector connector)
         {
-            List<Connector> connectors = getConnectors(p);
+            // Get all connectors of the pipe
+            List<Connector> connectors = GetConnectors(p);
             foreach(Connector c in connectors)
             {
                 if (c.IsConnected) continue;
+                // Check if connectors are in the same location
                 if (c.Origin.IsAlmostEqualTo(connector.Origin))
                 {
                     try
