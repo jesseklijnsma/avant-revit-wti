@@ -6,7 +6,7 @@
 
 ### Installation
 
- - Download the latest [release](/jesseklijnsma/avant-revit-wti/releases/latest)
+ - Download the latest [release](https://github.com/jesseklijnsma/avant-revit-wti/releases/latest)
  - Copy the contents of the zip file to '**%appdata%\\Autodesk\\Revit\\Addins**\\*year*\\'
  - (Re)Start Revit
  - Enable Add-in in popup
