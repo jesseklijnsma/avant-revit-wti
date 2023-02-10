@@ -239,7 +239,7 @@ namespace Avant.WTI.Drip.Form
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 3, 5, 3);
             this.groupBox2.Size = new System.Drawing.Size(343, 296);
-            this.groupBox2.TabIndex = 14;
+            this.groupBox2.TabIndex = 10;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Dimensions";
             // 
@@ -289,7 +289,7 @@ namespace Avant.WTI.Drip.Form
             this.combo_distributiondiameter.Location = new System.Drawing.Point(168, 220);
             this.combo_distributiondiameter.Name = "combo_distributiondiameter";
             this.combo_distributiondiameter.Size = new System.Drawing.Size(158, 25);
-            this.combo_distributiondiameter.TabIndex = 17;
+            this.combo_distributiondiameter.TabIndex = 15;
             this.combo_distributiondiameter.SelectedValueChanged += new System.EventHandler(this.Combo_distributiondiameter_SelectedValueChanged);
             // 
             // label6
@@ -497,7 +497,7 @@ namespace Avant.WTI.Drip.Form
             -2147483648});
             this.num_transportheight.Name = "num_transportheight";
             this.num_transportheight.Size = new System.Drawing.Size(158, 25);
-            this.num_transportheight.TabIndex = 11;
+            this.num_transportheight.TabIndex = 9;
             this.num_transportheight.Value = new decimal(new int[] {
             400,
             0,
@@ -513,7 +513,7 @@ namespace Avant.WTI.Drip.Form
             this.combo_transportdiameter.Location = new System.Drawing.Point(168, 158);
             this.combo_transportdiameter.Name = "combo_transportdiameter";
             this.combo_transportdiameter.Size = new System.Drawing.Size(158, 25);
-            this.combo_transportdiameter.TabIndex = 15;
+            this.combo_transportdiameter.TabIndex = 11;
             this.combo_transportdiameter.SelectedValueChanged += new System.EventHandler(this.Combo_transportdiameter_SelectedValueChanged);
             // 
             // groupBox1
@@ -524,7 +524,7 @@ namespace Avant.WTI.Drip.Form
             this.groupBox1.Location = new System.Drawing.Point(1001, 53);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(356, 631);
-            this.groupBox1.TabIndex = 3;
+            this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "WTI Settings";
             // 
@@ -534,7 +534,7 @@ namespace Avant.WTI.Drip.Form
             this.generateButton.Location = new System.Drawing.Point(1199, 702);
             this.generateButton.Name = "generateButton";
             this.generateButton.Size = new System.Drawing.Size(158, 58);
-            this.generateButton.TabIndex = 4;
+            this.generateButton.TabIndex = 2;
             this.generateButton.Text = "Generate";
             this.generateButton.UseVisualStyleBackColor = true;
             this.generateButton.Click += new System.EventHandler(this.GenerateButton_Click);
@@ -547,7 +547,7 @@ namespace Avant.WTI.Drip.Form
             this.button_convertplaceholders.Margin = new System.Windows.Forms.Padding(5);
             this.button_convertplaceholders.Name = "button_convertplaceholders";
             this.button_convertplaceholders.Size = new System.Drawing.Size(154, 21);
-            this.button_convertplaceholders.TabIndex = 5;
+            this.button_convertplaceholders.TabIndex = 1;
             this.button_convertplaceholders.Text = "Convert placeholders";
             this.button_convertplaceholders.UseVisualStyleBackColor = true;
             this.button_convertplaceholders.CheckedChanged += new System.EventHandler(this.CheckBox1_CheckedChanged);
