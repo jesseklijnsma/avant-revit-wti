@@ -7,6 +7,8 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
+using static Avant.WTI.Drip.DripData;
+using System.Windows.Forms;
 
 namespace Avant.WTI.Util
 {
@@ -173,6 +175,54 @@ namespace Avant.WTI.Util
             return new System.Drawing.RectangleF(left, top, right - left, bottom - top);
         }
 
+
+        /// <summary>
+        /// Displays all errors as a dialog and returns the maximum error severity
+        /// </summary>
+        /// <param name="msgs"></param>
+        /// <returns></returns>
+        public static DripData.DripDataErrorMessage.Severity DisplayErrors(List<DripData.DripDataErrorMessage> msgs)
+        {
+            if (msgs == null) return DripData.DripDataErrorMessage.Severity.NONE;
+
+            DripData.DripDataErrorMessage.Severity maxSeverity = DripData.DripDataErrorMessage.Severity.NONE;
+            for (int i = 0; i < msgs.Count; i++)
+            {
+                DripData.DripDataErrorMessage msg = msgs[i];
+
+                if (msg.severity > maxSeverity) maxSeverity = msg.severity;
+
+                string caption;
+                MessageBoxIcon icon;
+                switch (msg.severity)
+                {
+                    case DripData.DripDataErrorMessage.Severity.FATAL:
+                        icon = MessageBoxIcon.Error;
+                        caption = "An error occurred!";
+                        break;
+                    case DripData.DripDataErrorMessage.Severity.WARNING:
+                        icon = MessageBoxIcon.Warning;
+                        caption = "Warning!";
+                        break;
+                    default:
+                        icon = MessageBoxIcon.Information;
+                        caption = "AvantWTI";
+                        break;
+
+                }
+
+                if (msgs.Count > 1)
+                {
+                    string captionSuffix = string.Format(" ({0} of {1})", i + 1, msgs.Count);
+                    caption += captionSuffix;
+                }
+
+                MessageBox.Show(msg.message, caption, MessageBoxButtons.OK, icon);
+
+            }
+
+            return maxSeverity;
+        }
 
     }
 }

@@ -34,7 +34,6 @@ namespace Avant.WTI.Drip.Form
         public WTIForm(DripData data)
         {
             InitializeComponent();
-            if (!data.isValidInput()) throw new ArgumentException();
             this.data = data;
 
             // Calculate bounds of the revit model based on grid lines

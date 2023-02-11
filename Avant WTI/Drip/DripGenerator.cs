@@ -1,5 +1,6 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.UI;
 using Avant.WTI.Util;
 using System;
 using System.Collections.Generic;
@@ -107,13 +108,11 @@ namespace Avant.WTI.Drip
         public void GenerateDrip()
         {
             // Check if inputs are valid
-            if (!this.data.isValidOutput())
-            {
-                string message = "The inputs are not valid!";
-                string caption = "";
-                MessageBox.Show(message, caption, MessageBoxButtons.OK);
-                return;
-            }
+            List<DripData.DripDataErrorMessage> msgs = data.getErrorMessages(DripData.Data.OUTPUT);
+            DripData.DripDataErrorMessage.Severity maxSeverity = Utils.DisplayErrors(msgs);
+
+            if (maxSeverity == DripData.DripDataErrorMessage.Severity.FATAL) return;
+
 
             // Create transaction
             Transaction t = new Transaction(this.data.doc);

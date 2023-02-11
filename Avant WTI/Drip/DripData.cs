@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Avant.WTI.Drip
 {
@@ -30,24 +31,6 @@ namespace Avant.WTI.Drip
         public List<Line> lines = new List<Line>();
 
         public Level groundLevel;
-
-        public bool isValidInput()
-        {
-            if (doc == null) return false;
-            if (uidoc == null) return false;
-
-            if (pipetypes.Count == 0) return false;
-            if (pipetypes.Count != pipesizeMap.Keys.Count) return false;
-            if (systemtypes.Count == 0) return false;
-            if (valvefamilies.Count == 0) return false;
-
-            if (areas.Count == 0) return false;
-            if (columnpoints.Count == 0) return false;
-            if (lines.Count == 0) return false;
-
-            if (groundLevel == null) return false;
-            return true;
-        }
 
         // Output data
         //  All these outputs need to be valid in order to run the drip generator
@@ -80,15 +63,6 @@ namespace Avant.WTI.Drip
         public readonly List<XYZ> previewPoints = new List<XYZ>();
         public readonly List<Line> debugLines = new List<Line>();
 
-        public bool isValidOutput()
-        {
-            if (pipetype == null) return false;
-            if (transportSystemType == null) return false;
-            if (distributionSystemType == null) return false;
-            if (valvefamily == null) return false;
-            return true;
-        }
-
         public DripData(Document document, UIDocument uidoc)
         {
             this.doc = document;
@@ -98,7 +72,7 @@ namespace Avant.WTI.Drip
 
         public void LoadPrevious()
         {
-            this.pipetype =  this.pipetypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
+            this.pipetype = this.pipetypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
             this.transportSystemType = this.systemtypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
             this.distributionSystemType = this.systemtypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
 
@@ -108,7 +82,7 @@ namespace Avant.WTI.Drip
             this.intermediateDistance = (int)Properties.Settings.Default.PreviousIntermediateDistance;
             this.backwallDistance = (int)Properties.Settings.Default.PreviousBackwallDistance;
 
-            this.valvecolumnDistance = (int) Properties.Settings.Default.PreviousValveColumnDistance;
+            this.valvecolumnDistance = (int)Properties.Settings.Default.PreviousValveColumnDistance;
             this.pipecolumnDistance = (int)Properties.Settings.Default.PreviousPipeColumnDistance;
 
             this.transportlineheight = (int)Properties.Settings.Default.PreviousTransportHeight;
@@ -118,6 +92,124 @@ namespace Avant.WTI.Drip
 
             this.transport_diameter = Properties.Settings.Default.PreviousTransportDiameter;
             this.distribution_diameter = Properties.Settings.Default.PreviousDistributionDiameter;
+        }
+
+        public List<DripDataErrorMessage> getErrorMessages(Data d)
+        {
+            List<DripDataErrorMessage> messages = new List<DripDataErrorMessage>();
+
+            if (d == Data.INPUT)
+            {
+                if (this.uidoc == null)
+                {
+                    messages.Add(new DripDataErrorMessage("Active UI document is null.", DripDataErrorMessage.Severity.FATAL));
+                }
+                if (this.doc == null)
+                {
+                    messages.Add(new DripDataErrorMessage("Active document is null.", DripDataErrorMessage.Severity.FATAL));
+                }
+                if(this.pipetypes.Count == 0)
+                {
+                    messages.Add(new DripDataErrorMessage("No pipetypes found in this document.", DripDataErrorMessage.Severity.WARNING));
+                    // TODO handle ui
+                }
+                if (this.pipetypes.Count != this.pipesizeMap.Count)
+                {
+                    messages.Add(new DripDataErrorMessage("Not all pipes have a corresponding sizes.", DripDataErrorMessage.Severity.WARNING));
+                    // TODO handle ui
+                }
+                foreach (KeyValuePair<PipeType, List<double>> kv in this.pipesizeMap){
+                    PipeType pt = kv.Key;
+                    List<double> sizes = kv.Value;
+                    if (sizes.Count == 0) messages.Add(new DripDataErrorMessage(string.Format("{0} does not have any corresponding sizes.", pt.Name), DripDataErrorMessage.Severity.WARNING));
+                    // TODO handle ui
+                }
+                if (systemtypes.Count == 0)
+                {
+                    messages.Add(new DripDataErrorMessage("No piping system types found in this document.", DripDataErrorMessage.Severity.WARNING));
+                    // TODO handle ui
+                }
+                if (valvefamilies.Count == 0)
+                {
+                    messages.Add(new DripDataErrorMessage("No valve or pipe accessories found in this document.", DripDataErrorMessage.Severity.WARNING));
+                    // TODO handle ui
+                }
+
+                if (areas.Count == 0)
+                {
+                    messages.Add(new DripDataErrorMessage("No areas found in this document.", DripDataErrorMessage.Severity.FATAL));
+                }
+
+                if(columnpoints.Count == 0)
+                {
+                    messages.Add(new DripDataErrorMessage("No columns found in this document", DripDataErrorMessage.Severity.FATAL));
+                }
+
+                if(lines.Count == 0)
+                {
+                    messages.Add(new DripDataErrorMessage("No grids found in this document", DripDataErrorMessage.Severity.WARNING));
+                    // TODO handle ui
+                    // TODO convert grid bounded to area bounded
+                }
+
+                if(groundLevel == null)
+                {
+                    messages.Add(new DripDataErrorMessage("No suitable ground level found in this document.\nMake sure you have a level with an elevation of 0.", DripDataErrorMessage.Severity.WARNING));
+                    
+                    // TODO Create pick level dialog
+
+                }
+            }
+            else if (d == Data.OUTPUT)
+            {
+                if(pipetype == null)
+                {
+                    messages.Add(new DripDataErrorMessage("No pipe type selected.", DripDataErrorMessage.Severity.FATAL));
+                }
+                if (transportSystemType == null)
+                {
+                    messages.Add(new DripDataErrorMessage("No transport pipe system type selected.", DripDataErrorMessage.Severity.FATAL));
+                }
+                if (distributionSystemType == null)
+                {
+                    messages.Add(new DripDataErrorMessage("No distribtion pipe system type selected.", DripDataErrorMessage.Severity.FATAL));
+                }
+                if (valvefamily == null)
+                {
+                    messages.Add(new DripDataErrorMessage("No valve family selected.\nCreating dummy connections instead", DripDataErrorMessage.Severity.WARNING));
+                }
+            }
+
+            messages = messages.OrderByDescending(m => m.severity).ToList();
+
+            return messages;
+        }
+
+        public enum Data
+        {
+            INPUT,
+            OUTPUT
+        }
+
+        public class DripDataErrorMessage
+        {
+
+            public string message { get; }
+            public Severity severity { get; }
+
+            public DripDataErrorMessage(string message, Severity s)
+            {
+                this.message = message;
+                this.severity = s;
+            }
+
+            public enum Severity
+            {
+                FATAL = 2,
+                WARNING = 1,
+                NONE = 0
+            }
+
         }
 
     }

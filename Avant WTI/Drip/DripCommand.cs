@@ -51,17 +51,25 @@ namespace Avant.WTI.Drip
 
                 data.pipesizeMap = data.pipetypes.ToDictionary(x => x, x => collector.GetPipeSizes(x));
 
+
+                List<DripData.DripDataErrorMessage> msgs = data.getErrorMessages(DripData.Data.INPUT);
+                DripData.DripDataErrorMessage.Severity maxSeverity = Utils.DisplayErrors(msgs);
+
+                if (maxSeverity == DripData.DripDataErrorMessage.Severity.FATAL) return Result.Failed;
+
                 // Show the input form
                 Application.Run(new WTIForm(data));
                 return Result.Succeeded;
             }
             catch (Exception ex)
             {
-                string caption = ex.Message + "\n" + ex.StackTrace;
+                string msg = ex.Message + "\n" + ex.StackTrace;
 
-                MessageBox.Show("An exception has occured", caption, MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(msg, "An exception has occured", MessageBoxButtons.OK, MessageBoxIcon.Warning);
 
-
+#if DEBUG
+                throw;
+#endif
                 return Result.Failed;
             }
         }
