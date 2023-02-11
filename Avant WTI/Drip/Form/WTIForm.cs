@@ -28,7 +28,7 @@ namespace Avant.WTI.Drip.Form
 
         private System.Drawing.RectangleF maxBounds;
         private System.Drawing.RectangleF bounds;
-        private readonly Dictionary<Area, List<Line>> areaLineMap = new Dictionary<Area, List<Line>>();
+        private readonly Dictionary<Area, PolyLine> areaLineMap = new Dictionary<Area, PolyLine>();
         private readonly Dictionary<Pipe, Line> pipe_lineMap = new Dictionary<Pipe, Line>();
 
         public WTIForm(DripData data)
@@ -43,8 +43,8 @@ namespace Avant.WTI.Drip.Form
             // Convert areas into geometry for displaying
             foreach (Area area in this.data.areas)
             {
-                RectangleF arearect = AreaUtils.GetAreaRectangle(area);
-                areaLineMap.Add(area, Utils.RectangleToLines(arearect));
+                PolyLine pl = AreaUtils.GetAreaPolyLine(area);
+                areaLineMap.Add(area, pl);
             }
 
             // Initialize the drip generator
@@ -68,40 +68,6 @@ namespace Avant.WTI.Drip.Form
                 "DoubleBuffered",
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
             ).SetValue(this.canvas, true, null);
-
-        }
-
-        private void LoadPrevious()
-        {
-            PipeType pt = this.data.pipetypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
-            if (pt != null) this.combo_pipetype.SelectedValue = pt;
-
-            PipingSystemType transportpst = this.data.systemtypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
-            if (transportpst != null) this.combo_transportsystem.SelectedValue = transportpst;
-
-            PipingSystemType distributionpst = this.data.systemtypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
-            if (distributionpst != null) this.combo_distributionsystem.SelectedValue = distributionpst;
-
-            FamilySymbol valvefamily = this.data.valvefamilies.First(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
-            if (distributionpst != null) this.combo_transportsystem.SelectedValue = distributionpst;
-
-            num_interdistance.Value = (decimal)Properties.Settings.Default.PreviousIntermediateDistance;
-            num_backwalldistance.Value = (decimal)Properties.Settings.Default.PreviousBackwallDistance;
-
-            num_valvecolumndistance.Value = (decimal)Properties.Settings.Default.PreviousValveColumnDistance;
-            num_pipecolumndistance.Value = (decimal)Properties.Settings.Default.PreviousPipeColumnDistance;
-
-            num_transportheight.Value = (decimal)Properties.Settings.Default.PreviousTransportHeight;
-            num_distributionheight.Value = (decimal)Properties.Settings.Default.PreviousDistributionHeight;
-
-            button_convertplaceholders.Checked = Properties.Settings.Default.PreviousDoConvertPlaceholders;
-
-            // Load sizes for the selected pipe type
-            UpdateSizes();
-
-            combo_transportdiameter.SelectedValue = Properties.Settings.Default.PreviousTransportDiameter;
-            combo_distributiondiameter.SelectedValue = Properties.Settings.Default.PreviousDistributionDiameter;
-
 
         }
 

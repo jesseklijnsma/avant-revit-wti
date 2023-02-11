@@ -4,6 +4,7 @@ using System;
 using Autodesk.Revit.DB;
 using Avant.WTI.Util;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Avant.WTI.Drip.Form
 {
@@ -33,12 +34,9 @@ namespace Avant.WTI.Drip.Form
             }
 
             // Draw area lines
-            foreach (List<Line> linelist in areaLineMap.Values)
+            foreach(PolyLine polyLine in areaLineMap.Values)
             {
-                foreach (Line l in linelist)
-                {
-                    DrawLine(l, System.Drawing.Color.Green, true);
-                }
+                DrawPolyLine(polyLine, System.Drawing.Color.Green, true);
             }
 
             // Draw pipe lines
@@ -83,6 +81,31 @@ namespace Avant.WTI.Drip.Form
             Pen pp = new Pen(c);
             if (dashed) pp.DashPattern = new float[] { 10, 10 };
             g.DrawLine(pp, (float)p1.X, (float)p1.Y, (float)p2.X, (float)p2.Y);
+        }
+
+        /// <summary>
+        ///     Draws a polyline from the Revit model coordinate space onto the canvas
+        /// </summary>
+        /// <param name="polyLine">Model polyline to be drawn</param>
+        /// <param name="c">Color</param>
+        /// <param name="dashed">Sets line solid or dashed</param>
+        private void DrawPolyLine(PolyLine polyLine, System.Drawing.Color c, bool dashed = false)
+        {
+            IList<XYZ> points = polyLine.GetCoordinates();
+
+            // Map model points to canvas points
+            points = points.Select(p => Utils.PointToScreenPoint(p, bounds, this.canvas.Size)).ToList();
+            if (points.Count < 2) return;
+
+            Pen pp = new Pen(c);
+            if (dashed) pp.DashPattern = new float[] { 10, 10 };
+
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                XYZ p1 = points[i];
+                XYZ p2 = points[i + 1];
+                g.DrawLine(pp, (float)p1.X, (float)p1.Y, (float)p2.X, (float)p2.Y);
+            }
         }
 
         /// <summary>

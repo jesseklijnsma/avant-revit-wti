@@ -182,7 +182,7 @@ namespace Avant.WTI.Drip
         /// <returns>List of pipe placeholders</returns>
         private List<Pipe> GenerateAreaBranch(Pipe source, Area area, List<XYZ> columnpoints, bool previewOnly = false)
         {
-            RectangleF arearect = AreaUtils.GetAreaRectangle(area);
+            RectangleF arearect = AreaUtils.GetAreaBoundingRectangle(area);
             XYZ center = Utils.RectangleGetCenter(arearect);
             XYZ areavector = new XYZ(arearect.Width, arearect.Height, 0);
 

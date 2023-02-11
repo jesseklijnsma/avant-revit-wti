@@ -136,7 +136,7 @@ namespace Avant.WTI.Util
         {
             if (pipes.Count == 0) return null;
 
-            RectangleF arearect = AreaUtils.GetAreaRectangle(a);
+            RectangleF arearect = AreaUtils.GetAreaBoundingRectangle(a);
             XYZ center = RectangleGetCenter(arearect);
 
             // Orders the pipes by distance to the center of the area and gets the first one.
@@ -163,6 +163,8 @@ namespace Avant.WTI.Util
                 points.Add(l.GetEndPoint(0));
                 points.Add(l.GetEndPoint(1));
             }
+
+
 
             // Check if we even have points, otherwise return default rectangle
             if (points.Count == 0) return new System.Drawing.RectangleF(0, 0, 1, 1);

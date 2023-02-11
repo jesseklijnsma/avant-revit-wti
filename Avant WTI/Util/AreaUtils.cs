@@ -17,63 +17,51 @@ namespace Avant.WTI.Util
         /// </summary>
         /// <param name="area">Area</param>
         /// <returns>Curveloop or null</returns>
-        public static CurveLoop GetAreaCurveloop(Area area)
+        public static PolyLine GetAreaPolyLine(Area area)
         {
             // Get boundaries
             IList<IList<BoundarySegment>> bounds = area.GetBoundarySegments(new SpatialElementBoundaryOptions());
 
-            // Convert boundaries to curves
-            List<Curve> curves = new List<Curve>();
-            foreach(IList<BoundarySegment> boundlist in bounds)
+            if (bounds.Count == 0) throw new Exception(string.Format("Area {0} doesn't have any regions.", area.Name));
+            if (bounds.Count > 1) throw new Exception(string.Format("Area {0} has multiple regions.", area.Name));
+
+            // Get all corner points of boundary
+            List<XYZ> points = new List<XYZ>();
+            IList<BoundarySegment> boundList = bounds[0];
+            foreach (BoundarySegment b in boundList)
             {
-                foreach(BoundarySegment b in boundlist)
-                {
-                    curves.Add(b.GetCurve());
-                }
+                points.Add(b.GetCurve().GetEndPoint(0));
             }
-            // Convert curves to curveloop
-            try
-            {
-                return CurveLoop.Create(curves);
-            }
-            catch
-            {
-                Console.WriteLine("Failed to create curveloop from area");
-                return null;
-            }
+
+            // Add last point
+            if (boundList.Count > 0) points.Add(boundList[boundList.Count - 1].GetCurve().GetEndPoint(1));
+
+            // Check if enough points
+            if (points.Count < 2) throw new Exception(string.Format("Area {0} doesn't have enough corner points", area.Name));
+
+            return PolyLine.Create(points);
         }
 
         /// <summary>
-        /// Get a rectangle from the area
+        /// Get the axis aligned bounding rectangle of an area
         /// </summary>
         /// <param name="area">Area</param>
-        /// <returns>Rectangle representing the area or default rectangle</returns>
-        public static System.Drawing.RectangleF GetAreaRectangle(Area area)
+        /// <returns>Rectangle</returns>
+        public static System.Drawing.RectangleF GetAreaBoundingRectangle(Area area)
         {
-            CurveLoop cl = GetAreaCurveloop(area);
-            if (cl == null) return new System.Drawing.RectangleF(0,0,1,1);
-            
-            Plane areaPlane = cl.GetPlane();
-            if (areaPlane == null || !cl.IsRectangular(areaPlane)) return new System.Drawing.RectangleF(0, 0, 1, 1);
+            PolyLine pl = GetAreaPolyLine(area);
+            IList<XYZ> points = pl.GetCoordinates();
 
-            XYZ center = areaPlane.Origin;
-            double w = cl.GetRectangularWidth(areaPlane);
-            double h = cl.GetRectangularHeight(areaPlane);
-
-            // Convert width and height in the areaPlane space to world space and represent as a vector
-            XYZ areavector = areaPlane.XVec.Multiply(w).Add(areaPlane.YVec.Multiply(h));
-
-            // Calculate all bounding points of the area
-            float x1 = (float)center.Add(areavector.Multiply(-0.5)).X;
-            float x2 = (float)center.Add(areavector.Multiply(0.5)).X;
-            float y1 = (float)center.Add(areavector.Multiply(0.5)).Y;
-            float y2 = (float)center.Add(areavector.Multiply(-0.5)).Y;
+            double minX = points.Min(p => p.X);
+            double maxX = points.Max(p => p.X);
+            double minY = points.Min(p => p.Y);
+            double maxY = points.Max(p => p.Y);
 
             RectangleF arearect = new RectangleF(
-                Math.Min(x1, x2),
-                Math.Min(y1, y2),
-                Math.Abs(x1 - x2),
-                Math.Abs(y1 - y2)
+                (float)minX,
+                (float)minY,
+                (float)(maxX - minX),
+                (float)(maxY - minY)
             );
 
             return arearect;
