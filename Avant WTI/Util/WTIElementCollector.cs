@@ -165,7 +165,7 @@ namespace Avant.WTI.Util
 
 
         /// <summary>
-        /// Gets the level at elevation 0
+        /// Gets the level closest to elevation 0
         /// </summary>
         /// <returns>Ground level</returns>
         public Level GetGroundLevel()
@@ -174,15 +174,13 @@ namespace Avant.WTI.Util
             .OfCategory(BuiltInCategory.OST_Levels)
             .WhereElementIsNotElementType()
             .ToElements() as List<Element>;
-            foreach (Element e in levels)
-            {
-                Level l = (Level)e;
-                if (l.Elevation == 0)
-                {
-                    return l;
-                }
-            }
-            return null;
+
+            if (levels.Count == 0) return null;
+
+            // Order levels by absolute distance to 0
+            levels = levels.OrderBy(l => Math.Abs(((Level)l).Elevation)).ToList();
+
+            return (Level)levels[0];
         }
 
         /// <summary>

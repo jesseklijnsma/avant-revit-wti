@@ -72,12 +72,15 @@ namespace Avant.WTI.Drip
 
         public void LoadPrevious()
         {
-            this.pipetype = this.pipetypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
-            this.transportSystemType = this.systemtypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
-            this.distributionSystemType = this.systemtypes.First(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
+            if(this.pipetypes.Count > 0) this.pipetype = this.pipetypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
 
-            this.valvefamily = this.valvefamilies.First(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
+            if (this.systemtypes.Count > 0)
+            {
+                this.transportSystemType = this.systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
+                this.distributionSystemType = this.systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
+            }
 
+            if(this.valvefamilies.Count > 0) this.valvefamily = this.valvefamilies.Find(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
 
             this.intermediateDistance = (int)Properties.Settings.Default.PreviousIntermediateDistance;
             this.backwallDistance = (int)Properties.Settings.Default.PreviousBackwallDistance;
@@ -154,10 +157,7 @@ namespace Avant.WTI.Drip
 
                 if(groundLevel == null)
                 {
-                    messages.Add(new DripDataErrorMessage("No suitable ground level found in this document.\nMake sure you have a level with an elevation of 0.", DripDataErrorMessage.Severity.WARNING));
-                    
-                    // TODO Create pick level dialog
-
+                    messages.Add(new DripDataErrorMessage("No levels found in this document.", DripDataErrorMessage.Severity.FATAL));
                 }
             }
             else if (d == Data.OUTPUT)

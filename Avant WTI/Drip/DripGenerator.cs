@@ -241,7 +241,7 @@ namespace Avant.WTI.Drip
             XYZ valve_out_p = null;
 
 
-            if (!previewOnly)
+            if (!previewOnly && this.data.valvefamily != null)
             {
                 // Place valve and find corresponding in and out points
                 FamilyInstance valve = this.data.doc.Create.NewFamilyInstance(valvePoint, this.data.valvefamily, this.data.groundLevel, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
@@ -254,11 +254,6 @@ namespace Avant.WTI.Drip
             }
 
             bool valveConnect = valve_in_c != null && valve_out_c != null;
-
-            if (!previewOnly && !valveConnect)
-            {
-                // TODO Add error message
-            }
 
             if (previewOnly || !valveConnect)
             {
