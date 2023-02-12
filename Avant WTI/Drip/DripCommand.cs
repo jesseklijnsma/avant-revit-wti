@@ -52,6 +52,8 @@ namespace Avant.WTI.Drip
                 data.pipesizeMap = data.pipetypes.ToDictionary(x => x, x => collector.GetPipeSizes(x));
 
 
+                data.LoadPrevious();
+
                 List<DripData.DripDataErrorMessage> msgs = data.getErrorMessages(DripData.Data.INPUT);
                 DripData.DripDataErrorMessage.Severity maxSeverity = Utils.DisplayErrors(msgs);
 

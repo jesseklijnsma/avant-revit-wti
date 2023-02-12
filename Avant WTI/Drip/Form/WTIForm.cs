@@ -50,18 +50,17 @@ namespace Avant.WTI.Drip.Form
             // Initialize the drip generator
             dripGenerator = new DripGenerator(this.data);
 
-            isLoading = true;
 
-            this.data.LoadPrevious();
+
+            // Disable value changed event for inputs
+            isLoading = true;
 
             // Load all input data into the form
             ReloadData();
 
+            // Enable value changed event for inputs
             isLoading = false;
 
-            //isLoading = false;
-            // Load all settings from previous run
-            //LoadPrevious();
 
             // Enable double buffering for the canvas
             this.canvas.GetType().GetProperty(
@@ -173,10 +172,11 @@ namespace Avant.WTI.Drip.Form
 
             PipePlaceholderSelectionFilter selfilter = new PipePlaceholderSelectionFilter();
 
-            pipe_lineMap.Clear();
             try
             {
                 IList<Reference> refs = this.data.uidoc.Selection.PickObjects(ObjectType.Element, selfilter);
+
+                pipe_lineMap.Clear();
                 foreach (Reference r in refs)
                 {
                     Pipe p = (Pipe)this.data.doc.GetElement(r.ElementId);
@@ -198,7 +198,7 @@ namespace Avant.WTI.Drip.Form
                 // Set the pipes
                 this.data.pipelines = pipelines;
             }
-            catch (OperationCanceledException) { }
+            catch (Autodesk.Revit.Exceptions.OperationCanceledException) { }
             
             ReloadPreview();
 
