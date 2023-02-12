@@ -133,7 +133,10 @@ namespace Avant.WTI.Drip.Form
 
         private void GenerateButton_Click(object sender, EventArgs e)
         {
-            dripGenerator.GenerateDrip();
+            bool validRun = dripGenerator.GenerateDrip();
+            if (!validRun) return;
+
+
             Properties.Settings.Default.Save();
 
             this.Close();

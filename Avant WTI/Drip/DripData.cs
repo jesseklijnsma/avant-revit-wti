@@ -170,8 +170,38 @@ namespace Avant.WTI.Drip
                 }
                 if (valvefamily == null)
                 {
-                    messages.Add(new DripDataErrorMessage("No valve family selected.\nCreating dummy connections instead", DripDataErrorMessage.Severity.WARNING));
+                    messages.Add(new DripDataErrorMessage("No valve family selected. Creating dummy connections instead", DripDataErrorMessage.Severity.WARNING));
                 }
+
+                MEPSystemClassification globalClassification = transportSystemType.SystemClassification;
+                if (globalClassification != distributionSystemType.SystemClassification)
+                {
+                    messages.Add(new DripDataErrorMessage("System Classification cannot be different between system types.", DripDataErrorMessage.Severity.FATAL));
+                }
+                else
+                {
+                    foreach(Pipe pipe in this.pipelines)
+                    {
+                        PipingSystem ps = (PipingSystem)pipe.MEPSystem;
+                        try
+                        {
+                            PipingSystemType pst = (PipingSystemType)doc.GetElement(ps.GetTypeId());
+                            if (pst.SystemClassification != globalClassification)
+                            {
+                                string pipeClass = Enum.GetName(typeof(MEPSystemClassification), pst.SystemClassification);
+                                string newClass = Enum.GetName(typeof(MEPSystemClassification), globalClassification);
+
+
+                                messages.Add(new DripDataErrorMessage(string.Format("Source pipe ({0}) is of system classification {1}, but the system classification of the set system types is {2}.", pipe.Id, pipeClass, newClass), DripDataErrorMessage.Severity.FATAL));
+                            }
+                        }
+                        catch (Exception) { }
+                    }
+                }
+
+
+
+
             }
 
             messages = messages.OrderByDescending(m => m.severity).ToList();

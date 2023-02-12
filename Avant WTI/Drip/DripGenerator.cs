@@ -107,13 +107,13 @@ namespace Avant.WTI.Drip
             }
         }
 
-        public void GenerateDrip()
+        public bool GenerateDrip()
         {
             // Check if inputs are valid
             List<DripData.DripDataErrorMessage> msgs = data.getErrorMessages(DripData.Data.OUTPUT);
             DripData.DripDataErrorMessage.Severity maxSeverity = Utils.DisplayErrors(msgs);
 
-            if (maxSeverity == DripData.DripDataErrorMessage.Severity.FATAL) return;
+            if (maxSeverity == DripData.DripDataErrorMessage.Severity.FATAL) return false;
 
 
             // Create transaction
@@ -172,6 +172,8 @@ namespace Avant.WTI.Drip
                 throw;
 #endif
             }
+
+            return true;
         }
 
         /// <summary>
