@@ -84,7 +84,7 @@ namespace Avant.WTI.Drip.Form
             this.titleLabel.Font = new System.Drawing.Font("Segoe UI", 14.25F);
             this.titleLabel.Location = new System.Drawing.Point(7, 10);
             this.titleLabel.Name = "titleLabel";
-            this.titleLabel.Size = new System.Drawing.Size(144, 32);
+            this.titleLabel.Size = new System.Drawing.Size(116, 25);
             this.titleLabel.TabIndex = 0;
             this.titleLabel.Text = "WTI Preview";
             // 
@@ -95,7 +95,7 @@ namespace Avant.WTI.Drip.Form
             | System.Windows.Forms.AnchorStyles.Right)));
             this.canvas.Location = new System.Drawing.Point(13, 53);
             this.canvas.Name = "canvas";
-            this.canvas.Size = new System.Drawing.Size(982, 707);
+            this.canvas.Size = new System.Drawing.Size(849, 707);
             this.canvas.TabIndex = 1;
             this.canvas.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvas_paint);
             this.canvas.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousedown);
@@ -120,10 +120,10 @@ namespace Avant.WTI.Drip.Form
             this.flowLayoutPanel1.Controls.Add(this.groupBox2);
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 21);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 17);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(350, 607);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(350, 611);
             this.flowLayoutPanel1.TabIndex = 2;
             this.flowLayoutPanel1.WrapContents = false;
             // 
@@ -132,13 +132,13 @@ namespace Avant.WTI.Drip.Form
             this.selectLabel.AutoSize = true;
             this.selectLabel.Location = new System.Drawing.Point(7, 5);
             this.selectLabel.Name = "selectLabel";
-            this.selectLabel.Size = new System.Drawing.Size(217, 17);
+            this.selectLabel.Size = new System.Drawing.Size(190, 13);
             this.selectLabel.TabIndex = 0;
             this.selectLabel.Text = "Select main pipelines (placeholders)";
             // 
             // selectButton
             // 
-            this.selectButton.Location = new System.Drawing.Point(7, 25);
+            this.selectButton.Location = new System.Drawing.Point(7, 21);
             this.selectButton.MinimumSize = new System.Drawing.Size(100, 30);
             this.selectButton.Name = "selectButton";
             this.selectButton.Size = new System.Drawing.Size(100, 30);
@@ -150,9 +150,9 @@ namespace Avant.WTI.Drip.Form
             // pipetypelabel
             // 
             this.pipetypelabel.AutoSize = true;
-            this.pipetypelabel.Location = new System.Drawing.Point(7, 58);
+            this.pipetypelabel.Location = new System.Drawing.Point(7, 54);
             this.pipetypelabel.Name = "pipetypelabel";
-            this.pipetypelabel.Size = new System.Drawing.Size(71, 17);
+            this.pipetypelabel.Size = new System.Drawing.Size(61, 13);
             this.pipetypelabel.TabIndex = 2;
             this.pipetypelabel.Text = "Pipe Type: ";
             // 
@@ -162,18 +162,18 @@ namespace Avant.WTI.Drip.Form
             | System.Windows.Forms.AnchorStyles.Right)));
             this.combo_pipetype.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.combo_pipetype.FormattingEnabled = true;
-            this.combo_pipetype.Location = new System.Drawing.Point(7, 78);
+            this.combo_pipetype.Location = new System.Drawing.Point(7, 70);
             this.combo_pipetype.Name = "combo_pipetype";
-            this.combo_pipetype.Size = new System.Drawing.Size(343, 25);
+            this.combo_pipetype.Size = new System.Drawing.Size(336, 20);
             this.combo_pipetype.TabIndex = 3;
             this.combo_pipetype.SelectedValueChanged += new System.EventHandler(this.Combo_pipetype_SelectedValueChanged);
             // 
             // transportsystemtypelabel
             // 
             this.transportsystemtypelabel.AutoSize = true;
-            this.transportsystemtypelabel.Location = new System.Drawing.Point(7, 106);
+            this.transportsystemtypelabel.Location = new System.Drawing.Point(7, 94);
             this.transportsystemtypelabel.Name = "transportsystemtypelabel";
-            this.transportsystemtypelabel.Size = new System.Drawing.Size(144, 17);
+            this.transportsystemtypelabel.Size = new System.Drawing.Size(124, 13);
             this.transportsystemtypelabel.TabIndex = 4;
             this.transportsystemtypelabel.Text = "Transport system type: ";
             // 
@@ -183,18 +183,18 @@ namespace Avant.WTI.Drip.Form
             | System.Windows.Forms.AnchorStyles.Right)));
             this.combo_transportsystem.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.combo_transportsystem.FormattingEnabled = true;
-            this.combo_transportsystem.Location = new System.Drawing.Point(7, 126);
+            this.combo_transportsystem.Location = new System.Drawing.Point(7, 110);
             this.combo_transportsystem.Name = "combo_transportsystem";
-            this.combo_transportsystem.Size = new System.Drawing.Size(343, 25);
+            this.combo_transportsystem.Size = new System.Drawing.Size(336, 20);
             this.combo_transportsystem.TabIndex = 5;
             this.combo_transportsystem.SelectedValueChanged += new System.EventHandler(this.Combo_transportsystem_SelectedValueChanged);
             // 
             // distributionsystemtypelabel
             // 
             this.distributionsystemtypelabel.AutoSize = true;
-            this.distributionsystemtypelabel.Location = new System.Drawing.Point(7, 154);
+            this.distributionsystemtypelabel.Location = new System.Drawing.Point(7, 134);
             this.distributionsystemtypelabel.Name = "distributionsystemtypelabel";
-            this.distributionsystemtypelabel.Size = new System.Drawing.Size(155, 17);
+            this.distributionsystemtypelabel.Size = new System.Drawing.Size(137, 13);
             this.distributionsystemtypelabel.TabIndex = 6;
             this.distributionsystemtypelabel.Text = "Distribution system type: ";
             // 
@@ -204,15 +204,15 @@ namespace Avant.WTI.Drip.Form
             | System.Windows.Forms.AnchorStyles.Right)));
             this.combo_distributionsystem.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.combo_distributionsystem.FormattingEnabled = true;
-            this.combo_distributionsystem.Location = new System.Drawing.Point(7, 174);
+            this.combo_distributionsystem.Location = new System.Drawing.Point(7, 150);
             this.combo_distributionsystem.Name = "combo_distributionsystem";
-            this.combo_distributionsystem.Size = new System.Drawing.Size(343, 25);
+            this.combo_distributionsystem.Size = new System.Drawing.Size(336, 20);
             this.combo_distributionsystem.TabIndex = 7;
             this.combo_distributionsystem.SelectedValueChanged += new System.EventHandler(this.Combo_distributionsystem_SelectedValueChanged);
             // 
             // valvelabel
             // 
-            this.valvelabel.Location = new System.Drawing.Point(7, 202);
+            this.valvelabel.Location = new System.Drawing.Point(7, 174);
             this.valvelabel.Name = "valvelabel";
             this.valvelabel.Size = new System.Drawing.Size(81, 17);
             this.valvelabel.TabIndex = 8;
@@ -224,9 +224,9 @@ namespace Avant.WTI.Drip.Form
             | System.Windows.Forms.AnchorStyles.Right)));
             this.combo_valvefamily.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.combo_valvefamily.FormattingEnabled = true;
-            this.combo_valvefamily.Location = new System.Drawing.Point(7, 222);
+            this.combo_valvefamily.Location = new System.Drawing.Point(7, 194);
             this.combo_valvefamily.Name = "combo_valvefamily";
-            this.combo_valvefamily.Size = new System.Drawing.Size(343, 25);
+            this.combo_valvefamily.Size = new System.Drawing.Size(336, 20);
             this.combo_valvefamily.TabIndex = 9;
             this.combo_valvefamily.SelectedValueChanged += new System.EventHandler(this.Combo_valvefamily_SelectedValueChanged);
             // 
@@ -235,10 +235,10 @@ namespace Avant.WTI.Drip.Form
             this.groupBox2.AutoSize = true;
             this.groupBox2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
             this.groupBox2.Controls.Add(this.tableLayoutPanel1);
-            this.groupBox2.Location = new System.Drawing.Point(7, 253);
+            this.groupBox2.Location = new System.Drawing.Point(7, 221);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(3, 3, 5, 3);
-            this.groupBox2.Size = new System.Drawing.Size(343, 296);
+            this.groupBox2.Size = new System.Drawing.Size(336, 260);
             this.groupBox2.TabIndex = 10;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Dimensions";
@@ -278,7 +278,7 @@ namespace Avant.WTI.Drip.Form
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle());
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(329, 248);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(322, 216);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // combo_distributiondiameter
@@ -286,9 +286,9 @@ namespace Avant.WTI.Drip.Form
             this.combo_distributiondiameter.Dock = System.Windows.Forms.DockStyle.Fill;
             this.combo_distributiondiameter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.combo_distributiondiameter.FormattingEnabled = true;
-            this.combo_distributiondiameter.Location = new System.Drawing.Point(168, 220);
+            this.combo_distributiondiameter.Location = new System.Drawing.Point(151, 192);
             this.combo_distributiondiameter.Name = "combo_distributiondiameter";
-            this.combo_distributiondiameter.Size = new System.Drawing.Size(158, 25);
+            this.combo_distributiondiameter.Size = new System.Drawing.Size(168, 20);
             this.combo_distributiondiameter.TabIndex = 15;
             this.combo_distributiondiameter.SelectedValueChanged += new System.EventHandler(this.Combo_distributiondiameter_SelectedValueChanged);
             // 
@@ -296,9 +296,9 @@ namespace Avant.WTI.Drip.Form
             // 
             this.label6.AutoSize = true;
             this.label6.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label6.Location = new System.Drawing.Point(3, 217);
+            this.label6.Location = new System.Drawing.Point(3, 189);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(159, 31);
+            this.label6.Size = new System.Drawing.Size(142, 27);
             this.label6.TabIndex = 16;
             this.label6.Text = "Distribution Line Diameter";
             this.label6.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -307,9 +307,9 @@ namespace Avant.WTI.Drip.Form
             // 
             this.label5.AutoSize = true;
             this.label5.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label5.Location = new System.Drawing.Point(3, 155);
+            this.label5.Location = new System.Drawing.Point(3, 135);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(159, 31);
+            this.label5.Size = new System.Drawing.Size(142, 27);
             this.label5.TabIndex = 12;
             this.label5.Text = "Transport Line Diameter";
             this.label5.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -318,9 +318,9 @@ namespace Avant.WTI.Drip.Form
             // 
             this.label4.AutoSize = true;
             this.label4.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label4.Location = new System.Drawing.Point(3, 93);
+            this.label4.Location = new System.Drawing.Point(3, 81);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(159, 31);
+            this.label4.Size = new System.Drawing.Size(142, 27);
             this.label4.TabIndex = 6;
             this.label4.Text = "Pipe to column distance";
             this.label4.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -328,7 +328,7 @@ namespace Avant.WTI.Drip.Form
             // num_pipecolumndistance
             // 
             this.num_pipecolumndistance.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.num_pipecolumndistance.Location = new System.Drawing.Point(168, 96);
+            this.num_pipecolumndistance.Location = new System.Drawing.Point(151, 84);
             this.num_pipecolumndistance.Maximum = new decimal(new int[] {
             10000000,
             0,
@@ -340,7 +340,7 @@ namespace Avant.WTI.Drip.Form
             0,
             0});
             this.num_pipecolumndistance.Name = "num_pipecolumndistance";
-            this.num_pipecolumndistance.Size = new System.Drawing.Size(158, 25);
+            this.num_pipecolumndistance.Size = new System.Drawing.Size(168, 21);
             this.num_pipecolumndistance.TabIndex = 7;
             this.num_pipecolumndistance.Value = new decimal(new int[] {
             500,
@@ -353,9 +353,9 @@ namespace Avant.WTI.Drip.Form
             // 
             this.label3.AutoSize = true;
             this.label3.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label3.Location = new System.Drawing.Point(3, 62);
+            this.label3.Location = new System.Drawing.Point(3, 54);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(159, 31);
+            this.label3.Size = new System.Drawing.Size(142, 27);
             this.label3.TabIndex = 4;
             this.label3.Text = "Valve to column distance";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -363,14 +363,14 @@ namespace Avant.WTI.Drip.Form
             // num_valvecolumndistance
             // 
             this.num_valvecolumndistance.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.num_valvecolumndistance.Location = new System.Drawing.Point(168, 65);
+            this.num_valvecolumndistance.Location = new System.Drawing.Point(151, 57);
             this.num_valvecolumndistance.Maximum = new decimal(new int[] {
             10000000,
             0,
             0,
             0});
             this.num_valvecolumndistance.Name = "num_valvecolumndistance";
-            this.num_valvecolumndistance.Size = new System.Drawing.Size(158, 25);
+            this.num_valvecolumndistance.Size = new System.Drawing.Size(168, 21);
             this.num_valvecolumndistance.TabIndex = 5;
             this.num_valvecolumndistance.Value = new decimal(new int[] {
             500,
@@ -383,9 +383,9 @@ namespace Avant.WTI.Drip.Form
             // 
             this.label2.AutoSize = true;
             this.label2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.label2.Location = new System.Drawing.Point(3, 31);
+            this.label2.Location = new System.Drawing.Point(3, 27);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(159, 31);
+            this.label2.Size = new System.Drawing.Size(142, 27);
             this.label2.TabIndex = 2;
             this.label2.Text = "Distance from back wall";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -393,14 +393,14 @@ namespace Avant.WTI.Drip.Form
             // num_backwalldistance
             // 
             this.num_backwalldistance.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.num_backwalldistance.Location = new System.Drawing.Point(168, 34);
+            this.num_backwalldistance.Location = new System.Drawing.Point(151, 30);
             this.num_backwalldistance.Maximum = new decimal(new int[] {
             10000000,
             0,
             0,
             0});
             this.num_backwalldistance.Name = "num_backwalldistance";
-            this.num_backwalldistance.Size = new System.Drawing.Size(158, 25);
+            this.num_backwalldistance.Size = new System.Drawing.Size(168, 21);
             this.num_backwalldistance.TabIndex = 3;
             this.num_backwalldistance.Value = new decimal(new int[] {
             1000,
@@ -416,7 +416,7 @@ namespace Avant.WTI.Drip.Form
             this.label1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.label1.Location = new System.Drawing.Point(3, 0);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(159, 31);
+            this.label1.Size = new System.Drawing.Size(142, 27);
             this.label1.TabIndex = 0;
             this.label1.Text = "Intermediate Distance";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -424,14 +424,14 @@ namespace Avant.WTI.Drip.Form
             // num_interdistance
             // 
             this.num_interdistance.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.num_interdistance.Location = new System.Drawing.Point(168, 3);
+            this.num_interdistance.Location = new System.Drawing.Point(151, 3);
             this.num_interdistance.Maximum = new decimal(new int[] {
             10000000,
             0,
             0,
             0});
             this.num_interdistance.Name = "num_interdistance";
-            this.num_interdistance.Size = new System.Drawing.Size(158, 25);
+            this.num_interdistance.Size = new System.Drawing.Size(168, 21);
             this.num_interdistance.TabIndex = 1;
             this.num_interdistance.Value = new decimal(new int[] {
             1000,
@@ -444,9 +444,9 @@ namespace Avant.WTI.Drip.Form
             // 
             this.transporteheightlabel.AutoSize = true;
             this.transporteheightlabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.transporteheightlabel.Location = new System.Drawing.Point(3, 124);
+            this.transporteheightlabel.Location = new System.Drawing.Point(3, 108);
             this.transporteheightlabel.Name = "transporteheightlabel";
-            this.transporteheightlabel.Size = new System.Drawing.Size(159, 31);
+            this.transporteheightlabel.Size = new System.Drawing.Size(142, 27);
             this.transporteheightlabel.TabIndex = 10;
             this.transporteheightlabel.Text = "Transport Line Height";
             this.transporteheightlabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -454,7 +454,7 @@ namespace Avant.WTI.Drip.Form
             // num_distributionheight
             // 
             this.num_distributionheight.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.num_distributionheight.Location = new System.Drawing.Point(168, 189);
+            this.num_distributionheight.Location = new System.Drawing.Point(151, 165);
             this.num_distributionheight.Maximum = new decimal(new int[] {
             -1,
             -1,
@@ -466,7 +466,7 @@ namespace Avant.WTI.Drip.Form
             -1,
             -2147483648});
             this.num_distributionheight.Name = "num_distributionheight";
-            this.num_distributionheight.Size = new System.Drawing.Size(158, 25);
+            this.num_distributionheight.Size = new System.Drawing.Size(168, 21);
             this.num_distributionheight.TabIndex = 13;
             this.num_distributionheight.ValueChanged += new System.EventHandler(this.Num_distributionheight_ValueChanged);
             // 
@@ -474,9 +474,9 @@ namespace Avant.WTI.Drip.Form
             // 
             this.distributionheightlabel.AutoSize = true;
             this.distributionheightlabel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.distributionheightlabel.Location = new System.Drawing.Point(3, 186);
+            this.distributionheightlabel.Location = new System.Drawing.Point(3, 162);
             this.distributionheightlabel.Name = "distributionheightlabel";
-            this.distributionheightlabel.Size = new System.Drawing.Size(159, 31);
+            this.distributionheightlabel.Size = new System.Drawing.Size(142, 27);
             this.distributionheightlabel.TabIndex = 12;
             this.distributionheightlabel.Text = "Distribution Line Height";
             this.distributionheightlabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
@@ -484,7 +484,7 @@ namespace Avant.WTI.Drip.Form
             // num_transportheight
             // 
             this.num_transportheight.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.num_transportheight.Location = new System.Drawing.Point(168, 127);
+            this.num_transportheight.Location = new System.Drawing.Point(151, 111);
             this.num_transportheight.Maximum = new decimal(new int[] {
             -1,
             -1,
@@ -496,7 +496,7 @@ namespace Avant.WTI.Drip.Form
             -1,
             -2147483648});
             this.num_transportheight.Name = "num_transportheight";
-            this.num_transportheight.Size = new System.Drawing.Size(158, 25);
+            this.num_transportheight.Size = new System.Drawing.Size(168, 21);
             this.num_transportheight.TabIndex = 9;
             this.num_transportheight.Value = new decimal(new int[] {
             400,
@@ -510,9 +510,9 @@ namespace Avant.WTI.Drip.Form
             this.combo_transportdiameter.Dock = System.Windows.Forms.DockStyle.Fill;
             this.combo_transportdiameter.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.combo_transportdiameter.FormattingEnabled = true;
-            this.combo_transportdiameter.Location = new System.Drawing.Point(168, 158);
+            this.combo_transportdiameter.Location = new System.Drawing.Point(151, 138);
             this.combo_transportdiameter.Name = "combo_transportdiameter";
-            this.combo_transportdiameter.Size = new System.Drawing.Size(158, 25);
+            this.combo_transportdiameter.Size = new System.Drawing.Size(168, 20);
             this.combo_transportdiameter.TabIndex = 11;
             this.combo_transportdiameter.SelectedValueChanged += new System.EventHandler(this.Combo_transportdiameter_SelectedValueChanged);
             // 
@@ -521,7 +521,7 @@ namespace Avant.WTI.Drip.Form
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.flowLayoutPanel1);
-            this.groupBox1.Location = new System.Drawing.Point(1001, 53);
+            this.groupBox1.Location = new System.Drawing.Point(868, 53);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(356, 631);
             this.groupBox1.TabIndex = 0;
@@ -531,7 +531,7 @@ namespace Avant.WTI.Drip.Form
             // generateButton
             // 
             this.generateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.generateButton.Location = new System.Drawing.Point(1199, 702);
+            this.generateButton.Location = new System.Drawing.Point(1066, 702);
             this.generateButton.Name = "generateButton";
             this.generateButton.Size = new System.Drawing.Size(158, 58);
             this.generateButton.TabIndex = 2;
@@ -543,10 +543,10 @@ namespace Avant.WTI.Drip.Form
             // 
             this.button_convertplaceholders.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button_convertplaceholders.AutoSize = true;
-            this.button_convertplaceholders.Location = new System.Drawing.Point(1011, 737);
+            this.button_convertplaceholders.Location = new System.Drawing.Point(897, 741);
             this.button_convertplaceholders.Margin = new System.Windows.Forms.Padding(5);
             this.button_convertplaceholders.Name = "button_convertplaceholders";
-            this.button_convertplaceholders.Size = new System.Drawing.Size(154, 21);
+            this.button_convertplaceholders.Size = new System.Drawing.Size(135, 17);
             this.button_convertplaceholders.TabIndex = 1;
             this.button_convertplaceholders.Text = "Convert placeholders";
             this.button_convertplaceholders.UseVisualStyleBackColor = true;
@@ -554,9 +554,9 @@ namespace Avant.WTI.Drip.Form
             // 
             // WTIForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1369, 772);
+            this.ClientSize = new System.Drawing.Size(1236, 776);
             this.Controls.Add(this.button_convertplaceholders);
             this.Controls.Add(this.generateButton);
             this.Controls.Add(this.groupBox1);
