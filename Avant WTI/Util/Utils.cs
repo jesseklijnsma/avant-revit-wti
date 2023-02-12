@@ -150,7 +150,7 @@ namespace Avant.WTI.Util
         }
 
         /// <summary>
-        /// Calculates the bounds of all grid lines
+        /// Calculates the bounds of all grid lines and areas
         /// </summary>
         /// <param name="data">DripData</param>
         /// <returns>Bounding Rectangle</returns>
@@ -164,6 +164,14 @@ namespace Avant.WTI.Util
                 points.Add(l.GetEndPoint(1));
             }
 
+            foreach(Area area in data.areas)
+            {
+                RectangleF bounds = AreaUtils.GetAreaBoundingRectangle(area);
+                points.Add(new XYZ(bounds.Left, bounds.Top, 0));
+                points.Add(new XYZ(bounds.Right, bounds.Top, 0));
+                points.Add(new XYZ(bounds.Right, bounds.Bottom, 0));
+                points.Add(new XYZ(bounds.Left, bounds.Bottom, 0));
+            }
 
 
             // Check if we even have points, otherwise return default rectangle
