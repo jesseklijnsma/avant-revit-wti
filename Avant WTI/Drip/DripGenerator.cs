@@ -90,6 +90,8 @@ namespace Avant.WTI.Drip
 
         public void GeneratePreviewGeometry()
         {
+            // Preview doesn't need any input validation
+
             this.data.previewGeometry.Clear();
             this.data.debugLines.Clear();
             this.data.previewPoints.Clear();
@@ -101,7 +103,7 @@ namespace Avant.WTI.Drip
                 if (pipe == null) pipe = Utils.FindClosestPipe(this.data.pipelines, area);
                 if (pipe == null) continue;
 
-                GenerateAreaBranch(pipe, area, this.data.columnpoints, previewOnly: true);
+                GenerateAreaBranch(pipe, area, previewOnly: true);
             }
         }
 
@@ -140,7 +142,7 @@ namespace Avant.WTI.Drip
                     // Add source pipe to the sources
                     sources.Add(pipe);
 
-                    List<Pipe> pipes = GenerateAreaBranch(pipe, area, this.data.columnpoints, false);
+                    List<Pipe> pipes = GenerateAreaBranch(pipe, area, false);
                     if (pipes == null) continue;
                     placeholders.AddRange(pipes);
                 }
@@ -177,10 +179,9 @@ namespace Avant.WTI.Drip
         /// </summary>
         /// <param name="source">Source pipe</param>
         /// <param name="area">Area</param>
-        /// <param name="columnpoints">All points to consider</param>
         /// <param name="previewOnly">Whether the generated geometry should be placed into the model</param>
         /// <returns>List of pipe placeholders</returns>
-        private List<Pipe> GenerateAreaBranch(Pipe source, Area area, List<XYZ> columnpoints, bool previewOnly = false)
+        private List<Pipe> GenerateAreaBranch(Pipe source, Area area, bool previewOnly = false)
         {
             RectangleF arearect = AreaUtils.GetAreaBoundingRectangle(area);
             XYZ center = Utils.RectangleGetCenter(arearect);
@@ -198,7 +199,7 @@ namespace Avant.WTI.Drip
 
             // Get all points inside of the area
             List<XYZ> areaColumnPoints = new List<XYZ>();
-            foreach (XYZ p in columnpoints)
+            foreach (XYZ p in this.data.columnpoints)
             {
                 if (Utils.RectangleIntersect(arearect, p, tolerance: 1))
                 {
@@ -225,6 +226,11 @@ namespace Avant.WTI.Drip
                 Console.WriteLine("Error: No valve point found");
                 return null;
             }
+
+            previewOnly |= this.data.pipetype == null;
+            previewOnly |= this.data.distributionSystemType == null;
+            previewOnly |= this.data.transportSystemType == null;
+
 
 
             // Calculate the point to actually place the valve using an offset

@@ -72,15 +72,12 @@ namespace Avant.WTI.Drip
 
         public void LoadPrevious()
         {
-            if(this.pipetypes.Count > 0) this.pipetype = this.pipetypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
+            this.pipetype = this.pipetypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
 
-            if (this.systemtypes.Count > 0)
-            {
-                this.transportSystemType = this.systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
-                this.distributionSystemType = this.systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
-            }
+            this.transportSystemType = this.systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
+            this.distributionSystemType = this.systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
 
-            if(this.valvefamilies.Count > 0) this.valvefamily = this.valvefamilies.Find(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
+            this.valvefamily = this.valvefamilies.Find(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
 
             this.intermediateDistance = (int)Properties.Settings.Default.PreviousIntermediateDistance;
             this.backwallDistance = (int)Properties.Settings.Default.PreviousBackwallDistance;
@@ -114,7 +111,6 @@ namespace Avant.WTI.Drip
                 if(this.pipetypes.Count == 0)
                 {
                     messages.Add(new DripDataErrorMessage("No pipetypes found in this document.", DripDataErrorMessage.Severity.WARNING));
-                    // TODO handle ui
                 }
                 if (this.pipetypes.Count != this.pipesizeMap.Count)
                 {
@@ -130,12 +126,10 @@ namespace Avant.WTI.Drip
                 if (systemtypes.Count == 0)
                 {
                     messages.Add(new DripDataErrorMessage("No piping system types found in this document.", DripDataErrorMessage.Severity.WARNING));
-                    // TODO handle ui
                 }
                 if (valvefamilies.Count == 0)
                 {
                     messages.Add(new DripDataErrorMessage("No valve or pipe accessories found in this document.", DripDataErrorMessage.Severity.WARNING));
-                    // TODO handle ui
                 }
 
                 if (areas.Count == 0)
