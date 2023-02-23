@@ -186,55 +186,7 @@ namespace Avant.WTI.Util
         }
 
 
-        /// <summary>
-        /// Displays all errors as a dialog and returns the maximum error severity
-        /// </summary>
-        /// <param name="msgs"></param>
-        /// <returns></returns>
-        public static DripData.DripErrorMessage.Severity DisplayErrors(List<DripData.DripErrorMessage> msgs)
-        {
-            if (msgs == null) return DripData.DripErrorMessage.Severity.NONE;
-
-            msgs = msgs.Distinct().ToList();
-
-            DripData.DripErrorMessage.Severity maxSeverity = DripData.DripErrorMessage.Severity.NONE;
-            for (int i = 0; i < msgs.Count; i++)
-            {
-                DripData.DripErrorMessage msg = msgs[i];
-
-                if (msg.severity > maxSeverity) maxSeverity = msg.severity;
-
-                string caption;
-                MessageBoxIcon icon;
-                switch (msg.severity)
-                {
-                    case DripData.DripErrorMessage.Severity.FATAL:
-                        icon = MessageBoxIcon.Error;
-                        caption = "An error occurred!";
-                        break;
-                    case DripData.DripErrorMessage.Severity.WARNING:
-                        icon = MessageBoxIcon.Warning;
-                        caption = "Warning!";
-                        break;
-                    default:
-                        icon = MessageBoxIcon.Information;
-                        caption = "AvantWTI";
-                        break;
-
-                }
-
-                if (msgs.Count > 1)
-                {
-                    string captionSuffix = string.Format(" ({0} of {1})", i + 1, msgs.Count);
-                    caption += captionSuffix;
-                }
-
-                MessageBox.Show(msg.message, caption, MessageBoxButtons.OK, icon);
-
-            }
-
-            return maxSeverity;
-        }
+        
 
     }
 }
