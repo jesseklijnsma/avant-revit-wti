@@ -223,26 +223,31 @@ namespace Avant.WTI.Util
             // Initialize column filter
             ElementFilter filter = new ElementMulticategoryFilter(new[]{ BuiltInCategory.OST_StructuralColumns, BuiltInCategory.OST_Columns });
 
+            List<Element> allColumns = new List<Element>();
+
             foreach (Document d in allDocuments)
             {
                 List<Element> columns = (new FilteredElementCollector(d))
                     .WherePasses(filter)
                     .WhereElementIsNotElementType()
                     .ToElements() as List<Element>;
+                allColumns.AddRange(columns);
 
-                // Group element by the Z coordinate of the center of their boundingbox
-                var groupedByZ = from c in columns group c by GeomUtils.boundingBoxGetCenter(c.get_BoundingBox(null)).Z into g select new { height = g.Key, columns = g.ToList()};
-                if (groupedByZ.Count() == 0) continue;
+                
+            }
 
-                // Get group of elements with the most elements and with the lowest height
-                List<Element> mostOccurringHeight = groupedByZ.OrderBy(a => a.height).OrderByDescending(a => a.columns.Count).First().columns;                    
-                foreach (Element e in mostOccurringHeight)
-                {
-                    if (e.Location.GetType() != typeof(LocationPoint)) continue;
+            // Group element by the Z coordinate of the center of their boundingbox
+            var groupedByZ = from c in allColumns group c by GeomUtils.boundingBoxGetCenter(c.get_BoundingBox(null)).Z into g select new { height = g.Key, columns = g.ToList() };
+            if (groupedByZ.Count() == 0) return points;
 
-                    LocationPoint lp = (LocationPoint)e.Location;
-                    points.Add(VectorUtils.Vector_setZ(lp.Point, 0));
-                }
+            // Get group of elements with the most elements and with the lowest height
+            List<Element> mostOccurringHeight = groupedByZ.OrderBy(a => a.height).OrderByDescending(a => a.columns.Count).First().columns;
+            foreach (Element e in mostOccurringHeight)
+            {
+                if (e.Location.GetType() != typeof(LocationPoint)) continue;
+
+                LocationPoint lp = (LocationPoint)e.Location;
+                points.Add(VectorUtils.Vector_setZ(lp.Point, 0));
             }
 
             return points;
