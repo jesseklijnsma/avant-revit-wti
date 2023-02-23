@@ -2,6 +2,7 @@
 using Autodesk.Revit.DB.Plumbing;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Avant.WTI.Util
@@ -218,10 +219,14 @@ namespace Avant.WTI.Util
         public List<XYZ> GetColumnPoints()
         {
             List<XYZ> points = new List<XYZ>();
+
+            // Initialize column filter
+            ElementFilter filter = new ElementMulticategoryFilter(new[]{ BuiltInCategory.OST_StructuralColumns, BuiltInCategory.OST_Columns });
+
             foreach (Document d in allDocuments)
             {
                 List<Element> columns = (new FilteredElementCollector(d))
-                    .OfCategory(BuiltInCategory.OST_StructuralColumns)
+                    .WherePasses(filter)
                     .WhereElementIsNotElementType()
                     .ToElements() as List<Element>;
 
