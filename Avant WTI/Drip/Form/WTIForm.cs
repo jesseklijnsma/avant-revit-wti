@@ -100,6 +100,8 @@ namespace Avant.WTI.Drip.Form
             else this.data.valvefamily = (FamilySymbol)this.combo_valvefamily.SelectedValue;
 
             // Load all primitive values
+            num_valveheight.Value = this.data.valveheight;
+
             num_interdistance.Value = this.data.intermediateDistance;
             num_backwalldistance.Value = this.data.backwallDistance;
 

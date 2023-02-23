@@ -237,7 +237,7 @@ namespace Avant.WTI.Drip
 
             // Calculate the point to actually place the valve using an offset
             XYZ valvePoint = valveColumnPoint.Add(rootVector.Normalize().Multiply(this.data.valvecolumnDistance / 304.8));
-            valvePoint = VectorUtils.Vector_setZ(valvePoint, this.data.valveheight);
+            valvePoint = VectorUtils.Vector_setZ(valvePoint, this.data.valveheight / 304.8);
 
             this.data.previewPoints.Add(valvePoint);
 

@@ -78,6 +78,7 @@ namespace Avant.WTI.Drip
             this.distributionSystemType = this.systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
 
             this.valvefamily = this.valvefamilies.Find(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
+            this.valveheight = (int)Properties.Settings.Default.PreviousValveHeight;
 
             this.intermediateDistance = (int)Properties.Settings.Default.PreviousIntermediateDistance;
             this.backwallDistance = (int)Properties.Settings.Default.PreviousBackwallDistance;

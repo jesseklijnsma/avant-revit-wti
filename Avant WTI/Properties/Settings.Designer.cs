@@ -189,5 +189,17 @@ namespace Avant.WTI.Properties {
                 return ((string)(this["QuarryConnectionString"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public double PreviousValveHeight {
+            get {
+                return ((double)(this["PreviousValveHeight"]));
+            }
+            set {
+                this["PreviousValveHeight"] = value;
+            }
+        }
     }
 }

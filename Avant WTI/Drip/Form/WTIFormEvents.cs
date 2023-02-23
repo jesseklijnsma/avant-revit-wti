@@ -88,6 +88,13 @@ namespace Avant.WTI.Drip.Form
             Properties.Settings.Default.PreviousPipeColumnDistance = (int)num_pipecolumndistance.Value;
         }
 
+        private void num_valveheight_ValueChanged(object sender, EventArgs e)
+        {
+            if (isLoading) return;
+            this.data.valveheight = (int)num_valveheight.Value;
+            Properties.Settings.Default.PreviousValveHeight = (int)num_valveheight.Value;
+        }
+
         private void Num_transportheight_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
