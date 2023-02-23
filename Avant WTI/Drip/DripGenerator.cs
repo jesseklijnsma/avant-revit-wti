@@ -94,6 +94,9 @@ namespace Avant.WTI.Drip
             data.previewGeometry.Clear();
             data.debugLines.Clear();
             data.previewPoints.Clear();
+
+            data.errorMessages.Clear();
+
             foreach (Area area in data.areas)
             {
                 // Try to get corresponding type to area
@@ -172,7 +175,8 @@ namespace Avant.WTI.Drip
 #endif
             }
 
-            Utils.DisplayErrors(this.data.errorMessages);
+            maxSeverity = Utils.DisplayErrors(data.errorMessages);
+            if (maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return false;
 
             return true;
         }

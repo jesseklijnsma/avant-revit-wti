@@ -7,9 +7,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("DebugApp")]
 [assembly: AssemblyDescription("GUI for Revit app debugging.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Petar Mitev")]
+[assembly: AssemblyCompany("Avant Projects")]
 [assembly: AssemblyProduct("DebugApp")]
-[assembly: AssemblyCopyright("Copyright 2019 © Petar Mitev")]
+[assembly: AssemblyCopyright("Copyright 2023 © Avant Projects")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
