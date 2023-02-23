@@ -1,12 +1,6 @@
 ﻿using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.DB;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autodesk.Revit.DB.Visual;
-using System.Configuration;
 
 namespace Avant.WTI.Drip.Form
 {
@@ -24,8 +18,8 @@ namespace Avant.WTI.Drip.Form
             PipeType pt = (PipeType)combo_pipetype.SelectedValue;
 
             // Make sure it really changed, so UpdateSizes will not reset the size input
-            if (this.data.pipetype == pt) return;
-            this.data.pipetype = pt;
+            if (data.pipetype == pt) return;
+            data.pipetype = pt;
             UpdateSizes();
             if (pt != null) Properties.Settings.Default.PreviousPipeType = pt.Name;
         }
@@ -36,7 +30,7 @@ namespace Avant.WTI.Drip.Form
         {
             if (isLoading) return;
             PipingSystemType pst = (PipingSystemType)combo_transportsystem.SelectedValue;
-            this.data.transportSystemType = pst;
+            data.transportSystemType = pst;
             if(pst != null) Properties.Settings.Default.PreviousTransportSystem = pst.Name;
         }
 
@@ -44,7 +38,7 @@ namespace Avant.WTI.Drip.Form
         {
             if (isLoading) return;
             PipingSystemType pst = (PipingSystemType)combo_distributionsystem.SelectedValue;
-            this.data.distributionSystemType = pst;
+            data.distributionSystemType = pst;
             if (pst != null) Properties.Settings.Default.PreviousDistributionSystem = pst.Name;
         }
 
@@ -52,14 +46,14 @@ namespace Avant.WTI.Drip.Form
         {
             if (isLoading) return;
             FamilySymbol valve = (FamilySymbol)combo_valvefamily.SelectedValue;
-            this.data.valvefamily = valve;
+            data.valvefamily = valve;
             if (valve != null) Properties.Settings.Default.PreviousValveFamily = valve.Name;
         }
 
         private void Num_interdistance_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            this.data.intermediateDistance = (int)num_interdistance.Value;
+            data.intermediateDistance = (int)num_interdistance.Value;
             ReloadPreview();
             Properties.Settings.Default.PreviousIntermediateDistance = (int)num_interdistance.Value;
         }
@@ -67,7 +61,7 @@ namespace Avant.WTI.Drip.Form
         private void Num_backwalldistance_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            this.data.backwallDistance = (int)num_backwalldistance.Value;
+            data.backwallDistance = (int)num_backwalldistance.Value;
             ReloadPreview();
             Properties.Settings.Default.PreviousBackwallDistance = (int)num_backwalldistance.Value;
         }
@@ -75,7 +69,7 @@ namespace Avant.WTI.Drip.Form
         private void Num_valvecolumndistance_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            this.data.valvecolumnDistance = (int)num_valvecolumndistance.Value;
+            data.valvecolumnDistance = (int)num_valvecolumndistance.Value;
             ReloadPreview();
             Properties.Settings.Default.PreviousValveColumnDistance = (int)num_valvecolumndistance.Value;
         }
@@ -83,7 +77,7 @@ namespace Avant.WTI.Drip.Form
         private void Num_pipecolumndistance_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            this.data.pipecolumnDistance = (int)num_pipecolumndistance.Value;
+            data.pipecolumnDistance = (int)num_pipecolumndistance.Value;
             ReloadPreview();
             Properties.Settings.Default.PreviousPipeColumnDistance = (int)num_pipecolumndistance.Value;
         }
@@ -91,14 +85,14 @@ namespace Avant.WTI.Drip.Form
         private void num_valveheight_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            this.data.valveheight = (int)num_valveheight.Value;
+            data.valveheight = (int)num_valveheight.Value;
             Properties.Settings.Default.PreviousValveHeight = (int)num_valveheight.Value;
         }
 
         private void Num_transportheight_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            this.data.transportlineheight = (int)num_transportheight.Value;
+            data.transportlineheight = (int)num_transportheight.Value;
             Properties.Settings.Default.PreviousTransportHeight = (int)num_transportheight.Value;
         }
 
@@ -107,7 +101,7 @@ namespace Avant.WTI.Drip.Form
             if (isLoading) return;
             if (this.combo_transportdiameter.SelectedValue == null) return;
             double size = (double)combo_transportdiameter.SelectedValue;
-            this.data.transport_diameter = size;
+            data.transport_diameter = size;
             Properties.Settings.Default.PreviousTransportDiameter = size;
 
         }
@@ -115,7 +109,7 @@ namespace Avant.WTI.Drip.Form
         private void Num_distributionheight_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            this.data.distributionlineheight = (int)num_distributionheight.Value;
+            data.distributionlineheight = (int)num_distributionheight.Value;
             Properties.Settings.Default.PreviousDistributionHeight = (int)num_distributionheight.Value;
         }
 
@@ -124,13 +118,13 @@ namespace Avant.WTI.Drip.Form
             if (isLoading) return;
             if (this.combo_distributiondiameter.SelectedValue == null) return;
             double size = (double)combo_distributiondiameter.SelectedValue;
-            this.data.distribution_diameter = size;
+            data.distribution_diameter = size;
             Properties.Settings.Default.PreviousDistributionDiameter = size;
         }
         private void CheckBox1_CheckedChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            this.data.convertPlaceholders = button_convertplaceholders.Checked;
+            data.convertPlaceholders = button_convertplaceholders.Checked;
             Properties.Settings.Default.PreviousDoConvertPlaceholders = button_convertplaceholders.Checked;
         }
 

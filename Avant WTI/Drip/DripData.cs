@@ -3,9 +3,7 @@ using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Runtime.CompilerServices;
 
 namespace Avant.WTI.Drip
 {
@@ -74,27 +72,27 @@ namespace Avant.WTI.Drip
 
         public void LoadPrevious()
         {
-            this.pipetype = this.pipetypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
+            pipetype = pipetypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
 
-            this.transportSystemType = this.systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
-            this.distributionSystemType = this.systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
+            transportSystemType = systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
+            distributionSystemType = systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
 
-            this.valvefamily = this.valvefamilies.Find(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
-            this.valveheight = (int)Properties.Settings.Default.PreviousValveHeight;
+            valvefamily = valvefamilies.Find(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
+            valveheight = (int)Properties.Settings.Default.PreviousValveHeight;
 
-            this.intermediateDistance = (int)Properties.Settings.Default.PreviousIntermediateDistance;
-            this.backwallDistance = (int)Properties.Settings.Default.PreviousBackwallDistance;
+            intermediateDistance = (int)Properties.Settings.Default.PreviousIntermediateDistance;
+            backwallDistance = (int)Properties.Settings.Default.PreviousBackwallDistance;
 
-            this.valvecolumnDistance = (int)Properties.Settings.Default.PreviousValveColumnDistance;
-            this.pipecolumnDistance = (int)Properties.Settings.Default.PreviousPipeColumnDistance;
+            valvecolumnDistance = (int)Properties.Settings.Default.PreviousValveColumnDistance;
+            pipecolumnDistance = (int)Properties.Settings.Default.PreviousPipeColumnDistance;
 
-            this.transportlineheight = (int)Properties.Settings.Default.PreviousTransportHeight;
-            this.distributionlineheight = (int)Properties.Settings.Default.PreviousDistributionHeight;
+            transportlineheight = (int)Properties.Settings.Default.PreviousTransportHeight;
+            distributionlineheight = (int)Properties.Settings.Default.PreviousDistributionHeight;
 
-            this.convertPlaceholders = Properties.Settings.Default.PreviousDoConvertPlaceholders;
+            convertPlaceholders = Properties.Settings.Default.PreviousDoConvertPlaceholders;
 
-            this.transport_diameter = Properties.Settings.Default.PreviousTransportDiameter;
-            this.distribution_diameter = Properties.Settings.Default.PreviousDistributionDiameter;
+            transport_diameter = Properties.Settings.Default.PreviousTransportDiameter;
+            distribution_diameter = Properties.Settings.Default.PreviousDistributionDiameter;
         }
 
         public void refreshErrorMessages(Data d)
@@ -103,24 +101,24 @@ namespace Avant.WTI.Drip
 
             if (d == Data.INPUT)
             {
-                if (this.uidoc == null)
+                if (uidoc == null)
                 {
                     errorMessages.Add(new DripErrorMessage("Active UI document is null.", DripErrorMessage.Severity.FATAL));
                 }
-                if (this.doc == null)
+                if (doc == null)
                 {
                     errorMessages.Add(new DripErrorMessage("Active document is null.", DripErrorMessage.Severity.FATAL));
                 }
-                if(this.pipetypes.Count == 0)
+                if(pipetypes.Count == 0)
                 {
                     errorMessages.Add(new DripErrorMessage("No pipetypes found in this document.", DripErrorMessage.Severity.WARNING));
                 }
-                if (this.pipetypes.Count != this.pipesizeMap.Count)
+                if (pipetypes.Count != pipesizeMap.Count)
                 {
                     errorMessages.Add(new DripErrorMessage("Not all pipes have a corresponding sizes.", DripErrorMessage.Severity.WARNING));
                     // TODO handle ui
                 }
-                foreach (KeyValuePair<PipeType, List<double>> kv in this.pipesizeMap){
+                foreach (KeyValuePair<PipeType, List<double>> kv in pipesizeMap){
                     PipeType pt = kv.Key;
                     List<double> sizes = kv.Value;
                     if (sizes.Count == 0) errorMessages.Add(new DripErrorMessage(string.Format("{0} does not have any corresponding sizes.", pt.Name), DripErrorMessage.Severity.WARNING));
@@ -183,7 +181,7 @@ namespace Avant.WTI.Drip
                 }
                 else
                 {
-                    foreach(Pipe pipe in this.pipelines)
+                    foreach(Pipe pipe in pipelines)
                     {
                         PipingSystem ps = (PipingSystem)pipe.MEPSystem;
                         try
