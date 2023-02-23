@@ -1,4 +1,4 @@
-﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 using Avant.WTI.Util;
 using System;
@@ -94,6 +94,9 @@ namespace Avant.WTI.Drip
             data.previewGeometry.Clear();
             data.debugLines.Clear();
             data.previewPoints.Clear();
+
+            data.errorMessages.Clear();
+
             foreach (Area area in data.areas)
             {
                 // Try to get corresponding type to area
@@ -171,6 +174,9 @@ namespace Avant.WTI.Drip
                 throw;
 #endif
             }
+
+            maxSeverity = Utils.DisplayErrors(data.errorMessages);
+            if (maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return false;
 
             return true;
         }

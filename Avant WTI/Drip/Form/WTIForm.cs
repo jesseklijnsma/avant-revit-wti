@@ -138,8 +138,17 @@ namespace Avant.WTI.Drip.Form
         public void ReloadPreview()
         {
             dripGenerator.GeneratePreviewGeometry();
+
+            if(data.errorMessages.Count == 0)
+            {
+                label_previewwarning.Visible = false;
+            }
+            else
+            {
+                label_previewwarning.Visible = true;
+            }
             // rerender
-            this.canvas.Invalidate();
+            canvas.Invalidate();
         }
 
         

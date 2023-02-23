@@ -195,6 +195,8 @@ namespace Avant.WTI.Util
         {
             if (msgs == null) return DripData.DripErrorMessage.Severity.NONE;
 
+            msgs = msgs.Distinct().ToList();
+
             DripData.DripErrorMessage.Severity maxSeverity = DripData.DripErrorMessage.Severity.NONE;
             for (int i = 0; i < msgs.Count; i++)
             {

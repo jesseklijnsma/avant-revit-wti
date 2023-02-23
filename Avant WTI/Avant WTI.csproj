@@ -111,12 +111,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
-    <Compile Include="Drip\Form\WTIFormCanvas.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Drip\Form\WTIFormEvents.cs">
-      <SubType>Form</SubType>
-    </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="Util\AreaUtils.cs" />
     <Compile Include="Drip\DripData.cs" />
@@ -132,6 +126,14 @@
     </Compile>
     <Compile Include="Drip\Form\WTIForm.Designer.cs">
       <DependentUpon>WTIForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Drip\Form\WTIForm.Canvas.cs">
+      <DependentUpon>WTIForm.cs</DependentUpon>
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Drip\Form\WTIForm.Events.cs">
+      <DependentUpon>WTIForm.cs</DependentUpon>
+      <SubType>Form</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

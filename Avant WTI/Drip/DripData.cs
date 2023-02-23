@@ -215,11 +215,31 @@ namespace Avant.WTI.Drip
 
             public string message { get; }
             public Severity severity { get; }
+            public bool unique { get; }
 
-            public DripErrorMessage(string message, Severity s)
+            public DripErrorMessage(string message, Severity s, bool unique = true)
             {
                 this.message = message;
                 this.severity = s;
+                this.unique = unique;
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (obj == null || GetType() != obj.GetType()) return false;
+
+                DripErrorMessage other = (DripErrorMessage)obj;
+                if (unique) return base.Equals(obj);
+                return message.Equals(other.message);
+            }
+
+            public override int GetHashCode()
+            {
+                int hashCode = 1300177356;
+                hashCode = hashCode * -1521134295 + EqualityComparer<string>.Default.GetHashCode(message);
+                hashCode = hashCode * -1521134295 + severity.GetHashCode();
+                hashCode = hashCode * -1521134295 + unique.GetHashCode();
+                return hashCode;
             }
 
             public enum Severity
