@@ -191,14 +191,14 @@ namespace Avant.WTI.Util
         /// </summary>
         /// <param name="msgs"></param>
         /// <returns></returns>
-        public static DripData.DripDataErrorMessage.Severity DisplayErrors(List<DripData.DripDataErrorMessage> msgs)
+        public static DripData.DripErrorMessage.Severity DisplayErrors(List<DripData.DripErrorMessage> msgs)
         {
-            if (msgs == null) return DripData.DripDataErrorMessage.Severity.NONE;
+            if (msgs == null) return DripData.DripErrorMessage.Severity.NONE;
 
-            DripData.DripDataErrorMessage.Severity maxSeverity = DripData.DripDataErrorMessage.Severity.NONE;
+            DripData.DripErrorMessage.Severity maxSeverity = DripData.DripErrorMessage.Severity.NONE;
             for (int i = 0; i < msgs.Count; i++)
             {
-                DripData.DripDataErrorMessage msg = msgs[i];
+                DripData.DripErrorMessage msg = msgs[i];
 
                 if (msg.severity > maxSeverity) maxSeverity = msg.severity;
 
@@ -206,11 +206,11 @@ namespace Avant.WTI.Util
                 MessageBoxIcon icon;
                 switch (msg.severity)
                 {
-                    case DripData.DripDataErrorMessage.Severity.FATAL:
+                    case DripData.DripErrorMessage.Severity.FATAL:
                         icon = MessageBoxIcon.Error;
                         caption = "An error occurred!";
                         break;
-                    case DripData.DripDataErrorMessage.Severity.WARNING:
+                    case DripData.DripErrorMessage.Severity.WARNING:
                         icon = MessageBoxIcon.Warning;
                         caption = "Warning!";
                         break;

@@ -110,11 +110,11 @@ namespace Avant.WTI.Drip
         public bool GenerateDrip()
         {
             // Check if inputs are valid
-            List<DripData.DripDataErrorMessage> msgs = data.getErrorMessages(DripData.Data.OUTPUT);
-            DripData.DripDataErrorMessage.Severity maxSeverity = Utils.DisplayErrors(msgs);
+            data.refreshErrorMessages(DripData.Data.OUTPUT);
+            DripData.DripErrorMessage.Severity maxSeverity = Utils.DisplayErrors(this.data.errorMessages);
 
-            if (maxSeverity == DripData.DripDataErrorMessage.Severity.FATAL) return false;
-
+            if (maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return false;
+            data.errorMessages.Clear();
 
             // Create transaction
             Transaction t = new Transaction(this.data.doc);

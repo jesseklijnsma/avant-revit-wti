@@ -54,10 +54,11 @@ namespace Avant.WTI.Drip
 
                 data.LoadPrevious();
 
-                List<DripData.DripDataErrorMessage> msgs = data.getErrorMessages(DripData.Data.INPUT);
-                DripData.DripDataErrorMessage.Severity maxSeverity = Utils.DisplayErrors(msgs);
+                // Check for input value errors
+                data.refreshErrorMessages(DripData.Data.INPUT);
+                DripData.DripErrorMessage.Severity maxSeverity = Utils.DisplayErrors(data.errorMessages);
 
-                if (maxSeverity == DripData.DripDataErrorMessage.Severity.FATAL) return Result.Failed;
+                if (maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return Result.Failed;
 
                 // Show the input form
                 Application.Run(new WTIForm(data));
