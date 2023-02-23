@@ -1,5 +1,6 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
+using Autodesk.Revit.Exceptions;
 using Avant.WTI.Util;
 using System;
 using System.Collections.Generic;
@@ -85,6 +86,23 @@ namespace Avant.WTI.Drip
 
             if (sortedClosestPoints.Count == 0) return null;
             return sortedClosestPoints[0];
+        }
+
+
+        private Line FindBestCenterLine(XYZ source, Line preferredLine, List<XYZ> columns, double paddingmm)
+        {
+            double paddingft = paddingmm / 304.8;
+            List<XYZ> closePoints = GeomUtils.GetClosestPoints(preferredLine, columns, 1 / 304.8);
+            bool goodLine = !closePoints.Any(p => preferredLine.Distance(p) < paddingft || source.DistanceTo(p) < paddingft);
+
+            if (goodLine) return preferredLine;
+
+            XYZ linePoint = GeomUtils.GetClosestPoint(preferredLine, source);
+            XYZ sourceToLine = (linePoint - source).Normalize();
+
+            Line newLine = (Line)preferredLine.CreateTransformed(Transform.CreateTranslation(sourceToLine.Multiply(paddingft)));
+
+            return FindBestCenterLine(source, newLine, columns, paddingmm);
         }
 
         public void GeneratePreviewGeometry()
@@ -239,7 +257,8 @@ namespace Avant.WTI.Drip
             previewOnly |= data.transportSystemType == null;
 
 
-            double minimumPipeLength = 3 * Math.Min(data.transport_diameter, data.distribution_diameter) / 304.8;
+            double minimumPipeLengthFt = 3 * Math.Max(this.data.transport_diameter, this.data.distribution_diameter) / 304.8;
+
 
             // Calculate the point to actually place the valve using an offset
             XYZ valvePoint = valveColumnPoint.Add(rootVector.Normalize().Multiply(data.valvecolumnDistance / 304.8));
@@ -280,7 +299,8 @@ namespace Avant.WTI.Drip
                 }
             }
 
-            bool valveConnect = valve_in_c != null && valve_out_c != null;
+
+            bool valveConnect = (valve_in_c != null && valve_out_c != null);
 
             if (previewOnly || !valveConnect)
             {
@@ -309,6 +329,20 @@ namespace Avant.WTI.Drip
             XYZ p1 = VectorUtils.Vector_setZ(sourcepoint, data.transportlineheight / 304.8);
 
 
+            // Checking sizes and distances
+            double source_transport_heightdiff = Math.Abs(data.transportlineheight / 304.8 - sourcepoint.Z);
+            if (source_transport_heightdiff < minimumPipeLengthFt && source_transport_heightdiff > 0.000000001f)
+            {
+                data.errorMessages.Add(new DripData.DripErrorMessage(string.Format("Height between source pipe and transport pipe is too small. Distance: {0}mm. No pipes will be generated.", source_transport_heightdiff * 304.8), DripData.DripErrorMessage.Severity.WARNING, unique: false));
+                previewOnly = true;
+            }
+            double transport_distribution_heightdiff = Math.Abs(data.transportlineheight - data.distributionlineheight) / 304.8;
+            if(transport_distribution_heightdiff < minimumPipeLengthFt)
+            {
+                data.errorMessages.Add(new DripData.DripErrorMessage(string.Format("Height between distribution pipe and transport pipe is too small. Distance needs to be at least {0}mm. No pipes will be generated.", minimumPipeLengthFt * 304.8), DripData.DripErrorMessage.Severity.WARNING, unique: false));
+                previewOnly = true;
+            }
+
 
             // ROUTE VALVE TO DISTRIBUTION TEE
             // offcenter:
@@ -318,13 +352,24 @@ namespace Avant.WTI.Drip
             bool offcenter = false;
 
             XYZ p3 = VectorUtils.Vector_setZ(valve_out_p, data.transportlineheight / 304.8);
-            XYZ valve_transport_corner_out_p = VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(centerline, p3), data.transportlineheight / 304.8);
-            if (centerline.Distance(VectorUtils.Vector_setZ(p3, 0)) <= data.pipecolumnDistance / 304.8)
+
+            //GeomUtils.GetClosestPoints(centerline, columnpoints, 1/304.8);
+            double minOffset = Math.Min(data.pipecolumnDistance, minimumPipeLengthFt);
+            Line transportCenterLine = FindBestCenterLine(p3, centerline, columnpoints, minOffset);
+
+            double distanceFromCenter = transportCenterLine.Distance(center);
+
+            if (distanceFromCenter >= 0.000000001f)
             {
-                double centerOffset = Math.Min(data.pipecolumnDistance, minimumPipeLength);
-                valve_transport_corner_out_p = p3.Add(perpendicularVector.Normalize().Multiply(centerOffset / 304.8));
                 offcenter = true;
+                if(distanceFromCenter < minOffset)
+                {
+                    data.errorMessages.Add(new DripData.DripErrorMessage(string.Format("Transport line is too close to a column or other pipe. Distance: {0}mm. No pipes will be generated.", distanceFromCenter * 304.8), DripData.DripErrorMessage.Severity.WARNING));
+                    previewOnly = true;
+                }
             }
+
+            XYZ valve_transport_corner_out_p = VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(transportCenterLine, p3), data.transportlineheight / 304.8);
 
             XYZ teeOffsetFromBackWall = rootVector.Normalize().Multiply(-data.backwallDistance / 304.8);
             XYZ tee = VectorUtils.Vector_setZ(center.Add(rootVector.Multiply(0.5).Add(teeOffsetFromBackWall)), data.distributionlineheight / 304.8);
@@ -343,36 +388,42 @@ namespace Avant.WTI.Drip
 
 
             // Source to valve
-            pipe_geometry.Add(Line.CreateBound(sourcepoint, p1));
-            pipe_geometry.Add(Line.CreateBound(p1, valve_transport_corner_p));
-            pipe_geometry.Add(Line.CreateBound(valve_transport_corner_p, p2));
-            pipe_geometry.Add(Line.CreateBound(p2, valve_in_p));
-
-            // Valve to tee
-            pipe_geometry.Add(Line.CreateBound(valve_out_p, p3));
-            pipe_geometry.Add(Line.CreateBound(p3, valve_transport_corner_out_p));
-            if (offcenter)
+            try
             {
-                pipe_geometry.Add(Line.CreateBound(valve_transport_corner_out_p, p4));
-                pipe_geometry.Add(Line.CreateBound(p4, p5));
-            }
-            else
-            {
-                pipe_geometry.Add(Line.CreateBound(valve_transport_corner_out_p, p5));
-            }
-            pipe_geometry.Add(Line.CreateBound(p5, tee));
+                pipe_geometry.Add(Line.CreateBound(sourcepoint, p1));
+                pipe_geometry.Add(Line.CreateBound(p1, valve_transport_corner_p));
+                pipe_geometry.Add(Line.CreateBound(valve_transport_corner_p, p2));
+                pipe_geometry.Add(Line.CreateBound(p2, valve_in_p));
 
-            // Tee
-            pipe_geometry.Add(Line.CreateBound(tee_p1, tee_p2));
+                // Valve to tee
+                pipe_geometry.Add(Line.CreateBound(valve_out_p, p3));
+                pipe_geometry.Add(Line.CreateBound(p3, valve_transport_corner_out_p));
+                if (offcenter)
+                {
+                    pipe_geometry.Add(Line.CreateBound(valve_transport_corner_out_p, p4));
+                    pipe_geometry.Add(Line.CreateBound(p4, p5));
+                }
+                else
+                {
+                    pipe_geometry.Add(Line.CreateBound(valve_transport_corner_out_p, p5));
+                }
+                pipe_geometry.Add(Line.CreateBound(p5, tee));
 
-            data.previewGeometry.AddRange(pipe_geometry);
+                // Tee
+                pipe_geometry.Add(Line.CreateBound(tee_p1, tee_p2));
+            }catch(ArgumentsInconsistentException){
+                this.data.errorMessages.Add(new DripData.DripErrorMessage("Generated pipe segment is too short! Branch will not be generated.", DripData.DripErrorMessage.Severity.WARNING));
+                previewOnly = true;
+            }
+
+            this.data.previewGeometry.AddRange(pipe_geometry);
 
             foreach(Line l in pipe_geometry)
             {
-                if (l.Length < minimumPipeLength)
+                if (l.Length < minimumPipeLengthFt)
                 {
                     previewOnly = true;
-                    data.errorMessages.Add(new DripData.DripErrorMessage("Generated pipe segment is too short! Branch will not be generated.", DripData.DripErrorMessage.Severity.WARNING));
+                    this.data.errorMessages.Add(new DripData.DripErrorMessage("Generated pipe segment is too short! Branch will not be generated.", DripData.DripErrorMessage.Severity.WARNING));
                 }
             }
 
