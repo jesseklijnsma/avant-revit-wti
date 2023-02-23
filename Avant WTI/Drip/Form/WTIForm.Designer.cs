@@ -102,7 +102,7 @@ namespace Avant.WTI.Drip.Form
             this.canvas.Controls.Add(this.label_previewwarning);
             this.canvas.Location = new System.Drawing.Point(13, 53);
             this.canvas.Name = "canvas";
-            this.canvas.Size = new System.Drawing.Size(953, 795);
+            this.canvas.Size = new System.Drawing.Size(921, 844);
             this.canvas.TabIndex = 1;
             this.canvas.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvas_paint);
             this.canvas.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousedown);
@@ -113,15 +113,16 @@ namespace Avant.WTI.Drip.Form
             // 
             // label_previewwarning
             // 
+            this.label_previewwarning.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.label_previewwarning.BackColor = System.Drawing.Color.Transparent;
-            this.label_previewwarning.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.label_previewwarning.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label_previewwarning.ForeColor = System.Drawing.Color.Red;
-            this.label_previewwarning.Location = new System.Drawing.Point(0, 750);
+            this.label_previewwarning.Location = new System.Drawing.Point(0, 786);
             this.label_previewwarning.Margin = new System.Windows.Forms.Padding(3, 0, 0, 0);
             this.label_previewwarning.Name = "label_previewwarning";
             this.label_previewwarning.Padding = new System.Windows.Forms.Padding(0, 0, 0, 20);
-            this.label_previewwarning.Size = new System.Drawing.Size(953, 45);
+            this.label_previewwarning.Size = new System.Drawing.Size(921, 58);
             this.label_previewwarning.TabIndex = 3;
             this.label_previewwarning.Text = "Warning! There were errors creating the preview. Full generation will most likely" +
     " not succeed";
@@ -148,7 +149,7 @@ namespace Avant.WTI.Drip.Form
             this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 26);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(424, 702);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(424, 751);
             this.flowLayoutPanel1.TabIndex = 2;
             this.flowLayoutPanel1.WrapContents = false;
             // 
@@ -586,9 +587,9 @@ namespace Avant.WTI.Drip.Form
             | System.Windows.Forms.AnchorStyles.Right)));
             this.groupBox1.Controls.Add(this.flowLayoutPanel1);
             this.groupBox1.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.groupBox1.Location = new System.Drawing.Point(972, 53);
+            this.groupBox1.Location = new System.Drawing.Point(940, 53);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(430, 731);
+            this.groupBox1.Size = new System.Drawing.Size(430, 780);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "WTI Settings";
@@ -596,7 +597,7 @@ namespace Avant.WTI.Drip.Form
             // generateButton
             // 
             this.generateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.generateButton.Location = new System.Drawing.Point(1244, 790);
+            this.generateButton.Location = new System.Drawing.Point(1212, 839);
             this.generateButton.Name = "generateButton";
             this.generateButton.Size = new System.Drawing.Size(158, 58);
             this.generateButton.TabIndex = 2;
@@ -609,7 +610,7 @@ namespace Avant.WTI.Drip.Form
             this.button_convertplaceholders.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.button_convertplaceholders.AutoSize = true;
             this.button_convertplaceholders.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_convertplaceholders.Location = new System.Drawing.Point(982, 821);
+            this.button_convertplaceholders.Location = new System.Drawing.Point(950, 870);
             this.button_convertplaceholders.Margin = new System.Windows.Forms.Padding(5);
             this.button_convertplaceholders.Name = "button_convertplaceholders";
             this.button_convertplaceholders.Size = new System.Drawing.Size(193, 27);
@@ -621,7 +622,7 @@ namespace Avant.WTI.Drip.Form
             // WTIForm
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(1414, 864);
+            this.ClientSize = new System.Drawing.Size(1382, 913);
             this.Controls.Add(this.button_convertplaceholders);
             this.Controls.Add(this.generateButton);
             this.Controls.Add(this.groupBox1);
@@ -629,9 +630,10 @@ namespace Avant.WTI.Drip.Form
             this.Controls.Add(this.canvas);
             this.Font = new System.Drawing.Font("Segoe UI", 7.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MinimumSize = new System.Drawing.Size(800, 850);
+            this.MinimumSize = new System.Drawing.Size(1000, 960);
             this.Name = "WTIForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Avant WTI";
             this.Activated += new System.EventHandler(this.WTIForm_Activated);
             this.canvas.ResumeLayout(false);

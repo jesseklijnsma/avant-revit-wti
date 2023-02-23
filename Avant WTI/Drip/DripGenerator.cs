@@ -1,6 +1,7 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.Exceptions;
+using Autodesk.Revit.UI;
 using Avant.WTI.Util;
 using System;
 using System.Collections.Generic;
@@ -131,9 +132,11 @@ namespace Avant.WTI.Drip
         {
             // Check if inputs are valid
             data.refreshErrorMessages(DripData.Data.OUTPUT);
-            DripData.DripErrorMessage.Severity maxSeverity = Utils.DisplayErrors(data.errorMessages);
+            ErrorDialog errorDialog = new ErrorDialog(data.errorMessages);
+            errorDialog.ShowErrors();
 
-            if (maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return false;
+            if (errorDialog.maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return false;
+
             data.errorMessages.Clear();
 
             // Create transaction
@@ -193,8 +196,10 @@ namespace Avant.WTI.Drip
 #endif
             }
 
-            maxSeverity = Utils.DisplayErrors(data.errorMessages);
-            if (maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return false;
+            errorDialog = new ErrorDialog(data.errorMessages);
+            errorDialog.ShowErrors();
+
+            if (errorDialog.maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return false;
 
             return true;
         }
