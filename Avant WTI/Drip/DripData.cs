@@ -57,11 +57,13 @@ namespace Avant.WTI.Drip
 
         public bool convertPlaceholders = true;
 
-
         // Misc
         public readonly List<Line> previewGeometry = new List<Line>();
         public readonly List<XYZ> previewPoints = new List<XYZ>();
         public readonly List<Line> debugLines = new List<Line>();
+
+        // Error messages
+        public List<DripErrorMessage> errorMessages = new List<DripErrorMessage>();
 
         public DripData(Document document, UIDocument uidoc)
         {
@@ -95,89 +97,89 @@ namespace Avant.WTI.Drip
             this.distribution_diameter = Properties.Settings.Default.PreviousDistributionDiameter;
         }
 
-        public List<DripDataErrorMessage> getErrorMessages(Data d)
+        public void refreshErrorMessages(Data d)
         {
-            List<DripDataErrorMessage> messages = new List<DripDataErrorMessage>();
+            errorMessages.Clear();
 
             if (d == Data.INPUT)
             {
                 if (this.uidoc == null)
                 {
-                    messages.Add(new DripDataErrorMessage("Active UI document is null.", DripDataErrorMessage.Severity.FATAL));
+                    errorMessages.Add(new DripErrorMessage("Active UI document is null.", DripErrorMessage.Severity.FATAL));
                 }
                 if (this.doc == null)
                 {
-                    messages.Add(new DripDataErrorMessage("Active document is null.", DripDataErrorMessage.Severity.FATAL));
+                    errorMessages.Add(new DripErrorMessage("Active document is null.", DripErrorMessage.Severity.FATAL));
                 }
                 if(this.pipetypes.Count == 0)
                 {
-                    messages.Add(new DripDataErrorMessage("No pipetypes found in this document.", DripDataErrorMessage.Severity.WARNING));
+                    errorMessages.Add(new DripErrorMessage("No pipetypes found in this document.", DripErrorMessage.Severity.WARNING));
                 }
                 if (this.pipetypes.Count != this.pipesizeMap.Count)
                 {
-                    messages.Add(new DripDataErrorMessage("Not all pipes have a corresponding sizes.", DripDataErrorMessage.Severity.WARNING));
+                    errorMessages.Add(new DripErrorMessage("Not all pipes have a corresponding sizes.", DripErrorMessage.Severity.WARNING));
                     // TODO handle ui
                 }
                 foreach (KeyValuePair<PipeType, List<double>> kv in this.pipesizeMap){
                     PipeType pt = kv.Key;
                     List<double> sizes = kv.Value;
-                    if (sizes.Count == 0) messages.Add(new DripDataErrorMessage(string.Format("{0} does not have any corresponding sizes.", pt.Name), DripDataErrorMessage.Severity.WARNING));
+                    if (sizes.Count == 0) errorMessages.Add(new DripErrorMessage(string.Format("{0} does not have any corresponding sizes.", pt.Name), DripErrorMessage.Severity.WARNING));
                     // TODO handle ui
                 }
                 if (systemtypes.Count == 0)
                 {
-                    messages.Add(new DripDataErrorMessage("No piping system types found in this document.", DripDataErrorMessage.Severity.WARNING));
+                    errorMessages.Add(new DripErrorMessage("No piping system types found in this document.", DripErrorMessage.Severity.WARNING));
                 }
                 if (valvefamilies.Count == 0)
                 {
-                    messages.Add(new DripDataErrorMessage("No valve or pipe accessories found in this document.", DripDataErrorMessage.Severity.WARNING));
+                    errorMessages.Add(new DripErrorMessage("No valve or pipe accessories found in this document.", DripErrorMessage.Severity.WARNING));
                 }
 
                 if (areas.Count == 0)
                 {
-                    messages.Add(new DripDataErrorMessage("No areas found in this document.", DripDataErrorMessage.Severity.FATAL));
+                    errorMessages.Add(new DripErrorMessage("No areas found in this document.", DripErrorMessage.Severity.FATAL));
                 }
 
                 if(columnpoints.Count == 0)
                 {
-                    messages.Add(new DripDataErrorMessage("No columns found in this document", DripDataErrorMessage.Severity.FATAL));
+                    errorMessages.Add(new DripErrorMessage("No columns found in this document", DripErrorMessage.Severity.FATAL));
                 }
 
                 if(lines.Count == 0)
                 {
-                    messages.Add(new DripDataErrorMessage("No grids found in this document", DripDataErrorMessage.Severity.WARNING));
+                    errorMessages.Add(new DripErrorMessage("No grids found in this document", DripErrorMessage.Severity.WARNING));
                     // TODO handle ui
                     // TODO convert grid bounded to area bounded
                 }
 
                 if(groundLevel == null)
                 {
-                    messages.Add(new DripDataErrorMessage("No levels found in this document.", DripDataErrorMessage.Severity.FATAL));
+                    errorMessages.Add(new DripErrorMessage("No levels found in this document.", DripErrorMessage.Severity.FATAL));
                 }
             }
             else if (d == Data.OUTPUT)
             {
                 if(pipetype == null)
                 {
-                    messages.Add(new DripDataErrorMessage("No pipe type selected.", DripDataErrorMessage.Severity.FATAL));
+                    errorMessages.Add(new DripErrorMessage("No pipe type selected.", DripErrorMessage.Severity.FATAL));
                 }
                 if (transportSystemType == null)
                 {
-                    messages.Add(new DripDataErrorMessage("No transport pipe system type selected.", DripDataErrorMessage.Severity.FATAL));
+                    errorMessages.Add(new DripErrorMessage("No transport pipe system type selected.", DripErrorMessage.Severity.FATAL));
                 }
                 if (distributionSystemType == null)
                 {
-                    messages.Add(new DripDataErrorMessage("No distribtion pipe system type selected.", DripDataErrorMessage.Severity.FATAL));
+                    errorMessages.Add(new DripErrorMessage("No distribtion pipe system type selected.", DripErrorMessage.Severity.FATAL));
                 }
                 if (valvefamily == null)
                 {
-                    messages.Add(new DripDataErrorMessage("No valve family selected. Creating dummy connections instead", DripDataErrorMessage.Severity.WARNING));
+                    errorMessages.Add(new DripErrorMessage("No valve family selected. Creating dummy connections instead", DripErrorMessage.Severity.WARNING));
                 }
 
                 MEPSystemClassification globalClassification = transportSystemType.SystemClassification;
                 if (globalClassification != distributionSystemType.SystemClassification)
                 {
-                    messages.Add(new DripDataErrorMessage("System Classification cannot be different between system types.", DripDataErrorMessage.Severity.FATAL));
+                    errorMessages.Add(new DripErrorMessage("System Classification cannot be different between system types.", DripErrorMessage.Severity.FATAL));
                 }
                 else
                 {
@@ -193,21 +195,15 @@ namespace Avant.WTI.Drip
                                 string newClass = Enum.GetName(typeof(MEPSystemClassification), globalClassification);
 
 
-                                messages.Add(new DripDataErrorMessage(string.Format("Source pipe ({0}) is of system classification {1}, but the system classification of the set system types is {2}.", pipe.Id, pipeClass, newClass), DripDataErrorMessage.Severity.FATAL));
+                                errorMessages.Add(new DripErrorMessage(string.Format("Source pipe ({0}) is of system classification {1}, but the system classification of the set system types is {2}.", pipe.Id, pipeClass, newClass), DripErrorMessage.Severity.FATAL));
                             }
                         }
                         catch (Exception) { }
                     }
                 }
-
-
-
-
             }
 
-            messages = messages.OrderByDescending(m => m.severity).ToList();
-
-            return messages;
+            errorMessages = errorMessages.OrderByDescending(m => m.severity).ToList();
         }
 
         public enum Data
@@ -216,13 +212,13 @@ namespace Avant.WTI.Drip
             OUTPUT
         }
 
-        public class DripDataErrorMessage
+        public class DripErrorMessage
         {
 
             public string message { get; }
             public Severity severity { get; }
 
-            public DripDataErrorMessage(string message, Severity s)
+            public DripErrorMessage(string message, Severity s)
             {
                 this.message = message;
                 this.severity = s;
