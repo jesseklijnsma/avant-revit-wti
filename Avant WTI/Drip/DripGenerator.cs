@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
-using Autodesk.Revit.UI;
 using Avant.WTI.Util;
 using System;
 using System.Collections.Generic;
@@ -35,7 +34,7 @@ namespace Avant.WTI.Drip
             if (ids.Count == 0) return new List<ElementId>();
             try
             {
-                List<ElementId> newIds = (List<ElementId>)PlumbingUtils.ConvertPipePlaceholders(this.data.doc, ids);
+                List<ElementId> newIds = (List<ElementId>)PlumbingUtils.ConvertPipePlaceholders(data.doc, ids);
                 return newIds;
             }
             catch (Exception)
@@ -92,15 +91,15 @@ namespace Avant.WTI.Drip
         {
             // Preview doesn't need any input validation
 
-            this.data.previewGeometry.Clear();
-            this.data.debugLines.Clear();
-            this.data.previewPoints.Clear();
-            foreach (Area area in this.data.areas)
+            data.previewGeometry.Clear();
+            data.debugLines.Clear();
+            data.previewPoints.Clear();
+            foreach (Area area in data.areas)
             {
                 // Try to get corresponding type to area
                 Pipe pipe = null;
-                if (this.data.areapipemap.ContainsKey(area)) pipe = this.data.areapipemap[area];
-                if (pipe == null) pipe = Utils.FindClosestPipe(this.data.pipelines, area);
+                if (data.areapipemap.ContainsKey(area)) pipe = data.areapipemap[area];
+                if (pipe == null) pipe = Utils.FindClosestPipe(data.pipelines, area);
                 if (pipe == null) continue;
 
                 GenerateAreaBranch(pipe, area, previewOnly: true);
@@ -111,13 +110,13 @@ namespace Avant.WTI.Drip
         {
             // Check if inputs are valid
             data.refreshErrorMessages(DripData.Data.OUTPUT);
-            DripData.DripErrorMessage.Severity maxSeverity = Utils.DisplayErrors(this.data.errorMessages);
+            DripData.DripErrorMessage.Severity maxSeverity = Utils.DisplayErrors(data.errorMessages);
 
             if (maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return false;
             data.errorMessages.Clear();
 
             // Create transaction
-            Transaction t = new Transaction(this.data.doc);
+            Transaction t = new Transaction(data.doc);
             t.Start("Drip generation");
 
             // Set Revit model errors to non blocking dialogs
@@ -131,12 +130,12 @@ namespace Avant.WTI.Drip
 
                 // List of unique source pipes
                 HashSet<Pipe> sources = new HashSet<Pipe>();
-                foreach (Area area in this.data.areas)
+                foreach (Area area in data.areas)
                 {
                     // Try to get corresponding type to area
                     Pipe pipe = null;
-                    if (this.data.areapipemap.ContainsKey(area)) pipe = this.data.areapipemap[area];
-                    if (pipe == null) pipe = Utils.FindClosestPipe(this.data.pipelines, area);
+                    if (data.areapipemap.ContainsKey(area)) pipe = data.areapipemap[area];
+                    if (pipe == null) pipe = Utils.FindClosestPipe(data.pipelines, area);
                     if (pipe == null) continue;
 
                     // Add source pipe to the sources
@@ -151,7 +150,7 @@ namespace Avant.WTI.Drip
                 placeholders.AddRange(sources);
 
 
-                if (this.data.convertPlaceholders)
+                if (data.convertPlaceholders)
                 {
                     ConvertPlaceholders(placeholders);
                 }
@@ -201,7 +200,7 @@ namespace Avant.WTI.Drip
 
             // Get all points inside of the area
             List<XYZ> areaColumnPoints = new List<XYZ>();
-            foreach (XYZ p in this.data.columnpoints)
+            foreach (XYZ p in data.columnpoints)
             {
                 if (Utils.RectangleIntersect(arearect, p, tolerance: 1))
                 {
@@ -229,17 +228,17 @@ namespace Avant.WTI.Drip
                 return null;
             }
 
-            previewOnly |= this.data.pipetype == null;
-            previewOnly |= this.data.distributionSystemType == null;
-            previewOnly |= this.data.transportSystemType == null;
+            previewOnly |= data.pipetype == null;
+            previewOnly |= data.distributionSystemType == null;
+            previewOnly |= data.transportSystemType == null;
 
 
 
             // Calculate the point to actually place the valve using an offset
-            XYZ valvePoint = valveColumnPoint.Add(rootVector.Normalize().Multiply(this.data.valvecolumnDistance / 304.8));
-            valvePoint = VectorUtils.Vector_setZ(valvePoint, this.data.valveheight / 304.8);
+            XYZ valvePoint = valveColumnPoint.Add(rootVector.Normalize().Multiply(data.valvecolumnDistance / 304.8));
+            valvePoint = VectorUtils.Vector_setZ(valvePoint, data.valveheight / 304.8);
 
-            this.data.previewPoints.Add(valvePoint);
+            data.previewPoints.Add(valvePoint);
 
             Line centerline = Line.CreateBound(center, VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(sourcepipeline, center), 0));
 
@@ -249,10 +248,10 @@ namespace Avant.WTI.Drip
             XYZ valve_out_p = null;
 
 
-            if (!previewOnly && this.data.valvefamily != null)
+            if (!previewOnly && data.valvefamily != null)
             {
                 // Place valve and find corresponding in and out points
-                FamilyInstance valve = this.data.doc.Create.NewFamilyInstance(valvePoint, this.data.valvefamily, this.data.groundLevel, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
+                FamilyInstance valve = data.doc.Create.NewFamilyInstance(valvePoint, data.valvefamily, data.groundLevel, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
                 XYZ valvedir = ValveUtils.GetValveDirection(valve);
                 Line up = Line.CreateUnbound(valvePoint, XYZ.BasisZ);
                 valve.Location.Rotate(axis: up, valvedir.AngleOnPlaneTo(rootVector, XYZ.BasisZ));
@@ -282,12 +281,12 @@ namespace Avant.WTI.Drip
             // ROUTE SOURCE TO VALVE
             // sourcepoint -> p1 -> valve_transport_corner_p -> p2 -> valve_in_p
 
-            XYZ p2 = VectorUtils.Vector_setZ(valve_in_p, this.data.transportlineheight / 304.8);
-            XYZ valve_transport_corner_p = p2.Add(perpendicularVector.Normalize().Multiply(this.data.pipecolumnDistance / 304.8));
+            XYZ p2 = VectorUtils.Vector_setZ(valve_in_p, data.transportlineheight / 304.8);
+            XYZ valve_transport_corner_p = p2.Add(perpendicularVector.Normalize().Multiply(data.pipecolumnDistance / 304.8));
 
             // Calculate ACTUAL source point
             XYZ sourcepoint = GeomUtils.GetClosestPoint(sourcepipeline, valve_transport_corner_p);
-            XYZ p1 = VectorUtils.Vector_setZ(sourcepoint, this.data.transportlineheight / 304.8);
+            XYZ p1 = VectorUtils.Vector_setZ(sourcepoint, data.transportlineheight / 304.8);
 
 
 
@@ -298,23 +297,23 @@ namespace Avant.WTI.Drip
             //  valve_out_p -> p3 -> valve_transport_corner_out_p -> p5 -> tee
             bool offcenter = false;
 
-            XYZ p3 = VectorUtils.Vector_setZ(valve_out_p, this.data.transportlineheight / 304.8);
-            XYZ valve_transport_corner_out_p = VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(centerline, p3), this.data.transportlineheight / 304.8);
-            if (centerline.Distance(VectorUtils.Vector_setZ(p3, 0)) <= this.data.pipecolumnDistance / 304.8)
+            XYZ p3 = VectorUtils.Vector_setZ(valve_out_p, data.transportlineheight / 304.8);
+            XYZ valve_transport_corner_out_p = VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(centerline, p3), data.transportlineheight / 304.8);
+            if (centerline.Distance(VectorUtils.Vector_setZ(p3, 0)) <= data.pipecolumnDistance / 304.8)
             {
-                valve_transport_corner_out_p = p3.Add(perpendicularVector.Normalize().Multiply(this.data.pipecolumnDistance / 304.8));
+                valve_transport_corner_out_p = p3.Add(perpendicularVector.Normalize().Multiply(data.pipecolumnDistance / 304.8));
                 offcenter = true;
             }
 
-            XYZ teeOffsetFromBackWall = rootVector.Normalize().Multiply(-this.data.backwallDistance / 304.8);
-            XYZ tee = VectorUtils.Vector_setZ(center.Add(rootVector.Multiply(0.5).Add(teeOffsetFromBackWall)), this.data.distributionlineheight / 304.8);
-            XYZ p5 = VectorUtils.Vector_setZ(tee, this.data.transportlineheight / 304.8);
+            XYZ teeOffsetFromBackWall = rootVector.Normalize().Multiply(-data.backwallDistance / 304.8);
+            XYZ tee = VectorUtils.Vector_setZ(center.Add(rootVector.Multiply(0.5).Add(teeOffsetFromBackWall)), data.distributionlineheight / 304.8);
+            XYZ p5 = VectorUtils.Vector_setZ(tee, data.transportlineheight / 304.8);
 
             // Create extra elbow point in case its offcenter
             XYZ p4 = GeomUtils.GetClosestPoint(Line.CreateUnbound(valve_transport_corner_out_p, rootVector), p5);
 
             // CALCULATE TEE LINE
-            XYZ sidePadding = perpendicularVector.Normalize().Multiply(-0.5 * this.data.intermediateDistance / 304.8);
+            XYZ sidePadding = perpendicularVector.Normalize().Multiply(-0.5 * data.intermediateDistance / 304.8);
             XYZ halfTee = perpendicularVector.Multiply(0.5).Add(sidePadding);
 
             XYZ tee_p1 = tee.Add(halfTee);
@@ -325,49 +324,49 @@ namespace Avant.WTI.Drip
                 // Create all pipe placeholders
 
                 // Route to valve
-                Pipe l1 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, sourcepoint, p1);
-                PlumbingUtils.ConnectPipePlaceholdersAtTee(this.data.doc, source.Id, l1.Id);
-                Pipe l2 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, p1, valve_transport_corner_p);
-                PlumbingUtils.ConnectPipePlaceholdersAtElbow(this.data.doc, l1.Id, l2.Id);
-                Pipe l3 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, valve_transport_corner_p, p2);
-                PlumbingUtils.ConnectPipePlaceholdersAtElbow(this.data.doc, l2.Id, l3.Id);
-                Pipe l4 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, p2, valve_in_p);
-                PlumbingUtils.ConnectPipePlaceholdersAtElbow(this.data.doc, l3.Id, l4.Id);
+                Pipe l1 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, sourcepoint, p1);
+                PlumbingUtils.ConnectPipePlaceholdersAtTee(data.doc, source.Id, l1.Id);
+                Pipe l2 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p1, valve_transport_corner_p);
+                PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l1.Id, l2.Id);
+                Pipe l3 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, valve_transport_corner_p, p2);
+                PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l2.Id, l3.Id);
+                Pipe l4 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p2, valve_in_p);
+                PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l3.Id, l4.Id);
 
                 ValveUtils.ConnectPipe(l4, valve_in_c);
 
                 // Route from valve to tee
-                Pipe l5 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, valve_out_p, p3);
-                Pipe l6 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, p3, valve_transport_corner_out_p);
-                PlumbingUtils.ConnectPipePlaceholdersAtElbow(this.data.doc, l5.Id, l6.Id);
+                Pipe l5 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, valve_out_p, p3);
+                Pipe l6 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p3, valve_transport_corner_out_p);
+                PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l5.Id, l6.Id);
                 ValveUtils.ConnectPipe(l5, valve_out_c);
 
                 Pipe l8;
 
                 if (offcenter)
                 {
-                    Pipe l7 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, valve_transport_corner_out_p, p4);
-                    PlumbingUtils.ConnectPipePlaceholdersAtElbow(this.data.doc, l6.Id, l7.Id);
+                    Pipe l7 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, valve_transport_corner_out_p, p4);
+                    PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l6.Id, l7.Id);
 
-                    l8 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, p4, p5);
-                    PlumbingUtils.ConnectPipePlaceholdersAtElbow(this.data.doc, l7.Id, l8.Id);
+                    l8 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p4, p5);
+                    PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l7.Id, l8.Id);
 
                     pipes.Add(l7);
                     transport_pipes.Add(l7);
                 }
                 else
                 {
-                    l8 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, valve_transport_corner_out_p, p5);
-                    PlumbingUtils.ConnectPipePlaceholdersAtElbow(this.data.doc, l6.Id, l8.Id);
+                    l8 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, valve_transport_corner_out_p, p5);
+                    PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l6.Id, l8.Id);
                 }
 
-                Pipe l9 = Pipe.CreatePlaceholder(this.data.doc, this.data.transportSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, p5, tee);
-                PlumbingUtils.ConnectPipePlaceholdersAtElbow(this.data.doc, l8.Id, l9.Id);
+                Pipe l9 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p5, tee);
+                PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l8.Id, l9.Id);
 
 
                 // Distribution pipe
-                Pipe teepipe = Pipe.CreatePlaceholder(this.data.doc, this.data.distributionSystemType.Id, this.data.pipetype.Id, this.data.groundLevel.Id, tee_p1, tee_p2);
-                PlumbingUtils.ConnectPipePlaceholdersAtTee(this.data.doc, teepipe.Id, l9.Id);
+                Pipe teepipe = Pipe.CreatePlaceholder(data.doc, data.distributionSystemType.Id, data.pipetype.Id, data.groundLevel.Id, tee_p1, tee_p2);
+                PlumbingUtils.ConnectPipePlaceholdersAtTee(data.doc, teepipe.Id, l9.Id);
 
                 pipes.Add(l1);
                 pipes.Add(l2);
@@ -415,11 +414,11 @@ namespace Avant.WTI.Drip
             pipe_geometry.Add(Line.CreateBound(tee_p1, tee_p2));
 
 
-            this.data.previewGeometry.AddRange(pipe_geometry);
+            data.previewGeometry.AddRange(pipe_geometry);
 
             // Set pipe sizes
-            foreach (Pipe p in transport_pipes) Utils.SetSize(p, this.data.transport_diameter / 304.8);
-            foreach (Pipe p in distribution_pipes) Utils.SetSize(p, this.data.distribution_diameter / 304.8);
+            foreach (Pipe p in transport_pipes) Utils.SetSize(p, data.transport_diameter / 304.8);
+            foreach (Pipe p in distribution_pipes) Utils.SetSize(p, data.distribution_diameter / 304.8);
 
             return pipes;
         }

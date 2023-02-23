@@ -28,7 +28,7 @@ namespace Avant.WTI.Drip.Form
             g.Clear(System.Drawing.Color.FromArgb(54, 54, 54));
 
             // Draw grid lines
-            foreach (Line line in this.data.lines)
+            foreach (Line line in data.lines)
             {
                 DrawLine(line, System.Drawing.Color.Black, false);
             }
@@ -46,13 +46,13 @@ namespace Avant.WTI.Drip.Form
             }
 
             // Draw preview lines
-            foreach (Line l in this.data.previewGeometry)
+            foreach (Line l in data.previewGeometry)
             {
                 DrawLine(l, System.Drawing.Color.Aqua, false);
             }
 
             // Draw preview points
-            foreach (XYZ p in this.data.previewPoints)
+            foreach (XYZ p in data.previewPoints)
             {
                 DrawPoint(p, System.Drawing.Color.White, 3);
             }

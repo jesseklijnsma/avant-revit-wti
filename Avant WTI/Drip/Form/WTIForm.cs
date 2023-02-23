@@ -2,7 +2,6 @@
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI.Selection;
 using Avant.WTI.Util;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -41,7 +40,7 @@ namespace Avant.WTI.Drip.Form
             this.maxBounds = this.bounds;
 
             // Convert areas into geometry for displaying
-            foreach (Area area in this.data.areas)
+            foreach (Area area in data.areas)
             {
                 PolyLine pl = AreaUtils.GetAreaPolyLine(area);
                 if (pl == null) continue;
@@ -49,7 +48,7 @@ namespace Avant.WTI.Drip.Form
             }
 
             // Initialize the drip generator
-            dripGenerator = new DripGenerator(this.data);
+            dripGenerator = new DripGenerator(data);
 
 
 
@@ -77,59 +76,59 @@ namespace Avant.WTI.Drip.Form
         private void ReloadData()
         {
             // Bind pipetypes and their display values
-            Dictionary<PipeType, string> pipetypes = this.data.pipetypes.ToDictionary(x => x, x => x.Name);
+            Dictionary<PipeType, string> pipetypes = data.pipetypes.ToDictionary(x => x, x => x.Name);
             Util.FormUtils.Combobox_bindItems(this.combo_pipetype, pipetypes);
-            if (this.data.pipetype != null) this.combo_pipetype.SelectedValue = this.data.pipetype;
-            else this.data.pipetype = (PipeType)this.combo_pipetype.SelectedValue;
+            if (data.pipetype != null) this.combo_pipetype.SelectedValue = data.pipetype;
+            else data.pipetype = (PipeType)this.combo_pipetype.SelectedValue;
 
             // Bind system types and their display values
-            Dictionary<PipingSystemType, string> systemtypes = this.data.systemtypes.ToDictionary(x => x, x => x.Name);
+            Dictionary<PipingSystemType, string> systemtypes = data.systemtypes.ToDictionary(x => x, x => x.Name);
             Util.FormUtils.Combobox_bindItems(this.combo_transportsystem, systemtypes);
-            if (this.data.transportSystemType != null) this.combo_transportsystem.SelectedValue = this.data.transportSystemType;
-            else this.data.transportSystemType = (PipingSystemType)this.combo_transportsystem.SelectedValue;
+            if (data.transportSystemType != null) this.combo_transportsystem.SelectedValue = data.transportSystemType;
+            else data.transportSystemType = (PipingSystemType)this.combo_transportsystem.SelectedValue;
 
             Util.FormUtils.Combobox_bindItems(this.combo_distributionsystem, systemtypes);
-            if (this.data.distributionSystemType != null) this.combo_distributionsystem.SelectedValue = this.data.distributionSystemType;
-            else this.data.distributionSystemType = (PipingSystemType)this.combo_distributionsystem.SelectedValue;
+            if (data.distributionSystemType != null) this.combo_distributionsystem.SelectedValue = data.distributionSystemType;
+            else data.distributionSystemType = (PipingSystemType)this.combo_distributionsystem.SelectedValue;
 
 
 
             // Bind valve family symbols and their display values
-            Dictionary<FamilySymbol, string> valvefamilies = this.data.valvefamilies.ToDictionary(x => x, x => x.Name);
+            Dictionary<FamilySymbol, string> valvefamilies = data.valvefamilies.ToDictionary(x => x, x => x.Name);
             Util.FormUtils.Combobox_bindItems(this.combo_valvefamily, valvefamilies);
-            if (this.data.valvefamily != null) this.combo_valvefamily.SelectedValue = this.data.valvefamily;
-            else this.data.valvefamily = (FamilySymbol)this.combo_valvefamily.SelectedValue;
+            if (data.valvefamily != null) this.combo_valvefamily.SelectedValue = data.valvefamily;
+            else data.valvefamily = (FamilySymbol)this.combo_valvefamily.SelectedValue;
 
             // Load all primitive values
-            num_valveheight.Value = this.data.valveheight;
+            num_valveheight.Value = data.valveheight;
 
-            num_interdistance.Value = this.data.intermediateDistance;
-            num_backwalldistance.Value = this.data.backwallDistance;
+            num_interdistance.Value = data.intermediateDistance;
+            num_backwalldistance.Value = data.backwallDistance;
 
-            num_valvecolumndistance.Value = this.data.valvecolumnDistance;
-            num_pipecolumndistance.Value = this.data.pipecolumnDistance;
+            num_valvecolumndistance.Value = data.valvecolumnDistance;
+            num_pipecolumndistance.Value = data.pipecolumnDistance;
 
-            num_transportheight.Value = this.data.transportlineheight;
-            num_distributionheight.Value = this.data.distributionlineheight;
+            num_transportheight.Value = data.transportlineheight;
+            num_distributionheight.Value = data.distributionlineheight;
 
-            button_convertplaceholders.Checked = this.data.convertPlaceholders;
+            button_convertplaceholders.Checked = data.convertPlaceholders;
 
             // Load sizes for the selected pipe type
             List<double> sizes = UpdateSizes();
-            if (sizes.Contains(this.data.transport_diameter)) combo_transportdiameter.SelectedValue = this.data.transport_diameter;
+            if (sizes.Contains(data.transport_diameter)) combo_transportdiameter.SelectedValue = data.transport_diameter;
             else
             {
                 if (sizes.Count == 0) this.combo_transportdiameter.SelectedIndex = -1;
                 else this.combo_transportdiameter.SelectedIndex = 0;
-                this.data.transport_diameter = (double)this.combo_transportdiameter.SelectedValue;
+                data.transport_diameter = (double)this.combo_transportdiameter.SelectedValue;
             }
 
-            if (sizes.Contains(this.data.distribution_diameter)) combo_distributiondiameter.SelectedValue = this.data.distribution_diameter;
+            if (sizes.Contains(data.distribution_diameter)) combo_distributiondiameter.SelectedValue = data.distribution_diameter;
             else
             {
                 if (sizes.Count == 0) this.combo_distributiondiameter.SelectedIndex = -1;
                 else this.combo_distributiondiameter.SelectedIndex = 0;
-                this.data.distribution_diameter = (double)this.combo_distributiondiameter.SelectedValue;
+                data.distribution_diameter = (double)this.combo_distributiondiameter.SelectedValue;
             }
         }
 
@@ -154,9 +153,9 @@ namespace Avant.WTI.Drip.Form
             this.combo_distributiondiameter.DataSource = null;
 
             // Get pipe sizes
-            if (this.data.pipetype == null) return new List<double>();
-            if (!this.data.pipesizeMap.ContainsKey(this.data.pipetype)) return new List<double>();
-            List<double> sizes = this.data.pipesizeMap[this.data.pipetype];
+            if (data.pipetype == null) return new List<double>();
+            if (!data.pipesizeMap.ContainsKey(data.pipetype)) return new List<double>();
+            List<double> sizes = data.pipesizeMap[data.pipetype];
 
             // Binds the sizes and their display value to the comboboxes
             Dictionary<double, string> sizeItems = sizes.ToDictionary(x => x, x => x.ToString() + " mm");
@@ -177,12 +176,12 @@ namespace Avant.WTI.Drip.Form
 
             try
             {
-                IList<Reference> refs = this.data.uidoc.Selection.PickObjects(ObjectType.Element, selfilter);
+                IList<Reference> refs = data.uidoc.Selection.PickObjects(ObjectType.Element, selfilter);
 
                 pipe_lineMap.Clear();
                 foreach (Reference r in refs)
                 {
-                    Pipe p = (Pipe)this.data.doc.GetElement(r.ElementId);
+                    Pipe p = (Pipe)data.doc.GetElement(r.ElementId);
                     pipelines.Add(p);
 
                     // Try to add the line of the pipe to the list of lines
@@ -199,7 +198,7 @@ namespace Avant.WTI.Drip.Form
                 }
                 
                 // Set the pipes
-                this.data.pipelines = pipelines;
+                data.pipelines = pipelines;
             }
             catch (Autodesk.Revit.Exceptions.OperationCanceledException) { }
             
