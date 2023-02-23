@@ -44,6 +44,7 @@ namespace Avant.WTI.Drip.Form
             foreach (Area area in this.data.areas)
             {
                 PolyLine pl = AreaUtils.GetAreaPolyLine(area);
+                if (pl == null) continue;
                 areaLineMap.Add(area, pl);
             }
 

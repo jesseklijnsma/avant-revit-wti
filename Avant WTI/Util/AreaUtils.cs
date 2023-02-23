@@ -22,8 +22,7 @@ namespace Avant.WTI.Util
             // Get boundaries
             IList<IList<BoundarySegment>> bounds = area.GetBoundarySegments(new SpatialElementBoundaryOptions());
 
-            if (bounds.Count == 0) throw new Exception(string.Format("Area {0} doesn't have any regions.", area.Name));
-            if (bounds.Count > 1) throw new Exception(string.Format("Area {0} has multiple regions.", area.Name));
+            if (bounds.Count == 0) return null;
 
             // Get all corner points of boundary
             List<XYZ> points = new List<XYZ>();
@@ -50,6 +49,9 @@ namespace Avant.WTI.Util
         public static System.Drawing.RectangleF GetAreaBoundingRectangle(Area area)
         {
             PolyLine pl = GetAreaPolyLine(area);
+
+            // Check if polyline exists, otherwise return default rectangle
+            if (pl == null) return new RectangleF(0,0,1,1);
             IList<XYZ> points = pl.GetCoordinates();
 
             double minX = points.Min(p => p.X);
