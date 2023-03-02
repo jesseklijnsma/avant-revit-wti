@@ -59,22 +59,32 @@ namespace Avant.WTI.Drip
         {
             if (columnpoints.Count == 0) return XYZ.Zero;
 
-            // Calculate point closest point on the source line to the center
-            XYZ sourcepoint = VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(sourceline, areacenter), 0);
-
             // Create line from source to center
-            Line centerLine = Line.CreateBound(VectorUtils.Vector_setZ(areacenter, 0), sourcepoint);
+            Line centerLine = Line.CreateUnbound(VectorUtils.Vector_setZ(areacenter, 0), rootVector);
 
-            // Find the row of points that are together the clostest to the center line
-            List<XYZ> centerLineClosePoints = GeomUtils.GetClosestPoints(centerLine, columnpoints, 1);
-            // Find the row of points that are together the clostest to the source line
-            List<XYZ> closestPoints = GeomUtils.GetClosestPoints(sourceline, centerLineClosePoints, 1);
+            // Pull all points to height 0
+            List<XYZ> flatColumnPoints = columnpoints.Select(p => VectorUtils.Vector_setZ(p, 0)).ToList();
 
-            // Sort points by distance to origin
-            List<XYZ> sortedClosestPoints = closestPoints.OrderBy(p => VectorUtils.Vector_mask(p, perpendicularVector).GetLength()).ToList();
+            // Find intersection point of the center line and the source line
+            IList<ClosestPointsPairBetweenTwoCurves> intersectionPoints = new List<ClosestPointsPairBetweenTwoCurves>();
+            centerLine.ComputeClosestPoints(sourceline, false, true, false, out intersectionPoints);
+            XYZ intersectionPoint = intersectionPoints.FirstOrDefault().XYZPointOnFirstCurve;
+            if (intersectionPoint == null) return XYZ.Zero;
 
-            if (sortedClosestPoints.Count == 0) return null;
-            return sortedClosestPoints[0];
+            // Group all points by distance to the intersection with a margin of 10mm
+            var groupedByDist = from p in columnpoints group p by Math.Round(p.DistanceTo(intersectionPoint) * 304.8 / 10) * 10 / 304.8 into g select new { distance = g.Key, points = g.ToList() };
+            if (groupedByDist.Count() == 0) return XYZ.Zero;
+
+            // Get group of points closest to intersection point
+            List<XYZ> surroundingPoints = groupedByDist.OrderBy(a => a.distance).First().points;
+
+            List<XYZ> orderedPoints = surroundingPoints
+                .OrderBy(p => VectorUtils.Vector_mask(p, perpendicularVector).GetLength())
+                .OrderByDescending(p => VectorUtils.Vector_mask(p, rootVector).GetLength())
+                .ToList();
+
+            // Get best point
+            return orderedPoints.FirstOrDefault();
         }
 
 
