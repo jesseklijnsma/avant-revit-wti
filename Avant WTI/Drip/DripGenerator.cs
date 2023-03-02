@@ -62,23 +62,11 @@ namespace Avant.WTI.Drip
             // Calculate point closest point on the source line to the center
             XYZ sourcepoint = VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(sourceline, areacenter), 0);
 
-            // Get points in front of source point
-            List<XYZ> pointsInFront = new List<XYZ>();
-            foreach (XYZ p in columnpoints)
-            {
-                // Check if the vector from the source point to the current point
-                // has an angle smaller than 90 degrees to the rootVector
-                if (p.Subtract(sourcepoint).DotProduct(rootVector) > 0.0)
-                {
-                    pointsInFront.Add(VectorUtils.Vector_setZ(p, 0));
-                }
-            }
-
             // Create line from source to center
             Line centerLine = Line.CreateBound(VectorUtils.Vector_setZ(areacenter, 0), sourcepoint);
 
             // Find the row of points that are together the clostest to the center line
-            List<XYZ> centerLineClosePoints = GeomUtils.GetClosestPoints(centerLine, pointsInFront, 1);
+            List<XYZ> centerLineClosePoints = GeomUtils.GetClosestPoints(centerLine, columnpoints, 1);
             // Find the row of points that are together the clostest to the source line
             List<XYZ> closestPoints = GeomUtils.GetClosestPoints(sourceline, centerLineClosePoints, 1);
 
