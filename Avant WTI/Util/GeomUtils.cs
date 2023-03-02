@@ -33,9 +33,9 @@ namespace Avant.WTI.Util
         /// </summary>
         /// <param name="l">Line</param>
         /// <param name="points">List of points</param>
-        /// <param name="tolerance">Tolerance to group points by</param>
+        /// <param name="toleranceft">Tolerance to group points by</param>
         /// <returns>List of points with an equal (within tolerance) distance to the line</returns>
-        public static List<XYZ> GetClosestPoints(Line l, List<XYZ> points, double tolerance)
+        public static List<XYZ> GetClosestPoints(Line l, List<XYZ> points, double toleranceft)
         {
             List<XYZ> result = new List<XYZ>();
 
@@ -43,12 +43,12 @@ namespace Avant.WTI.Util
             foreach(XYZ p in points)
             {
                 double dist = l.Distance(p);
-                if(dist < min)
+                if(dist < min - toleranceft)
                 {
                     min = dist;
                     result.Clear();
                 }
-                if (Math.Abs(dist - min) < tolerance)
+                if (Math.Abs(dist - min) < toleranceft)
                 {
                     result.Add(p);
                 }

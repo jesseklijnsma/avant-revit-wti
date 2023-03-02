@@ -280,12 +280,12 @@ namespace Avant.WTI.Drip
 
 
                 // Check if the pipes will connect to the 'open' side of the connector
-                if(valve_in_c.CoordinateSystem.BasisZ.DotProduct(new XYZ(0,0, valve_in_p.Z - data.transportlineheight)) < 0)
+                if(valve_in_c.CoordinateSystem.BasisZ.DotProduct(new XYZ(0,0, data.transportlineheight / 304.8 - valve_in_p.Z)) < 0)
                 {
                     valve_in_c = null;
                     data.errorMessages.Add(new DripData.DripErrorMessage("Pipe cannot be connected to In connector of the valve. Dummy connections will be created.", DripData.DripErrorMessage.Severity.WARNING));
                 }
-                if (valve_out_c.CoordinateSystem.BasisZ.DotProduct(new XYZ(0, 0, valve_out_p.Z - data.transportlineheight)) < 0)
+                if (valve_out_c.CoordinateSystem.BasisZ.DotProduct(new XYZ(0, 0, data.transportlineheight / 304.8 - valve_out_p.Z)) < 0)
                 {
                     valve_out_c = null;
                     data.errorMessages.Add(new DripData.DripErrorMessage("Pipe cannot be connected to Out connector of the valve. Dummy connections will be created.", DripData.DripErrorMessage.Severity.WARNING));
