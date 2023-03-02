@@ -263,7 +263,7 @@ namespace Avant.WTI.Drip
 
 
             // Calculate the point to actually place the valve using an offset
-            XYZ valvePoint = valveColumnPoint.Add(rootVector.Normalize().Multiply(data.valvecolumnDistance / 304.8));
+            XYZ valvePoint = valveColumnPoint.Add(rootVector.Normalize().Multiply(-data.valvecolumnDistance / 304.8));
             valvePoint = VectorUtils.Vector_setZ(valvePoint, data.valveheight / 304.8);
 
             data.previewPoints.Add(valvePoint);
@@ -282,7 +282,7 @@ namespace Avant.WTI.Drip
                 FamilyInstance valve = data.doc.Create.NewFamilyInstance(valvePoint, data.valvefamily, data.groundLevel, Autodesk.Revit.DB.Structure.StructuralType.NonStructural);
                 XYZ valvedir = ValveUtils.GetValveDirection(valve);
                 Line up = Line.CreateUnbound(valvePoint, XYZ.BasisZ);
-                valve.Location.Rotate(axis: up, valvedir.AngleOnPlaneTo(rootVector, XYZ.BasisZ));
+                valve.Location.Rotate(axis: up, valvedir.AngleOnPlaneTo(-rootVector, XYZ.BasisZ));
                 (valve_in_c, valve_out_c) = ValveUtils.GetValveConnectorPair(valve);
                 valve_in_p = valve_in_c?.Origin;
                 valve_out_p = valve_out_c?.Origin;
@@ -307,8 +307,8 @@ namespace Avant.WTI.Drip
             if (previewOnly || !valveConnect)
             {
                 // Create dummy in case of preview or valve creation failed
-                valve_in_p = valvePoint.Add(rootVector.Normalize().Multiply(-200 / 304.8));
-                valve_out_p = valvePoint.Add(rootVector.Normalize().Multiply(200 / 304.8));
+                valve_in_p = valvePoint.Add(rootVector.Normalize().Multiply(200 / 304.8));
+                valve_out_p = valvePoint.Add(rootVector.Normalize().Multiply(-200 / 304.8));
             }
 
             // Resulting elements
@@ -320,11 +320,23 @@ namespace Avant.WTI.Drip
 
             // START CALCULATING ROUTING
 
+
+            // Calculate from valve to long transport line
+            XYZ p3 = VectorUtils.Vector_setZ(valve_out_p, data.transportlineheight / 304.8);
+
+            double minOffset = Math.Max(data.pipecolumnDistance / 304.8, minimumPipeLengthFt);
+            Line transportCenterLine = FindBestCenterLine(p3, centerline, columnpoints, minOffset);
+
+            XYZ valve_closest_point = GeomUtils.GetClosestPoint(transportCenterLine, p3);
+            XYZ dir_valve_to_centerline = (valve_closest_point - p3).Normalize();
+
+
+
             // ROUTE SOURCE TO VALVE
             // sourcepoint -> p1 -> valve_transport_corner_p -> p2 -> valve_in_p
 
             XYZ p2 = VectorUtils.Vector_setZ(valve_in_p, data.transportlineheight / 304.8);
-            XYZ valve_transport_corner_p = p2.Add(perpendicularVector.Normalize().Multiply(data.pipecolumnDistance / 304.8));
+            XYZ valve_transport_corner_p = p2.Add(dir_valve_to_centerline.Multiply(-data.pipecolumnDistance / 304.8));
 
             // Calculate ACTUAL source point
             XYZ sourcepoint = GeomUtils.GetClosestPoint(sourcepipeline, valve_transport_corner_p);
@@ -353,11 +365,8 @@ namespace Avant.WTI.Drip
             //  valve_out_p -> p3 -> valve_transport_corner_out_p -> p5 -> tee
             bool offcenter = false;
 
-            XYZ p3 = VectorUtils.Vector_setZ(valve_out_p, data.transportlineheight / 304.8);
+            
 
-            //GeomUtils.GetClosestPoints(centerline, columnpoints, 1/304.8);
-            double minOffset = Math.Min(data.pipecolumnDistance, minimumPipeLengthFt);
-            Line transportCenterLine = FindBestCenterLine(p3, centerline, columnpoints, minOffset);
 
             double distanceFromCenter = transportCenterLine.Distance(center);
 
