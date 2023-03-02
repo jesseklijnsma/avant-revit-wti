@@ -241,7 +241,7 @@ namespace Avant.WTI.Util
             if (groupedByZ.Count() == 0) return points;
 
             // Get group of elements with the most elements and with the lowest height
-            List<Element> mostOccurringHeight = groupedByZ.OrderBy(a => a.height).OrderByDescending(a => a.columns.Count).First().columns;
+            List<Element> mostOccurringHeight = groupedByZ.OrderByDescending(a => a.columns.Count).OrderBy(a => a.height).First().columns;
             foreach (Element e in mostOccurringHeight)
             {
                 if (e.Location.GetType() != typeof(LocationPoint)) continue;
