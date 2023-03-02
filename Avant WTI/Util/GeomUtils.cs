@@ -1,4 +1,6 @@
 ﻿using Autodesk.Revit.DB;
+using Autodesk.Revit.Exceptions;
+using Avant.WTI.Drip;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,6 +65,29 @@ namespace Avant.WTI.Util
         public static XYZ boundingBoxGetCenter(BoundingBoxXYZ bb)
         {
             return (bb.Max + bb.Min) / 2;
+        }
+
+
+        /// <summary>
+        ///  Tries to create a line and adds an error message to the list if necessary
+        /// </summary>
+        /// <param name="b">Begin point</param>
+        /// <param name="e">End point</param>
+        /// <param name="name">Description of line</param>
+        /// <param name="errorMessages">List of error messages</param>
+        /// <returns></returns>
+        public static Line CreateNamedLine(XYZ b, XYZ e, string name, List<DripData.DripErrorMessage> errorMessages)
+        {
+            Line line = null;
+            try
+            {
+                line = Line.CreateBound(b, e);
+            }
+            catch (ArgumentsInconsistentException)
+            {
+                errorMessages.Add(new DripData.DripErrorMessage(string.Format("Failed to create line '{0}', because it is too short.", name), DripData.DripErrorMessage.Severity.WARNING));
+            }
+            return line;
         }
 
     }

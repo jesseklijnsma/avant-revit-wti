@@ -393,31 +393,33 @@ namespace Avant.WTI.Drip
 
 
             // Source to valve
-            try
+            pipe_geometry.Add(GeomUtils.CreateNamedLine(sourcepoint, p1, "Vertical from main line", data.errorMessages));
+
+            pipe_geometry.Add(GeomUtils.CreateNamedLine(p1, valve_transport_corner_p, "From main line pointing towards valve", data.errorMessages));
+            pipe_geometry.Add(GeomUtils.CreateNamedLine(valve_transport_corner_p, p2, "From an elbow to underneath the IN connector of the valve", data.errorMessages));
+            pipe_geometry.Add(GeomUtils.CreateNamedLine(p2, valve_in_p, "Vertical to IN connector of the valve", data.errorMessages));
+
+            // Valve to tee
+            pipe_geometry.Add(GeomUtils.CreateNamedLine(valve_out_p, p3, "Vertical from OUT connector of the valve", data.errorMessages));
+            pipe_geometry.Add(GeomUtils.CreateNamedLine(p3, valve_transport_corner_out_p, "From underneath the OUT connector to the start of the long transport line", data.errorMessages));
+            if (offcenter)
             {
-                pipe_geometry.Add(Line.CreateBound(sourcepoint, p1));
-                pipe_geometry.Add(Line.CreateBound(p1, valve_transport_corner_p));
-                pipe_geometry.Add(Line.CreateBound(valve_transport_corner_p, p2));
-                pipe_geometry.Add(Line.CreateBound(p2, valve_in_p));
+                pipe_geometry.Add(GeomUtils.CreateNamedLine(valve_transport_corner_out_p, p4, "Long transport line", data.errorMessages));
+                pipe_geometry.Add(GeomUtils.CreateNamedLine(p4, p5, "From the end of the long transport line to underneath the tee", data.errorMessages));
+            }
+            else
+            {
+                pipe_geometry.Add(GeomUtils.CreateNamedLine(valve_transport_corner_out_p, p5, "Long transport line", data.errorMessages));
+            }
+            pipe_geometry.Add(GeomUtils.CreateNamedLine(p5, tee, "Vertical under the tee", data.errorMessages));
 
-                // Valve to tee
-                pipe_geometry.Add(Line.CreateBound(valve_out_p, p3));
-                pipe_geometry.Add(Line.CreateBound(p3, valve_transport_corner_out_p));
-                if (offcenter)
-                {
-                    pipe_geometry.Add(Line.CreateBound(valve_transport_corner_out_p, p4));
-                    pipe_geometry.Add(Line.CreateBound(p4, p5));
-                }
-                else
-                {
-                    pipe_geometry.Add(Line.CreateBound(valve_transport_corner_out_p, p5));
-                }
-                pipe_geometry.Add(Line.CreateBound(p5, tee));
+            // Tee
+            pipe_geometry.Add(GeomUtils.CreateNamedLine(tee_p1, tee_p2, "Perpendicular branch line", data.errorMessages));
 
-                // Tee
-                pipe_geometry.Add(Line.CreateBound(tee_p1, tee_p2));
-            }catch(ArgumentsInconsistentException){
-                this.data.errorMessages.Add(new DripData.DripErrorMessage("Generated pipe segment is too short! Branch will not be generated.", DripData.DripErrorMessage.Severity.WARNING));
+
+            // Check if there were any errors creating pipes
+            if(pipe_geometry.RemoveAll(p => p == null) > 0)
+            {
                 previewOnly = true;
             }
 
