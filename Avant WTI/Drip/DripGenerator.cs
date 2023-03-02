@@ -88,20 +88,19 @@ namespace Avant.WTI.Drip
         }
 
 
-        private Line FindBestCenterLine(XYZ source, Line preferredLine, List<XYZ> columns, double paddingmm)
+        private Line FindBestCenterLine(XYZ source, Line preferredLine, List<XYZ> columns, double paddingft)
         {
-            double paddingft = paddingmm / 304.8;
             List<XYZ> closePoints = GeomUtils.GetClosestPoints(preferredLine, columns, 1 / 304.8);
             bool goodLine = !closePoints.Any(p => preferredLine.Distance(p) < paddingft || source.DistanceTo(p) < paddingft);
 
             if (goodLine) return preferredLine;
 
             XYZ linePoint = GeomUtils.GetClosestPoint(preferredLine, source);
-            XYZ sourceToLine = (linePoint - source).Normalize();
+            XYZ sourceToLine = VectorUtils.Vector_setZ((linePoint - source), 0).Normalize();
 
-            Line newLine = (Line)preferredLine.CreateTransformed(Transform.CreateTranslation(sourceToLine.Multiply(paddingft)));
+            Line newLine = (Line)preferredLine.CreateTransformed(Transform.CreateTranslation(sourceToLine.Multiply(paddingft + 0.0000001)));
 
-            return FindBestCenterLine(source, newLine, columns, paddingmm);
+            return FindBestCenterLine(source, newLine, columns, paddingft);
         }
 
         public void GeneratePreviewGeometry()
