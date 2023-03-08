@@ -1,14 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
-using Avant.WTI.Drip;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
-using System.Threading;
-using static Avant.WTI.Drip.DripData;
-using System.Windows.Forms;
 
 namespace Avant.WTI.Util
 {

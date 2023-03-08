@@ -111,13 +111,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Generators\Generator.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Util\AreaUtils.cs" />
-    <Compile Include="Drip\DripData.cs" />
-    <Compile Include="Drip\DripGenerator.cs" />
-    <Compile Include="Util\ErrorDialog.cs">
-      <SubType>Form</SubType>
-    </Compile>
+    <Compile Include="WTIData.cs" />
+    <Compile Include="Generators\DripGenerator.cs" />
+    <Compile Include="Util\ErrorDialog.cs" />
     <Compile Include="Util\ErrorDialog.Designer.cs">
       <DependentUpon>ErrorDialog.cs</DependentUpon>
     </Compile>
@@ -126,21 +125,21 @@
     <Compile Include="Util\PipeUtils.cs" />
     <Compile Include="Util\RenderPoint.cs" />
     <Compile Include="Util\WTIElementCollector.cs" />
-    <Compile Include="Drip\DripCommand.cs" />
+    <Compile Include="WTICommand.cs" />
     <Compile Include="Util\GeomUtils.cs" />
     <Compile Include="Util\ValveUtils.cs" />
     <Compile Include="Util\VectorUtils.cs" />
-    <Compile Include="Drip\Form\WTIForm.cs">
+    <Compile Include="Form\WTIForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Drip\Form\WTIForm.Designer.cs">
+    <Compile Include="Form\WTIForm.Designer.cs">
       <DependentUpon>WTIForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Drip\Form\WTIForm.Canvas.cs">
+    <Compile Include="Form\WTIForm.Canvas.cs">
       <DependentUpon>WTIForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Drip\Form\WTIForm.Events.cs">
+    <Compile Include="Form\WTIForm.Events.cs">
       <DependentUpon>WTIForm.cs</DependentUpon>
       <SubType>Form</SubType>
     </Compile>
@@ -176,7 +175,7 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <EmbeddedResource Include="Drip\Form\WTIForm.resx">
+    <EmbeddedResource Include="Form\WTIForm.resx">
       <DependentUpon>WTIForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Util\ErrorDialog.resx">

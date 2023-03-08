@@ -6,13 +6,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Avant.WTI.Drip
+namespace Avant.WTI
 {
     /// <summary>
     /// This class serves as all input data for the WTI Form. 
     /// And also as the output data
     /// </summary>
-    public class DripData
+    public class WTIData
     {
 
         // Input data
@@ -70,7 +70,7 @@ namespace Avant.WTI.Drip
         // Error messages
         public List<DripErrorMessage> errorMessages = new List<DripErrorMessage>();
 
-        public DripData(Document document, UIDocument uidoc)
+        public WTIData(Document document, UIDocument uidoc)
         {
             this.doc = document;
             this.uidoc = uidoc;

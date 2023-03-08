@@ -2,7 +2,7 @@
 using Autodesk.Revit.DB;
 using System;
 
-namespace Avant.WTI.Drip.Form
+namespace Avant.WTI.Form
 {
     partial class WTIForm
     {
@@ -134,7 +134,7 @@ namespace Avant.WTI.Drip.Form
 
         private void GenerateButton_Click(object sender, EventArgs e)
         {
-            bool validRun = dripGenerator.GenerateDrip();
+            bool validRun = dripGenerator.GenerateModel();
             if (!validRun) return;
 
 

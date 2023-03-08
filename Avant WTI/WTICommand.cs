@@ -7,12 +7,12 @@ using System.Windows.Forms;
 using System.Linq;
 using System.Collections.Generic;
 using Avant.WTI.Util;
-using Avant.WTI.Drip.Form;
+using Avant.WTI.Form;
 
 #endregion
 
 
-namespace Avant.WTI.Drip
+namespace Avant.WTI
 {
     /// <summary>
     /// This is the ExternalCommand which gets executed from the ExternalApplication. In a WPF context,
@@ -20,7 +20,7 @@ namespace Avant.WTI.Drip
     /// order of operations for executing the business logic.
     /// </summary>
     [Autodesk.Revit.Attributes.Transaction(Autodesk.Revit.Attributes.TransactionMode.Manual)]
-    public class DripCommand : IExternalCommand
+    public class WTICommand : IExternalCommand
     {
 
         private Document doc;
@@ -37,7 +37,7 @@ namespace Avant.WTI.Drip
                 allDocuments = Utils.GetAllDocuments(doc);
 
                 // Initialize data model
-                DripData data = new DripData(doc, uidoc);
+                WTIData data = new WTIData(doc, uidoc);
 
                 WTIElementCollector collector = new WTIElementCollector(doc, allDocuments);
 
@@ -55,11 +55,11 @@ namespace Avant.WTI.Drip
                 data.LoadPrevious();
 
                 // Check for input value errors
-                data.refreshErrorMessages(DripData.Data.INPUT);
+                data.refreshErrorMessages(WTIData.Data.INPUT);
                 ErrorDialog errorDialog = new ErrorDialog(data.errorMessages);
                 errorDialog.ShowErrors();
 
-                if (errorDialog.maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return Result.Failed;
+                if (errorDialog.maxSeverity == WTIData.DripErrorMessage.Severity.FATAL) return Result.Failed;
 
                 // Show the input form
                 Application.Run(new WTIForm(data));

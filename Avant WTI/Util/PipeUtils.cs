@@ -2,12 +2,7 @@
 using Autodesk.Revit.DB;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Avant.WTI.Drip.DripData;
 using System.Windows.Forms;
-using static Avant.WTI.Drip.DripGenerator;
 
 namespace Avant.WTI.Util
 {

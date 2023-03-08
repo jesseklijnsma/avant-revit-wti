@@ -1,13 +1,10 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.Exceptions;
-using Avant.WTI.Drip;
+using Avant.WTI.Generators;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
-using System.Security.Policy;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Avant.WTI.Util
 {
@@ -89,7 +86,7 @@ namespace Avant.WTI.Util
         /// <param name="name">Description of line</param>
         /// <param name="errorMessages">List of error messages</param>
         /// <returns></returns>
-        public static Line CreateNamedLine(XYZ b, XYZ e, string name, List<DripData.DripErrorMessage> errorMessages)
+        public static Line CreateNamedLine(XYZ b, XYZ e, string name, List<WTIData.DripErrorMessage> errorMessages)
         {
             Line line = null;
             try
@@ -98,7 +95,7 @@ namespace Avant.WTI.Util
             }
             catch (ArgumentsInconsistentException)
             {
-                errorMessages.Add(new DripData.DripErrorMessage(string.Format("Failed to create line '{0}', because it is too short.", name), DripData.DripErrorMessage.Severity.WARNING));
+                errorMessages.Add(new WTIData.DripErrorMessage(string.Format("Failed to create line '{0}', because it is too short.", name), WTIData.DripErrorMessage.Severity.WARNING));
             }
             return line;
         }
@@ -199,7 +196,7 @@ namespace Avant.WTI.Util
         /// </summary>
         /// <param name="data">DripData</param>
         /// <returns>Bounding Rectangle</returns>
-        public static System.Drawing.RectangleF CalculateBounds(DripData data)
+        public static System.Drawing.RectangleF CalculateBounds(WTIData data)
         {
             // Convert lines to their end points
             List<XYZ> points = new List<XYZ>();

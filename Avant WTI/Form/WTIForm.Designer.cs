@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 
-namespace Avant.WTI.Drip.Form
+namespace Avant.WTI.Form
 {
     partial class WTIForm
     {

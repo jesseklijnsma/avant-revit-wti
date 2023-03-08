@@ -6,7 +6,7 @@ using Avant.WTI.Util;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Avant.WTI.Drip.Form
+namespace Avant.WTI.Form
 {
     partial class WTIForm
     {

@@ -6,7 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Avant.WTI.Drip.DripData;
+using static Avant.WTI.WTIData;
 
 namespace Avant.WTI.Util
 {

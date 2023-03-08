@@ -14,17 +14,17 @@ namespace Avant.WTI.Util
     public partial class ErrorDialog : Form
     {
 
-        private List<DripData.DripErrorMessage> errorMessages;
-        public DripData.DripErrorMessage.Severity maxSeverity {
+        private List<WTIData.DripErrorMessage> errorMessages;
+        public WTIData.DripErrorMessage.Severity maxSeverity {
             get {
-                if (errorMessages.Count == 0) return DripData.DripErrorMessage.Severity.NONE;
+                if (errorMessages.Count == 0) return WTIData.DripErrorMessage.Severity.NONE;
                 return errorMessages.Select(m => m.severity).Max();
             }
         }
 
         private int currentIndex = 0;
 
-        public ErrorDialog(List<DripData.DripErrorMessage> msgs)
+        public ErrorDialog(List<WTIData.DripErrorMessage> msgs)
         {
             if (msgs == null) throw new ArgumentNullException();
             InitializeComponent();
@@ -33,7 +33,7 @@ namespace Avant.WTI.Util
 
         public void ShowErrors()
         {
-            List<DripData.DripErrorMessage> msgs = errorMessages;
+            List<WTIData.DripErrorMessage> msgs = errorMessages;
             msgs = msgs.Distinct().ToList();
             if (msgs.Count == 0) return;
 
@@ -43,18 +43,18 @@ namespace Avant.WTI.Util
 
         private void UpdateMessage()
         {
-            DripData.DripErrorMessage msg = errorMessages[currentIndex];
+            WTIData.DripErrorMessage msg = errorMessages[currentIndex];
 
             string title;
             System.Drawing.Image icon;
             string listLabel = "";
             switch (msg.severity)
             {
-                case DripData.DripErrorMessage.Severity.FATAL:
+                case WTIData.DripErrorMessage.Severity.FATAL:
                     icon = SystemIcons.Error.ToBitmap();
                     title = "An error occurred!";
                     break;
-                case DripData.DripErrorMessage.Severity.WARNING:
+                case WTIData.DripErrorMessage.Severity.WARNING:
                     icon = SystemIcons.Warning.ToBitmap();
 
                     title = "Warning!";

@@ -1,13 +1,14 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI.Selection;
+using Avant.WTI.Generators;
 using Avant.WTI.Util;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 
-namespace Avant.WTI.Drip.Form
+namespace Avant.WTI.Form
 {
     /// <summary>
     ///  GUI for the Drip Irrigation generator
@@ -22,7 +23,7 @@ namespace Avant.WTI.Drip.Form
 
         private Graphics g;
 
-        private readonly DripData data;
+        private readonly WTIData data;
         private readonly DripGenerator dripGenerator;
 
         private System.Drawing.RectangleF maxBounds;
@@ -30,7 +31,7 @@ namespace Avant.WTI.Drip.Form
         private readonly Dictionary<Area, PolyLine> areaLineMap = new Dictionary<Area, PolyLine>();
         private readonly Dictionary<Pipe, Line> pipe_lineMap = new Dictionary<Pipe, Line>();
 
-        public WTIForm(DripData data)
+        public WTIForm(WTIData data)
         {
             InitializeComponent();
             this.data = data;
@@ -137,7 +138,7 @@ namespace Avant.WTI.Drip.Form
         /// </summary>
         public void ReloadPreview()
         {
-            dripGenerator.GeneratePreviewGeometry();
+            dripGenerator.GeneratePreview();
 
             if(data.errorMessages.Count == 0)
             {

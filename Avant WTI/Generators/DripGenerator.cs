@@ -1,27 +1,22 @@
 using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
-using Autodesk.Revit.Exceptions;
-using Autodesk.Revit.UI;
 using Avant.WTI.Util;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using static Avant.WTI.Drip.DripData;
+using static Avant.WTI.WTIData;
 using static Avant.WTI.Util.PipeUtils;
 
-namespace Avant.WTI.Drip
+namespace Avant.WTI.Generators
 {
-    internal class DripGenerator
+    internal class DripGenerator : Generator
     {
-
-        private readonly DripData data;
-
-        public DripGenerator(DripData data)
+        public DripGenerator(WTIData data) : base(data)
         {
-            this.data = data;
         }
+
 
         /// <summary>
         /// Finds a point in the area closest to the source pipe and the center of the area
@@ -118,7 +113,7 @@ namespace Avant.WTI.Drip
             return valve;
         }
 
-        public void GeneratePreviewGeometry()
+        public override void GeneratePreview()
         {
             // Preview doesn't need any input validation
 
@@ -142,14 +137,14 @@ namespace Avant.WTI.Drip
             }
         }
 
-        public bool GenerateDrip()
+        public override bool GenerateModel()
         {
             // Check if inputs are valid
-            data.refreshErrorMessages(DripData.Data.OUTPUT);
+            data.refreshErrorMessages(WTIData.Data.OUTPUT);
             ErrorDialog errorDialog = new ErrorDialog(data.errorMessages);
             errorDialog.ShowErrors();
 
-            if (errorDialog.maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return false;
+            if (errorDialog.maxSeverity == WTIData.DripErrorMessage.Severity.FATAL) return false;
 
             data.errorMessages.Clear();
 
@@ -214,7 +209,7 @@ namespace Avant.WTI.Drip
             errorDialog = new ErrorDialog(data.errorMessages);
             errorDialog.ShowErrors();
 
-            if (errorDialog.maxSeverity == DripData.DripErrorMessage.Severity.FATAL) return false;
+            if (errorDialog.maxSeverity == WTIData.DripErrorMessage.Severity.FATAL) return false;
 
             return true;
         }
@@ -237,7 +232,7 @@ namespace Avant.WTI.Drip
             XYZ valveColumnPoint = FindValvePoint(columnpoints, area, rootVector, perpendicularVector, sourcepipeline);
             if (valveColumnPoint == null)
             {
-                data.errorMessages.Add(new DripData.DripErrorMessage("No valve column found", DripData.DripErrorMessage.Severity.FATAL));
+                data.errorMessages.Add(new WTIData.DripErrorMessage("No valve column found", WTIData.DripErrorMessage.Severity.FATAL));
                 return pipes;
             }
 
@@ -277,12 +272,12 @@ namespace Avant.WTI.Drip
                 if (MEPUtils.GetConnectorDirection(valve_in_c).DotProduct(new XYZ(0, 0, data.transportlineheight / 304.8 - valve_in_p.Z)) < 0)
                 {
                     valve_in_c = null;
-                    data.errorMessages.Add(new DripData.DripErrorMessage("Pipe cannot be connected to In connector of the valve. Dummy connections will be created.", DripData.DripErrorMessage.Severity.WARNING));
+                    data.errorMessages.Add(new WTIData.DripErrorMessage("Pipe cannot be connected to In connector of the valve. Dummy connections will be created.", WTIData.DripErrorMessage.Severity.WARNING));
                 }
                 if (MEPUtils.GetConnectorDirection(valve_out_c).DotProduct(new XYZ(0, 0, data.transportlineheight / 304.8 - valve_out_p.Z)) < 0)
                 {
                     valve_out_c = null;
-                    data.errorMessages.Add(new DripData.DripErrorMessage("Pipe cannot be connected to Out connector of the valve. Dummy connections will be created.", DripData.DripErrorMessage.Severity.WARNING));
+                    data.errorMessages.Add(new WTIData.DripErrorMessage("Pipe cannot be connected to Out connector of the valve. Dummy connections will be created.", WTIData.DripErrorMessage.Severity.WARNING));
                 }
             }
 
@@ -295,7 +290,7 @@ namespace Avant.WTI.Drip
             double distanceFromCenter = transportCenterLine.Distance(center);
             if (distanceFromCenter >= 0.000000001f && distanceFromCenter < minOffset)
             {
-                data.errorMessages.Add(new DripData.DripErrorMessage(string.Format("Transport line is too close to a column or other pipe or is too short. Distance: {0}mm. No pipes will be generated.", distanceFromCenter * 304.8), DripData.DripErrorMessage.Severity.WARNING));
+                data.errorMessages.Add(new WTIData.DripErrorMessage(string.Format("Transport line is too close to a column or other pipe or is too short. Distance: {0}mm. No pipes will be generated.", distanceFromCenter * 304.8), WTIData.DripErrorMessage.Severity.WARNING));
                 previewOnly = true;
             }
 
@@ -319,7 +314,7 @@ namespace Avant.WTI.Drip
                     }
                     else
                     {
-                        data.errorMessages.Add(new DripData.DripErrorMessage("Generated pipe segment is too short! Branch will not be generated.", DripData.DripErrorMessage.Severity.WARNING, false));
+                        data.errorMessages.Add(new WTIData.DripErrorMessage("Generated pipe segment is too short! Branch will not be generated.", WTIData.DripErrorMessage.Severity.WARNING, false));
                     }
                 }
             }
@@ -363,13 +358,13 @@ namespace Avant.WTI.Drip
             double source_transport_heightdiff = Math.Abs(data.transportlineheight / 304.8 - sourcepoint.Z);
             if (source_transport_heightdiff < data.minimumPipeLengthFt && source_transport_heightdiff > 0.000000001f)
             {
-                data.errorMessages.Add(new DripData.DripErrorMessage(string.Format("Height between source pipe and transport pipe is too small. Distance: {0}mm. No pipes will be generated.", source_transport_heightdiff * 304.8), DripData.DripErrorMessage.Severity.WARNING, unique: false));
+                data.errorMessages.Add(new WTIData.DripErrorMessage(string.Format("Height between source pipe and transport pipe is too small. Distance: {0}mm. No pipes will be generated.", source_transport_heightdiff * 304.8), WTIData.DripErrorMessage.Severity.WARNING, unique: false));
                 transport_geometry.PreviewOnly = true;
             }
             double transport_distribution_heightdiff = Math.Abs(data.transportlineheight - data.distributionlineheight) / 304.8;
             if (transport_distribution_heightdiff < data.minimumPipeLengthFt)
             {
-                data.errorMessages.Add(new DripData.DripErrorMessage(string.Format("Height between distribution pipe and transport pipe is too small. Distance needs to be at least {0}mm. No pipes will be generated.", data.minimumPipeLengthFt * 304.8), DripData.DripErrorMessage.Severity.WARNING, unique: false));
+                data.errorMessages.Add(new WTIData.DripErrorMessage(string.Format("Height between distribution pipe and transport pipe is too small. Distance needs to be at least {0}mm. No pipes will be generated.", data.minimumPipeLengthFt * 304.8), WTIData.DripErrorMessage.Severity.WARNING, unique: false));
                 transport_geometry.PreviewOnly = true;
                 distribution_geometry.PreviewOnly = true;
             }
