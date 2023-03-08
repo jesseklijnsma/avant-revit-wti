@@ -266,7 +266,7 @@ namespace Avant.WTI.Drip
             XYZ valvePoint = valveColumnPoint.Add(rootVector.Normalize().Multiply(-data.valvecolumnDistance / 304.8));
             valvePoint = VectorUtils.Vector_setZ(valvePoint, data.valveheight / 304.8);
 
-            data.previewPoints.Add(valvePoint);
+            data.previewPoints.Add(new RenderPoint(valvePoint, System.Drawing.Color.White, 200, RenderPoint.RenderUnits.MM));
 
             Line centerline = Line.CreateBound(center, VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(sourcepipeline, center), 0));
 

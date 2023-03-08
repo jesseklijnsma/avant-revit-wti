@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB;
 using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.UI;
+using Avant.WTI.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,7 +58,7 @@ namespace Avant.WTI.Drip
 
         // Misc
         public readonly List<Line> previewGeometry = new List<Line>();
-        public readonly List<XYZ> previewPoints = new List<XYZ>();
+        public readonly List<RenderPoint> previewPoints = new List<RenderPoint>();
         public readonly List<Line> debugLines = new List<Line>();
 
         // Error messages

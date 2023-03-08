@@ -52,9 +52,9 @@ namespace Avant.WTI.Drip.Form
             }
 
             // Draw preview points
-            foreach (XYZ p in data.previewPoints)
+            foreach (RenderPoint p in data.previewPoints)
             {
-                DrawPoint(p, System.Drawing.Color.White, 3);
+                DrawPoint(p);
             }
 
             // Render to canvas
@@ -112,13 +112,12 @@ namespace Avant.WTI.Drip.Form
         ///     Draws a point from the Revit model coordinate space onto the canvas as a dot
         /// </summary>
         /// <param name="point">Point to be drawn</param>
-        /// <param name="c">Color</param>
-        /// <param name="radius">Dot radius in pixels</param>
-        private void DrawPoint(XYZ point, System.Drawing.Color c, float radius)
+        private void DrawPoint(RenderPoint point)
         {
             // Convert model coordinate space to canvas coordinates
-            XYZ p = Utils.PointToScreenPoint(point, bounds, this.canvas.Size);
-            SolidBrush brush = new SolidBrush(c);
+            XYZ p = Utils.PointToScreenPoint(point.Point, bounds, this.canvas.Size);
+            float radius = point.GetPixelRadius(bounds, this.canvas.Size);
+            SolidBrush brush = new SolidBrush(point.Color);
             g.FillEllipse(brush, new RectangleF((float)(p.X - radius), (float)(p.Y - radius), radius * 2, radius * 2));
         }
 

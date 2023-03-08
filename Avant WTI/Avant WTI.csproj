@@ -122,6 +122,7 @@
       <DependentUpon>ErrorDialog.cs</DependentUpon>
     </Compile>
     <Compile Include="Util\FormUtils.cs" />
+    <Compile Include="Util\RenderPoint.cs" />
     <Compile Include="Util\WTIElementCollector.cs" />
     <Compile Include="Drip\DripCommand.cs" />
     <Compile Include="Util\GeomUtils.cs" />
