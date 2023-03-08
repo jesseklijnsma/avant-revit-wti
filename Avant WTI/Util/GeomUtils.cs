@@ -28,6 +28,18 @@ namespace Avant.WTI.Util
             return l.Origin.Add(dir.Multiply(dotP));
         }
 
+        /// <summary>
+        /// Gets the vector from the point to the line, orthogonal to the line
+        /// </summary>
+        /// <param name="l">Line</param>
+        /// <param name="p">Point</param>
+        /// <returns>Vector</returns>
+        public static XYZ GetVectorFromPointToLine(Line l, XYZ p)
+        {
+            XYZ closestPoint = GetClosestPoint(l, p);
+            return closestPoint - p;
+        }
+
 
         /// <summary>
         /// Get all points that are together the closest to a line

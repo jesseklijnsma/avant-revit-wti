@@ -65,6 +65,8 @@ namespace Avant.WTI.Drip
         public readonly List<Line> debugLines = new List<Line>();
         public readonly Dictionary<Area, RenderPoint> valvePoints = new Dictionary<Area, RenderPoint>();
 
+        public double minimumPipeLengthFt = 0.5;
+
         // Error messages
         public List<DripErrorMessage> errorMessages = new List<DripErrorMessage>();
 

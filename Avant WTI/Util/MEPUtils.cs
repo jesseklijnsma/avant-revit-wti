@@ -76,6 +76,21 @@ namespace Avant.WTI.Util
             return false;
         }
 
+        /// <summary>
+        ///  Tries to connect one of the pipes to a connector
+        /// </summary>
+        /// <param name="pipes">List of pipes to choose from</param>
+        /// <param name="connector">Connector</param>
+        /// <returns>True if succesful</returns>
+        public static bool ConnectPipe(List<Pipe> pipes, Connector connector)
+        {
+            foreach(Pipe p in pipes)
+            {
+                if (ConnectPipe(p, connector)) return true;
+            }
+            return false;
+        }
+
 
         /// <summary>
         /// Gets the vector pointing outward of a connector

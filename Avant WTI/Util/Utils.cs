@@ -61,5 +61,14 @@ namespace Avant.WTI.Util
             return closest;
         }
 
+        public static void EnsureFamilyActive(Document doc, FamilySymbol family)
+        {
+            if (!family.IsActive)
+            {
+                family.Activate();
+                doc.Regenerate();
+            }
+        }
+
     }
 }

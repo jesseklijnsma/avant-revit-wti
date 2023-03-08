@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static Avant.WTI.Drip.DripData;
 using System.Windows.Forms;
+using static Avant.WTI.Drip.DripGenerator;
 
 namespace Avant.WTI.Util
 {
@@ -101,6 +102,69 @@ namespace Avant.WTI.Util
                 MessageBox.Show("Placeholder to pipe conversion failed.", "", MessageBoxButtons.OK);
             }
             return new List<ElementId>();
+        }
+
+
+        public static List<Pipe> CreatePipesFromGeometry(Document doc, PipeGeometryCollection pipeCollection)
+        {
+            List<Pipe> pipes = new List<Pipe>();
+            foreach(Line l in pipeCollection.Geometry)
+            {
+                if (l == null) continue;
+
+                XYZ begin = l.GetEndPoint(0);
+                XYZ end = l.GetEndPoint(1);
+                try
+                {
+                    Pipe pipe = Pipe.CreatePlaceholder(doc, pipeCollection.PipingSystemType.Id, pipeCollection.PipeType.Id, pipeCollection.Level.Id, begin, end);
+                    if (pipe != null) pipes.Add(pipe);
+                }
+                catch (Exception) { }
+
+            }
+
+            return pipes;
+        }
+
+
+        public class PipeGeometryCollection
+        {
+
+            public readonly List<Line> Geometry = new List<Line>();
+            public PipingSystemType PipingSystemType { get; }
+            public PipeType PipeType { get; }
+            public Level Level { get; }
+            public double Size { get; }
+            public bool PreviewOnly { get; set; } = false;
+
+
+            public PipeGeometryCollection(PipingSystemType pipingSystemType, PipeType pipeType, Level level, double size)
+            {
+                PipingSystemType = pipingSystemType;
+                PipeType = pipeType;
+                Level = level;
+                Size = size;
+            }
+
+            public void AddLine(Line l)
+            {
+                if (l == null) return;
+                Geometry.Add(l);
+            }
+
+            public bool IsValidLength(double minimumPipeLengthFt)
+            {
+                bool valid = true;
+                foreach (Line l in Geometry)
+                {
+                    if (l.Length < minimumPipeLengthFt)
+                    {
+                        valid = false;
+                    }
+                }
+                return valid;
+            }
+
         }
 
     }
