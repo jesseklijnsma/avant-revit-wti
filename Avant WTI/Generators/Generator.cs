@@ -19,6 +19,5 @@ namespace Avant.WTI.Generators
         public abstract void GeneratePreview();
         public abstract bool GenerateModel();
 
-
     }
 }

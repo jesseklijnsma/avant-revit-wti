@@ -8,7 +8,12 @@ namespace Avant.WTI.Util
 {
     internal class PipeUtils
     {
-
+        
+        /// <summary>
+        ///  Sets the size of a pipe
+        /// </summary>
+        /// <param name="p">Pipe</param>
+        /// <param name="size">Size in feet</param>
         public static void SetSize(Pipe p, double size)
         {
             if (p.GetType() != typeof(Autodesk.Revit.DB.Plumbing.Pipe)) return;
@@ -17,6 +22,12 @@ namespace Avant.WTI.Util
             param.Set(size);
         }
 
+
+        /// <summary>
+        /// Given a list of placeholder pipes, tries to put fittings where needed
+        /// </summary>
+        /// <param name="doc">Document</param>
+        /// <param name="pipes">List of pipes</param>
         public static void GenerateFittigs(Document doc, List<Pipe> pipes)
         {
             foreach (Pipe pipe in pipes)
@@ -99,7 +110,12 @@ namespace Avant.WTI.Util
             return new List<ElementId>();
         }
 
-
+        /// <summary>
+        /// Tries to create pipes from a list of lines
+        /// </summary>
+        /// <param name="doc">Document</param>
+        /// <param name="pipeCollection">Pipecollection object</param>
+        /// <returns>List of generated pipes</returns>
         public static List<Pipe> CreatePipesFromGeometry(Document doc, PipeGeometryCollection pipeCollection)
         {
             List<Pipe> pipes = new List<Pipe>();
@@ -141,12 +157,21 @@ namespace Avant.WTI.Util
                 Size = size;
             }
 
+            /// <summary>
+            /// Adds a line to the collection
+            /// </summary>
+            /// <param name="l">Line</param>
             public void AddLine(Line l)
             {
                 if (l == null) return;
                 Geometry.Add(l);
             }
 
+            /// <summary>
+            /// Checks if every line is long enough
+            /// </summary>
+            /// <param name="minimumPipeLengthFt">Minimum pipe length in feet</param>
+            /// <returns>Whether every line is long enough</returns>
             public bool IsValidLength(double minimumPipeLengthFt)
             {
                 bool valid = true;

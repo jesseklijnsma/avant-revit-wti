@@ -55,6 +55,11 @@ namespace Avant.WTI.Util
             return closest;
         }
 
+        /// <summary>
+        /// Activates a FamilySymbol if necessary
+        /// </summary>
+        /// <param name="doc">Document</param>
+        /// <param name="family">FamilySymbol</param>
         public static void EnsureFamilyActive(Document doc, FamilySymbol family)
         {
             if (!family.IsActive)

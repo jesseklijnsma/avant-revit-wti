@@ -70,6 +70,12 @@ namespace Avant.WTI.Util
             return arearect;
         }
 
+        /// <summary>
+        /// Calculates the vectors of the sides of the area
+        /// </summary>
+        /// <param name="area">Area</param>
+        /// <param name="preferredRoot">Vector pointing inward to the area</param>
+        /// <returns>The root and perpendicular vector</returns>
         public static (XYZ rootVector, XYZ perpendicularVector) GetAreaVectors(Area area, XYZ preferredRoot)
         {
             RectangleF arearect = AreaUtils.GetAreaBoundingRectangle(area);
@@ -96,6 +102,12 @@ namespace Avant.WTI.Util
             return (rootVector, perpendicularVector);
         }
 
+        /// <summary>
+        /// Gets all points that are inside the area
+        /// </summary>
+        /// <param name="area">Area</param>
+        /// <param name="points">List of points to consider</param>
+        /// <returns>List of points inside of the area</returns>
         public static List<XYZ> GetPointsInArea(Area area, List<XYZ> points)
         {
             RectangleF arearect = AreaUtils.GetAreaBoundingRectangle(area);

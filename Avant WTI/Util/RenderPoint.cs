@@ -24,7 +24,12 @@ namespace Avant.WTI.Util
         public RenderPoint(XYZ point) : this(point, System.Drawing.Color.White) { }
         public RenderPoint(XYZ point, System.Drawing.Color color) : this(point, color, 3.0f, RenderUnits.PX) { }
 
-
+        /// <summary>
+        /// Converts the radius from set units to millimetres
+        /// </summary>
+        /// <param name="domain">Domain of model</param>
+        /// <param name="targetSize">Canvas size</param>
+        /// <returns>Radius in millimetres</returns>
         public float GetPixelRadius(RectangleF domain, System.Drawing.Size targetSize)
         {
             if (Units == RenderUnits.PX) return Radius;
