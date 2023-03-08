@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
+using System.Windows;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Autodesk.Revit.UI;
@@ -89,7 +90,7 @@ namespace Avant.WTI
             }
             catch (Exception ex)
             {
-                Utils.HandleError(ex);
+                MessageBox.Show(ex.Message);
             }
 
             // Try to create ribbon panel.
@@ -99,7 +100,7 @@ namespace Avant.WTI
             }
             catch (Exception ex)
             {
-                Utils.HandleError(ex);
+                MessageBox.Show(ex.Message);
             }
 
             // Search existing tab for your panel.

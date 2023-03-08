@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Avant.WTI.Drip.DripData;
 
 namespace Avant.WTI.Util
 {
@@ -13,40 +14,7 @@ namespace Avant.WTI.Util
     {
 
 
-        /// <summary>
-        ///  Gets all connectors of and element
-        /// </summary>
-        /// <param name="e">Element</param>
-        /// <returns>All connectors or empty list</returns>
-        public static List<Connector> GetConnectors(Element e)
-        {
-            if (e == null) return new List<Connector>();
-            
-            // Try to get connectormanager
-            ConnectorManager connectorManager = null;
-            if(typeof(FamilyInstance).IsAssignableFrom(e.GetType()))
-            {
-                FamilyInstance f = (FamilyInstance)e;
-                MEPModel mep = f.MEPModel;
-                connectorManager = mep?.ConnectorManager;
-            }
-            if(typeof(MEPCurve).IsAssignableFrom(e.GetType()))
-            {
-                MEPCurve curve = (MEPCurve)e;
-                connectorManager = curve.ConnectorManager;
-            }
-
-            // Return empty list if element has no connectors/connectormanager
-            if (connectorManager == null) return new List<Connector>();
-
-            // Get connectors out of the connectormanager
-            List<Connector> connectors = new List<Connector>();
-            foreach(Connector c in connectorManager.Connectors)
-            {
-                connectors.Add(c);
-            }
-            return connectors;
-        }
+        
 
         /// <summary>
         /// Get In and Out connector of a familyinstance
@@ -55,7 +23,7 @@ namespace Avant.WTI.Util
         /// <returns>In and Out connector tuple</returns>
         public static (Connector c_in, Connector c_out) GetValveConnectorPair(FamilyInstance valve)
         {
-            List<Connector> connectors = GetConnectors(valve);
+            List<Connector> connectors = MEPUtils.GetConnectors(valve);
             // Check if there are enough connectors
             if (connectors.Count < 2) return (null,null);
 
@@ -85,33 +53,6 @@ namespace Avant.WTI.Util
             return dir;
         }
 
-        /// <summary>
-        ///  Connects a (placeholder) pipe to a connector
-        /// </summary>
-        /// <param name="p">Pipe</param>
-        /// <param name="connector">Connector</param>
-        /// <returns>True if succesful</returns>
-        internal static bool ConnectPipe(Pipe p, Connector connector)
-        {
-            // Get all connectors of the pipe
-            List<Connector> connectors = GetConnectors(p);
-            foreach(Connector c in connectors)
-            {
-                if (c.IsConnected) continue;
-                // Check if connectors are in the same location
-                if (c.Origin.IsAlmostEqualTo(connector.Origin))
-                {
-                    try
-                    {
-                        c.ConnectTo(connector);
-                        return true;
-                    }catch(Exception)
-                    {
-                        return false;
-                    }
-                }
-            }
-            return false;
-        }
+
     }
 }

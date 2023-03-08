@@ -22,31 +22,6 @@ namespace Avant.WTI.Drip
         }
 
         /// <summary>
-        ///  Converts placeholder into pipes
-        /// </summary>
-        /// <param name="placeholders">Placeholders to convert</param>
-        /// <returns></returns>
-        private List<ElementId> ConvertPlaceholders(List<Pipe> placeholders)
-        {
-            List<ElementId> ids = new List<ElementId>();
-            foreach (Pipe p in placeholders)
-            {
-                if (p.IsPlaceholder) ids.Add(p.Id);
-            }
-            if (ids.Count == 0) return new List<ElementId>();
-            try
-            {
-                List<ElementId> newIds = (List<ElementId>)PlumbingUtils.ConvertPipePlaceholders(data.doc, ids);
-                return newIds;
-            }
-            catch (Exception)
-            {
-                MessageBox.Show("Placeholder to pipe conversion failed.", "", MessageBoxButtons.OK);
-            }
-            return new List<ElementId>();
-        }
-
-        /// <summary>
         /// Finds a point in the area closest to the source pipe and the center of the area
         /// </summary>
         /// <param name="columnpoints">All potential points</param>
@@ -65,7 +40,7 @@ namespace Avant.WTI.Drip
 
             if (columnpoints.Count == 0) return XYZ.Zero;
 
-            XYZ areacenter = Utils.RectangleGetCenter(AreaUtils.GetAreaBoundingRectangle(area));
+            XYZ areacenter = GeomUtils.RectangleGetCenter(AreaUtils.GetAreaBoundingRectangle(area));
 
             // Create line from source to center
             Line centerLine = Line.CreateUnbound(VectorUtils.Vector_setZ(areacenter, 0), rootVector);
@@ -153,7 +128,7 @@ namespace Avant.WTI.Drip
             // Set Revit model errors to non blocking dialogs
             FailureHandlingOptions fho = t.GetFailureHandlingOptions();
             fho.SetForcedModalHandling(false);
-            fho.SetFailuresPreprocessor(new UnconnectedWarningSwallower());
+            fho.SetFailuresPreprocessor(new DripWarningSwallower());
             t.SetFailureHandlingOptions(fho);
 
             try
@@ -184,7 +159,7 @@ namespace Avant.WTI.Drip
 
                 if (data.convertPlaceholders)
                 {
-                    ConvertPlaceholders(placeholders);
+                    PipeUtils.ConvertPlaceholders(data.doc, placeholders);
                 }
 
 
@@ -239,7 +214,7 @@ namespace Avant.WTI.Drip
         private List<Pipe> GenerateAreaBranch(Pipe source, Area area, bool previewOnly = false)
         {
             RectangleF arearect = AreaUtils.GetAreaBoundingRectangle(area);
-            XYZ center = Utils.RectangleGetCenter(arearect);
+            XYZ center = GeomUtils.RectangleGetCenter(arearect);
             XYZ areavector = new XYZ(arearect.Width, arearect.Height, 0);
 
             // Get line of source pipe
@@ -256,7 +231,7 @@ namespace Avant.WTI.Drip
             List<XYZ> areaColumnPoints = new List<XYZ>();
             foreach (XYZ p in data.columnpoints)
             {
-                if (Utils.RectangleIntersect(arearect, p, tolerance: 1))
+                if (GeomUtils.RectangleIntersect(arearect, p, tolerance: 1))
                 {
                     areaColumnPoints.Add(p);
                 }
@@ -273,7 +248,7 @@ namespace Avant.WTI.Drip
         {
             Line sourcepipeline = ((LocationCurve)source.Location).Curve as Line;
             RectangleF areaRect = AreaUtils.GetAreaBoundingRectangle(area);
-            XYZ center = Utils.RectangleGetCenter(areaRect);
+            XYZ center = GeomUtils.RectangleGetCenter(areaRect);
 
             // Find column to attach valve to
             XYZ valveColumnPoint = FindValvePoint(columnpoints, area, rootVector, perpendicularVector, sourcepipeline);
@@ -319,12 +294,12 @@ namespace Avant.WTI.Drip
 
 
                 // Check if the pipes will connect to the 'open' side of the connector
-                if(valve_in_c.CoordinateSystem.BasisZ.DotProduct(new XYZ(0,0, data.transportlineheight / 304.8 - valve_in_p.Z)) < 0)
+                if(MEPUtils.GetConnectorDirection(valve_in_c).DotProduct(new XYZ(0,0, data.transportlineheight / 304.8 - valve_in_p.Z)) < 0)
                 {
                     valve_in_c = null;
                     data.errorMessages.Add(new DripData.DripErrorMessage("Pipe cannot be connected to In connector of the valve. Dummy connections will be created.", DripData.DripErrorMessage.Severity.WARNING));
                 }
-                if (valve_out_c.CoordinateSystem.BasisZ.DotProduct(new XYZ(0, 0, data.transportlineheight / 304.8 - valve_out_p.Z)) < 0)
+                if (MEPUtils.GetConnectorDirection(valve_out_c).DotProduct(new XYZ(0, 0, data.transportlineheight / 304.8 - valve_out_p.Z)) < 0)
                 {
                     valve_out_c = null;
                     data.errorMessages.Add(new DripData.DripErrorMessage("Pipe cannot be connected to Out connector of the valve. Dummy connections will be created.", DripData.DripErrorMessage.Severity.WARNING));
@@ -485,13 +460,13 @@ namespace Avant.WTI.Drip
                 Pipe l4 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p2, valve_in_p);
                 //PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l3.Id, l4.Id);
 
-                ValveUtils.ConnectPipe(l4, valve_in_c);
+                MEPUtils.ConnectPipe(l4, valve_in_c);
 
                 // Route from valve to tee
                 Pipe l5 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, valve_out_p, p3);
                 Pipe l6 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p3, valve_transport_corner_out_p);
                 //PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l5.Id, l6.Id);
-                ValveUtils.ConnectPipe(l5, valve_out_c);
+                MEPUtils.ConnectPipe(l5, valve_out_c);
 
                 Pipe l8;
 
@@ -544,99 +519,19 @@ namespace Avant.WTI.Drip
                 distribution_pipes.Add(teepipe);
 
                 // Set pipe sizes
-                foreach (Pipe p in transport_pipes) Utils.SetSize(p, data.transport_diameter / 304.8);
-                foreach (Pipe p in distribution_pipes) Utils.SetSize(p, data.distribution_diameter / 304.8);
+                foreach (Pipe p in transport_pipes) PipeUtils.SetSize(p, data.transport_diameter / 304.8);
+                foreach (Pipe p in distribution_pipes) PipeUtils.SetSize(p, data.distribution_diameter / 304.8);
 
                 pipes.AddRange(transport_pipes);
                 pipes.AddRange(distribution_pipes);
 
-                //pipes = PlumbingUtils.ConvertPipePlaceholders(data.doc, pipes.Select(p => p.Id).ToList())
-                //    .Select(id => data.doc.GetElement(id))
-                //    .Where(el => el.GetType() == typeof(Pipe))
-                //    .Select(el => (Pipe)el)
-                //    .ToList();
-
-                //distribution_pipes = PlumbingUtils.ConvertPipePlaceholders(data.doc, distribution_pipes.Select(p => p.Id).ToList())
-                //    .Select(id => data.doc.GetElement(id))
-                //    .Where(el => el.GetType() == typeof(Pipe))
-                //    .Select(el => (Pipe)el)
-                //    .ToList();
-
-                GenerateFittigs(pipes);
-
+                PipeUtils.GenerateFittigs(data.doc, pipes);
             }
-
-            
 
             return pipes;
         }
 
-
-
-        public void GenerateFittigs(List<Pipe> pipes)
-        {
-            foreach(Pipe pipe in pipes)
-            {
-                List<Connector> connectors = ValveUtils.GetConnectors(pipe);
-                foreach(Connector c in connectors)
-                {
-                    if (c.IsConnected) continue;
-                    bool connectionMade = false;
-
-                    XYZ p = c.Origin;
-                    foreach(Pipe pipe2 in pipes)
-                    {
-                        if (pipe == pipe2) continue;
-
-                        Line l = (Line)((LocationCurve)pipe2.Location).Curve;
-
-                        double dist = l.Distance(p);
-                        if (dist < 0.00000001f)
-                        {
-                            List<Connector> otherConnectors = ValveUtils.GetConnectors(pipe2);
-                            foreach(Connector other in otherConnectors)
-                            {
-                                if (other.IsConnected) continue;
-                                if (other.Origin.IsAlmostEqualTo(p))
-                                {
-                                    double angle = GetConnectorDirection(other).AngleTo(GetConnectorDirection(c));
-                                    if (angle < Math.PI/3) continue;
-                                    if(angle == Math.PI)
-                                    {
-                                        other.ConnectTo(c);
-                                    }
-                                    else
-                                    {
-                                        PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, c, other);
-                                    }                                  
-                                }
-                                connectionMade = c.IsConnected;
-                                if (connectionMade) break;
-                            }
-
-
-                            // Try to create tee
-                            if (!connectionMade)
-                            {
-                                connectionMade = PlumbingUtils.ConnectPipePlaceholdersAtTee(data.doc, pipe2.Id, pipe.Id);
-                            }
-
-                        }
-                        if (connectionMade) break;
-                    }
-                    if (connectionMade) continue;
-                }
-            }
-        }
-
-        public XYZ GetConnectorDirection(Connector c)
-        {
-            return c.CoordinateSystem.BasisZ;
-        }
-
-
-
-        public class UnconnectedWarningSwallower : IFailuresPreprocessor
+        public class DripWarningSwallower : IFailuresPreprocessor
         {
             public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
             {

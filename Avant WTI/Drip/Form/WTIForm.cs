@@ -36,7 +36,7 @@ namespace Avant.WTI.Drip.Form
             this.data = data;
 
             // Calculate bounds of the revit model based on grid lines and areas
-            this.bounds = Utils.CalculateBounds(data);
+            this.bounds = GeomUtils.CalculateBounds(data);
             this.maxBounds = this.bounds;
 
             // Convert areas into geometry for displaying

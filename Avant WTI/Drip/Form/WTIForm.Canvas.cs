@@ -79,7 +79,7 @@ namespace Avant.WTI.Drip.Form
         private void DrawLine(Line line, System.Drawing.Color c, bool dashed = false)
         {
             // Convert model coordinate space to canvas coordinates
-            Line screenLine = Utils.LineToScreenLine(line, this.bounds, this.canvas.Size);
+            Line screenLine = GeomUtils.LineToScreenLine(line, this.bounds, this.canvas.Size);
             if (screenLine == null) return;
 
             XYZ p1 = screenLine.GetEndPoint(0);
@@ -100,7 +100,7 @@ namespace Avant.WTI.Drip.Form
             IList<XYZ> points = polyLine.GetCoordinates();
 
             // Map model points to canvas points
-            points = points.Select(p => Utils.PointToScreenPoint(p, bounds, this.canvas.Size)).ToList();
+            points = points.Select(p => GeomUtils.PointToScreenPoint(p, bounds, this.canvas.Size)).ToList();
             if (points.Count < 2) return;
 
             Pen pp = new Pen(c);
@@ -121,7 +121,7 @@ namespace Avant.WTI.Drip.Form
         private void DrawPoint(RenderPoint point)
         {
             // Convert model coordinate space to canvas coordinates
-            XYZ p = Utils.PointToScreenPoint(point.Point, bounds, this.canvas.Size);
+            XYZ p = GeomUtils.PointToScreenPoint(point.Point, bounds, this.canvas.Size);
             float radius = point.GetPixelRadius(bounds, this.canvas.Size);
             SolidBrush brush = new SolidBrush(point.Color);
             g.FillEllipse(brush, new RectangleF((float)(p.X - radius), (float)(p.Y - radius), radius * 2, radius * 2));
@@ -196,7 +196,7 @@ namespace Avant.WTI.Drip.Form
         private void Canvas_mousemove(object sender, MouseEventArgs e)
         {
             XYZ mouse = new XYZ(e.X, e.Y, 0);
-            XYZ mouseModel = Utils.PointToModelPoint(mouse, bounds, this.canvas.Size);
+            XYZ mouseModel = GeomUtils.PointToModelPoint(mouse, bounds, this.canvas.Size);
 
             // Handle valve point moving
             if (selectedArea == null)
@@ -256,7 +256,7 @@ namespace Avant.WTI.Drip.Form
                 RenderPoint point = kv.Value;
                 Area area = kv.Key;
 
-                XYZ screenPoint = Utils.PointToScreenPoint(point.Point, bounds, this.canvas.Size);
+                XYZ screenPoint = GeomUtils.PointToScreenPoint(point.Point, bounds, this.canvas.Size);
 
                 double selectionMarginPx = Math.Max(2.0, point.GetPixelRadius(bounds, this.canvas.Size) * 2);
 

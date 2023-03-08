@@ -237,7 +237,7 @@ namespace Avant.WTI.Util
             }
 
             // Group element by the Z coordinate of the center of their boundingbox
-            var groupedByZ = from c in allColumns group c by Math.Round(GeomUtils.boundingBoxGetCenter(c.get_BoundingBox(null)).Z * 0.3048) / 0.3048 into g select new { height = g.Key, columns = g.ToList() };
+            var groupedByZ = from c in allColumns group c by Math.Round(GeomUtils.BoundingBoxGetCenter(c.get_BoundingBox(null)).Z * 0.3048) / 0.3048 into g select new { height = g.Key, columns = g.ToList() };
             if (groupedByZ.Count() == 0) return points;
 
             // Get group of elements with the most elements and with the lowest height
