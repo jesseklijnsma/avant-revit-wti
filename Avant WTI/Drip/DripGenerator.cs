@@ -110,6 +110,7 @@ namespace Avant.WTI.Drip
             data.previewGeometry.Clear();
             data.debugLines.Clear();
             data.previewPoints.Clear();
+            data.previewPoints.AddRange(data.columnpoints.Select(p => new RenderPoint(p, System.Drawing.Color.Gray, 3, RenderPoint.RenderUnits.PX)));
 
             data.errorMessages.Clear();
 
