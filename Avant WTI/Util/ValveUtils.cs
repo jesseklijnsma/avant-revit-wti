@@ -24,7 +24,7 @@ namespace Avant.WTI.Util
             
             // Try to get connectormanager
             ConnectorManager connectorManager = null;
-            if(e.GetType() == typeof(FamilyInstance))
+            if(typeof(FamilyInstance).IsAssignableFrom(e.GetType()))
             {
                 FamilyInstance f = (FamilyInstance)e;
                 MEPModel mep = f.MEPModel;

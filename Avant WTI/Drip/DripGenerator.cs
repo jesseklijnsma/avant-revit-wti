@@ -50,14 +50,22 @@ namespace Avant.WTI.Drip
         /// Finds a point in the area closest to the source pipe and the center of the area
         /// </summary>
         /// <param name="columnpoints">All potential points</param>
-        /// <param name="areacenter">Center of the area</param>
+        /// <param name="area">Area</param>
         /// <param name="rootVector">Vector in the direction from the source pipe to the center of the area</param>
         /// <param name="perpendicularVector">Vector perpendicular to the rootVector</param>
         /// <param name="sourceline">Source pipe line</param>
         /// <returns></returns>
-        private XYZ FindValvePoint(List<XYZ> columnpoints, XYZ areacenter, XYZ rootVector, XYZ perpendicularVector, Line sourceline)
+        private XYZ FindValvePoint(List<XYZ> columnpoints, Area area, XYZ rootVector, XYZ perpendicularVector, Line sourceline)
         {
+            if (data.overrideValvePoints.ContainsKey(area))
+            {
+                XYZ valvePoint = data.overrideValvePoints[area];
+                if (valvePoint != null) return valvePoint;
+            }
+
             if (columnpoints.Count == 0) return XYZ.Zero;
+
+            XYZ areacenter = Utils.RectangleGetCenter(AreaUtils.GetAreaBoundingRectangle(area));
 
             // Create line from source to center
             Line centerLine = Line.CreateUnbound(VectorUtils.Vector_setZ(areacenter, 0), rootVector);
@@ -111,6 +119,7 @@ namespace Avant.WTI.Drip
             data.debugLines.Clear();
             data.previewPoints.Clear();
             data.previewPoints.AddRange(data.columnpoints.Select(p => new RenderPoint(p, System.Drawing.Color.Gray, 3, RenderPoint.RenderUnits.PX)));
+            data.valvePoints.Clear();
 
             data.errorMessages.Clear();
 
@@ -239,16 +248,17 @@ namespace Avant.WTI.Drip
             XYZ rootVector = VectorUtils.Vector_mask(branchinwardvector, areavector);
             XYZ perpendicularVector = VectorUtils.Vector_mask(branchinwardvector.CrossProduct(XYZ.BasisZ), areavector);
 
-            return GenerateBranch(source, arearect, rootVector, perpendicularVector, areaColumnPoints, previewOnly: previewOnly);
+            return GenerateBranch(source, area, rootVector, perpendicularVector, areaColumnPoints, previewOnly: previewOnly);
         }
 
-        private List<Pipe> GenerateBranch(Pipe source, RectangleF areaRect, XYZ rootVector, XYZ perpendicularVector, List<XYZ> columnpoints, bool previewOnly = false)
+        private List<Pipe> GenerateBranch(Pipe source, Area area, XYZ rootVector, XYZ perpendicularVector, List<XYZ> columnpoints, bool previewOnly = false)
         {
             Line sourcepipeline = ((LocationCurve)source.Location).Curve as Line;
+            RectangleF areaRect = AreaUtils.GetAreaBoundingRectangle(area);
             XYZ center = Utils.RectangleGetCenter(areaRect);
 
             // Find column to attach valve to
-            XYZ valveColumnPoint = FindValvePoint(columnpoints, center, rootVector, perpendicularVector, sourcepipeline);
+            XYZ valveColumnPoint = FindValvePoint(columnpoints, area, rootVector, perpendicularVector, sourcepipeline);
             if (valveColumnPoint == null)
             {
                 Console.WriteLine("Error: No valve point found");
@@ -267,7 +277,7 @@ namespace Avant.WTI.Drip
             XYZ valvePoint = valveColumnPoint.Add(rootVector.Normalize().Multiply(-data.valvecolumnDistance / 304.8));
             valvePoint = VectorUtils.Vector_setZ(valvePoint, data.valveheight / 304.8);
 
-            data.previewPoints.Add(new RenderPoint(valvePoint, System.Drawing.Color.White, 200, RenderPoint.RenderUnits.MM));
+            data.valvePoints[area] = new RenderPoint(valvePoint, System.Drawing.Color.White, 200, RenderPoint.RenderUnits.MM);
 
             Line centerline = Line.CreateBound(center, VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(sourcepipeline, center), 0));
 

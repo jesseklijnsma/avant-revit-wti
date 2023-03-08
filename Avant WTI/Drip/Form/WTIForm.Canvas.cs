@@ -57,6 +57,12 @@ namespace Avant.WTI.Drip.Form
                 DrawPoint(p);
             }
 
+            // Draw valve points
+            foreach (RenderPoint p in data.valvePoints.Values)
+            {
+                DrawPoint(p);
+            }
+
             // Render to canvas
             bg.Render();
             // Delete graphics buffer
@@ -160,12 +166,18 @@ namespace Avant.WTI.Drip.Form
         private bool canvas_panbuttondown = false;
         private System.Drawing.Point previous_mouse_location = new System.Drawing.Point();
 
+        private Area selectedArea = null;
+
         private void Canvas_mousedown(object sender, MouseEventArgs e)
         {
             if (e.Button == PAN_BUTTON)
             {
                 canvas_panbuttondown = true;
                 previous_mouse_location = e.Location;
+            }
+            if(e.Button == MouseButtons.Left)
+            {
+                selectedArea = GetValvePointAreaUnderCursor(new XYZ(e.X, e.Y, 0));
             }
         }
 
@@ -175,13 +187,49 @@ namespace Avant.WTI.Drip.Form
             {
                 canvas_panbuttondown = false;
             }
+            if (e.Button == MouseButtons.Left)
+            {
+                selectedArea = null;
+            }
         }
 
         private void Canvas_mousemove(object sender, MouseEventArgs e)
         {
+            XYZ mouse = new XYZ(e.X, e.Y, 0);
+            XYZ mouseModel = Utils.PointToModelPoint(mouse, bounds, this.canvas.Size);
+
+            // Handle valve point moving
+            if (selectedArea == null)
+            {
+                Area area = GetValvePointAreaUnderCursor(mouse);
+                if (area == null)
+                {
+                    Cursor.Current = Cursors.Default;
+                }
+                else
+                {
+                    Cursor.Current = Cursors.Hand;
+                }
+            }
+            else
+            {
+                // Dragging
+                Cursor.Current = Cursors.Hand;
+
+                XYZ valvePointSnap = this.data.columnpoints.OrderBy(p => p.DistanceTo(mouseModel)).FirstOrDefault();
+                bool reload = data.overrideValvePoints.ContainsKey(selectedArea) && data.overrideValvePoints[selectedArea] != valvePointSnap;
+
+                data.overrideValvePoints[selectedArea] = valvePointSnap;
+
+                if (reload) ReloadPreview();
+
+            }
+
+            
+
+            // Handle pan
             if (canvas_panbuttondown)
             {
-                // Handle pan
 
                 // Calculate mouse dx, dy
                 float dx = previous_mouse_location.X - e.Location.X;
@@ -199,6 +247,25 @@ namespace Avant.WTI.Drip.Form
             }
             // Rerender
             canvas.Invalidate();
+        }
+
+        private Area GetValvePointAreaUnderCursor(XYZ mousePoint)
+        {
+            foreach(KeyValuePair<Area,RenderPoint> kv in data.valvePoints)
+            {
+                RenderPoint point = kv.Value;
+                Area area = kv.Key;
+
+                XYZ screenPoint = Utils.PointToScreenPoint(point.Point, bounds, this.canvas.Size);
+
+                double selectionMarginPx = Math.Max(2.0, point.GetPixelRadius(bounds, this.canvas.Size) * 2);
+
+                if (screenPoint.DistanceTo(mousePoint) < selectionMarginPx)
+                {
+                    return area;
+                }
+            }
+            return null;
         }
 
         /// <summary>

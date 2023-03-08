@@ -37,6 +37,8 @@ namespace Avant.WTI.Drip
         public Dictionary<Area, Pipe> areapipemap = new Dictionary<Area, Pipe>();
         public PipeType pipetype = null;
 
+        public Dictionary<Area, XYZ> overrideValvePoints = new Dictionary<Area, XYZ>();
+
         public PipingSystemType transportSystemType = null;
         public double transport_diameter = 110;
         public PipingSystemType distributionSystemType = null;
@@ -57,9 +59,11 @@ namespace Avant.WTI.Drip
         public bool convertPlaceholders = true;
 
         // Misc
+
         public readonly List<Line> previewGeometry = new List<Line>();
         public readonly List<RenderPoint> previewPoints = new List<RenderPoint>();
         public readonly List<Line> debugLines = new List<Line>();
+        public readonly Dictionary<Area, RenderPoint> valvePoints = new Dictionary<Area, RenderPoint>();
 
         // Error messages
         public List<DripErrorMessage> errorMessages = new List<DripErrorMessage>();

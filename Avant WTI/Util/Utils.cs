@@ -37,6 +37,22 @@ namespace Avant.WTI.Util
             return new XYZ(x, y, 0);
         }
 
+
+        /// <summary>
+        /// Transforms a point in canvas space to Revit model space
+        /// </summary>
+        /// <param name="p">Point to transform</param>
+        /// <param name="domain">Full model space bounds to map to canvas coordinates</param>
+        /// <param name="targetSize">Canvas size</param>
+        /// <returns>Transformed point</returns>
+        public static XYZ PointToModelPoint(XYZ p, RectangleF domain, System.Drawing.Size targetSize)
+        {
+            double x = p.X * domain.Width / targetSize.Width + domain.X;
+            double y = (targetSize.Height - p.Y) * domain.Height / targetSize.Height + domain.Y;
+
+            return new XYZ(x, y, 0);
+        }
+
         /// <summary>
         /// Transform a line in Revit model space to canvas space
         /// </summary>
@@ -50,7 +66,7 @@ namespace Avant.WTI.Util
             XYZ p2 = PointToScreenPoint(line.GetEndPoint(1), domain, size);
 
             // Can't create a line if the points are not far enough apart
-            if (p1.IsAlmostEqualTo(p2)) return null;
+            if (p1.DistanceTo(p2) < 0.8) return null;
 
             return Line.CreateBound(p1, p2);
         }
