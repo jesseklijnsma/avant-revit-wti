@@ -115,7 +115,7 @@ namespace Avant.WTI.Util
 
         public static void SetSize(Pipe p, double size)
         {
-            if (p.GetType() != typeof(Element)) return;
+            if (p.GetType() != typeof(Autodesk.Revit.DB.Plumbing.Pipe)) return;
             Parameter param = p.LookupParameter("Diameter");
             if (param == null) return;
             param.Set(size);

@@ -153,6 +153,7 @@ namespace Avant.WTI.Drip
             // Set Revit model errors to non blocking dialogs
             FailureHandlingOptions fho = t.GetFailureHandlingOptions();
             fho.SetForcedModalHandling(false);
+            fho.SetFailuresPreprocessor(new UnconnectedWarningSwallower());
             t.SetFailureHandlingOptions(fho);
 
             try
@@ -185,6 +186,23 @@ namespace Avant.WTI.Drip
                 {
                     ConvertPlaceholders(placeholders);
                 }
+
+
+                List<Pipe> distribution_pipes = new FilteredElementCollector(data.doc)
+                    .OfCategory(BuiltInCategory.OST_PipeCurves)
+                    .WhereElementIsNotElementType()
+                    .Where(el => ((Pipe)el).MEPSystem?.GetTypeId() == data.distributionSystemType.Id)
+                    .Select(el => (Pipe)el)
+                    .ToList();
+
+                foreach(Pipe p in distribution_pipes)
+                {
+                    if (PlumbingUtils.HasOpenConnector(data.doc, p.Id))
+                    {
+                        PlumbingUtils.PlaceCapOnOpenEnds(data.doc, p.Id, p.GetTypeId());
+                    }
+                }
+
 
                 // We managed to make it to the end without any exceptions
                 t.Commit();
@@ -277,6 +295,7 @@ namespace Avant.WTI.Drip
             XYZ valvePoint = valveColumnPoint.Add(rootVector.Normalize().Multiply(-data.valvecolumnDistance / 304.8));
             valvePoint = VectorUtils.Vector_setZ(valvePoint, data.valveheight / 304.8);
 
+            //data.previewPoints.Add(new RenderPoint(valvePoint, System.Drawing.Color.White, 200, RenderPoint.RenderUnits.MM));
             data.valvePoints[area] = new RenderPoint(valvePoint, System.Drawing.Color.White, 200, RenderPoint.RenderUnits.MM);
 
             Line centerline = Line.CreateBound(center, VectorUtils.Vector_setZ(GeomUtils.GetClosestPoint(sourcepipeline, center), 0));
@@ -339,7 +358,7 @@ namespace Avant.WTI.Drip
             Line transportCenterLine = FindBestCenterLine(p3, centerline, columnpoints, minOffset);
 
             XYZ valve_closest_point = GeomUtils.GetClosestPoint(transportCenterLine, p3);
-            XYZ dir_valve_to_centerline = (valve_closest_point - p3).Normalize();
+            XYZ dir_valve_to_centerline = VectorUtils.Vector_setZ((valve_closest_point - p3), 0).Normalize();
 
 
 
@@ -458,20 +477,20 @@ namespace Avant.WTI.Drip
 
                 // Route to valve
                 Pipe l1 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, sourcepoint, p1);
-                PlumbingUtils.ConnectPipePlaceholdersAtTee(data.doc, source.Id, l1.Id);
+                //PlumbingUtils.ConnectPipePlaceholdersAtTee(data.doc, source.Id, l1.Id);
                 Pipe l2 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p1, valve_transport_corner_p);
-                PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l1.Id, l2.Id);
+                //PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l1.Id, l2.Id);
                 Pipe l3 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, valve_transport_corner_p, p2);
-                PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l2.Id, l3.Id);
+                //PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l2.Id, l3.Id);
                 Pipe l4 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p2, valve_in_p);
-                PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l3.Id, l4.Id);
+                //PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l3.Id, l4.Id);
 
                 ValveUtils.ConnectPipe(l4, valve_in_c);
 
                 // Route from valve to tee
                 Pipe l5 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, valve_out_p, p3);
                 Pipe l6 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p3, valve_transport_corner_out_p);
-                PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l5.Id, l6.Id);
+                //PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l5.Id, l6.Id);
                 ValveUtils.ConnectPipe(l5, valve_out_c);
 
                 Pipe l8;
@@ -479,37 +498,39 @@ namespace Avant.WTI.Drip
                 if (offcenter)
                 {
                     Pipe l7 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, valve_transport_corner_out_p, p4);
-                    PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l6.Id, l7.Id);
+                    //PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l6.Id, l7.Id);
 
                     l8 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p4, p5);
-                    PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l7.Id, l8.Id);
+                    //PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l7.Id, l8.Id);
 
-                    pipes.Add(l7);
+                    //pipes.Add(l7);
                     transport_pipes.Add(l7);
                 }
                 else
                 {
                     l8 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, valve_transport_corner_out_p, p5);
-                    PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l6.Id, l8.Id);
+                    //PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l6.Id, l8.Id);
                 }
 
                 Pipe l9 = Pipe.CreatePlaceholder(data.doc, data.transportSystemType.Id, data.pipetype.Id, data.groundLevel.Id, p5, tee);
-                PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l8.Id, l9.Id);
+                //PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, l8.Id, l9.Id);
 
 
                 // Distribution pipe
                 Pipe teepipe = Pipe.CreatePlaceholder(data.doc, data.distributionSystemType.Id, data.pipetype.Id, data.groundLevel.Id, tee_p1, tee_p2);
-                PlumbingUtils.ConnectPipePlaceholdersAtTee(data.doc, teepipe.Id, l9.Id);
 
-                pipes.Add(l1);
-                pipes.Add(l2);
-                pipes.Add(l3);
-                pipes.Add(l4);
-                pipes.Add(l5);
-                pipes.Add(l6);
-                pipes.Add(l8);
-                pipes.Add(l9);
-                pipes.Add(teepipe);
+                //PlumbingUtils.PlaceCapOnOpenEnds(data.doc, teepipe.Id, teepipe.Id);
+                //PlumbingUtils.ConnectPipePlaceholdersAtTee(data.doc, teepipe.Id, l9.Id);
+
+                //pipes.Add(l1);
+                //pipes.Add(l2);
+                //pipes.Add(l3);
+                //pipes.Add(l4);
+                //pipes.Add(l5);
+                //pipes.Add(l6);
+                //pipes.Add(l8);
+                //pipes.Add(l9);
+                //pipes.Add(teepipe);
 
                 transport_pipes.Add(l1);
                 transport_pipes.Add(l2);
@@ -521,14 +542,125 @@ namespace Avant.WTI.Drip
                 transport_pipes.Add(l9);
 
                 distribution_pipes.Add(teepipe);
+
+                // Set pipe sizes
+                foreach (Pipe p in transport_pipes) Utils.SetSize(p, data.transport_diameter / 304.8);
+                foreach (Pipe p in distribution_pipes) Utils.SetSize(p, data.distribution_diameter / 304.8);
+
+                pipes.AddRange(transport_pipes);
+                pipes.AddRange(distribution_pipes);
+
+                //pipes = PlumbingUtils.ConvertPipePlaceholders(data.doc, pipes.Select(p => p.Id).ToList())
+                //    .Select(id => data.doc.GetElement(id))
+                //    .Where(el => el.GetType() == typeof(Pipe))
+                //    .Select(el => (Pipe)el)
+                //    .ToList();
+
+                //distribution_pipes = PlumbingUtils.ConvertPipePlaceholders(data.doc, distribution_pipes.Select(p => p.Id).ToList())
+                //    .Select(id => data.doc.GetElement(id))
+                //    .Where(el => el.GetType() == typeof(Pipe))
+                //    .Select(el => (Pipe)el)
+                //    .ToList();
+
+                GenerateFittigs(pipes);
+
             }
 
-            // Set pipe sizes
-            foreach (Pipe p in transport_pipes) Utils.SetSize(p, data.transport_diameter / 304.8);
-            foreach (Pipe p in distribution_pipes) Utils.SetSize(p, data.distribution_diameter / 304.8);
+            
 
             return pipes;
         }
+
+
+
+        public void GenerateFittigs(List<Pipe> pipes)
+        {
+            foreach(Pipe pipe in pipes)
+            {
+                List<Connector> connectors = ValveUtils.GetConnectors(pipe);
+                foreach(Connector c in connectors)
+                {
+                    if (c.IsConnected) continue;
+                    bool connectionMade = false;
+
+                    XYZ p = c.Origin;
+                    foreach(Pipe pipe2 in pipes)
+                    {
+                        if (pipe == pipe2) continue;
+
+                        Line l = (Line)((LocationCurve)pipe2.Location).Curve;
+
+                        double dist = l.Distance(p);
+                        if (dist < 0.00000001f)
+                        {
+                            List<Connector> otherConnectors = ValveUtils.GetConnectors(pipe2);
+                            foreach(Connector other in otherConnectors)
+                            {
+                                if (other.IsConnected) continue;
+                                if (other.Origin.IsAlmostEqualTo(p))
+                                {
+                                    double angle = GetConnectorDirection(other).AngleTo(GetConnectorDirection(c));
+                                    if (angle < Math.PI/3) continue;
+                                    if(angle == Math.PI)
+                                    {
+                                        other.ConnectTo(c);
+                                    }
+                                    else
+                                    {
+                                        PlumbingUtils.ConnectPipePlaceholdersAtElbow(data.doc, c, other);
+                                    }                                  
+                                }
+                                connectionMade = c.IsConnected;
+                                if (connectionMade) break;
+                            }
+
+
+                            // Try to create tee
+                            if (!connectionMade)
+                            {
+                                connectionMade = PlumbingUtils.ConnectPipePlaceholdersAtTee(data.doc, pipe2.Id, pipe.Id);
+                            }
+
+                        }
+                        if (connectionMade) break;
+                    }
+                    if (connectionMade) continue;
+                }
+            }
+        }
+
+        public XYZ GetConnectorDirection(Connector c)
+        {
+            return c.CoordinateSystem.BasisZ;
+        }
+
+
+
+        public class UnconnectedWarningSwallower : IFailuresPreprocessor
+        {
+            public FailureProcessingResult PreprocessFailures(FailuresAccessor failuresAccessor)
+            {
+                IList<FailureMessageAccessor> failList = failuresAccessor.GetFailureMessages(); ;
+                // Inside event handler, get all warnings
+                foreach (FailureMessageAccessor failure in failList)
+                {
+                    // check FailureDefinitionIds against ones that you want to dismiss, 
+                    FailureDefinitionId failID = failure.GetFailureDefinitionId();
+                    // prevent Revit from showing Unenclosed room warnings
+                    if (failID == BuiltInFailures.AutoRouteFailures.ElementHasOpenConnection)
+                    {
+                        failuresAccessor.DeleteWarning(failure);
+                    }else if (failID == BuiltInFailures.AutoRouteFailures.ElementHasFlowCalculation)
+                    {
+                        failuresAccessor.DeleteWarning(failure);
+                    }
+                }
+
+                return FailureProcessingResult.Continue;
+            }
+        }
+
+
 
     }
 }

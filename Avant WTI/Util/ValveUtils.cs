@@ -30,7 +30,7 @@ namespace Avant.WTI.Util
                 MEPModel mep = f.MEPModel;
                 connectorManager = mep?.ConnectorManager;
             }
-            if(e.GetType() == typeof(MEPCurve))
+            if(typeof(MEPCurve).IsAssignableFrom(e.GetType()))
             {
                 MEPCurve curve = (MEPCurve)e;
                 connectorManager = curve.ConnectorManager;
