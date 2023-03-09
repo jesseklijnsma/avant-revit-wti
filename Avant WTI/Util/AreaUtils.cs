@@ -124,6 +124,31 @@ namespace Avant.WTI.Util
         }
 
 
+        /// <summary>
+        /// Gets the area the point is in
+        /// </summary>
+        /// <param name="areas">List of areas to consider</param>
+        /// <param name="point">Point</param>
+        /// <returns>Area under point or null</returns>
+        public static Area GetAreaAtPoint(List<Area> areas, XYZ point)
+        {
+            List<Area> areasUnderPoint = new List<Area>();
+            foreach(Area area in areas)
+            {
+                RectangleF arearect = AreaUtils.GetAreaBoundingRectangle(area);
+                if (GeomUtils.RectangleIntersect(arearect, point, tolerance: 1))
+                {
+                    areasUnderPoint.Add(area);
+                }
+            }
+
+            if (areasUnderPoint.Count == 0) return null;
+            if (areasUnderPoint.Count == 1) return areasUnderPoint[0];
+
+            return areasUnderPoint.OrderBy(a => a.Area).First();
+        }
+
+
 
     }
 }

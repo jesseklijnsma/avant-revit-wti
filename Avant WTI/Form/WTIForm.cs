@@ -212,6 +212,13 @@ namespace Avant.WTI.Form
             }
             catch (Autodesk.Revit.Exceptions.OperationCanceledException) { }
             
+            data.areapipemap.Clear();
+            foreach (Area area in data.areas)
+            {
+                data.areapipemap[area] = Utils.FindClosestPipe(data.pipelines, area);
+            }
+
+
             ReloadPreview();
 
             // Make sure the form is back in focus

@@ -2,7 +2,6 @@
 using Autodesk.Revit.DB.Plumbing;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 
 namespace Avant.WTI.Util

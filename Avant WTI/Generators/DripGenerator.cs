@@ -32,9 +32,8 @@ namespace Avant.WTI.Generators
             foreach (Area area in data.areas)
             {
                 // Try to get corresponding type to area
-                Pipe pipe = null;
-                if (data.areapipemap.ContainsKey(area)) pipe = data.areapipemap[area];
-                if (pipe == null) pipe = Utils.FindClosestPipe(data.pipelines, area);
+                if (!data.areapipemap.ContainsKey(area)) continue;
+                Pipe pipe = data.areapipemap[area];
                 if (pipe == null) continue;
 
                 GenerateBranch(pipe, area, previewOnly: true);
@@ -71,9 +70,8 @@ namespace Avant.WTI.Generators
                 foreach (Area area in data.areas)
                 {
                     // Try to get corresponding type to area
-                    Pipe pipe = null;
-                    if (data.areapipemap.ContainsKey(area)) pipe = data.areapipemap[area];
-                    if (pipe == null) pipe = Utils.FindClosestPipe(data.pipelines, area);
+                    if (!data.areapipemap.ContainsKey(area)) continue;
+                    Pipe pipe = data.areapipemap[area];
                     if (pipe == null) continue;
 
                     // Add source pipe to the sources
@@ -206,7 +204,15 @@ namespace Avant.WTI.Generators
             if (goodLine) return preferredLine;
 
             XYZ linePoint = GeomUtils.GetClosestPoint(preferredLine, source);
-            XYZ sourceToLine = VectorUtils.Vector_setZ((linePoint - source), 0).Normalize();
+            XYZ sourceToLine;
+            if (linePoint.IsAlmostEqualTo(source, 0.001))
+            {
+                sourceToLine = preferredLine.Direction.CrossProduct(XYZ.BasisZ).Normalize();
+            }
+            else
+            {
+                sourceToLine = VectorUtils.Vector_setZ((linePoint - source), 0).Normalize();
+            }
 
             Line newLine = (Line)preferredLine.CreateTransformed(Transform.CreateTranslation(sourceToLine.Multiply(paddingft + 0.0000001)));
 

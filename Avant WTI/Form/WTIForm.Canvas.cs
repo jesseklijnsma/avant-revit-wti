@@ -5,6 +5,7 @@ using Autodesk.Revit.DB;
 using Avant.WTI.Util;
 using System.Collections.Generic;
 using System.Linq;
+using Autodesk.Revit.DB.Plumbing;
 
 namespace Avant.WTI.Form
 {
@@ -26,6 +27,16 @@ namespace Avant.WTI.Form
 
             // Fill with background color
             g.Clear(System.Drawing.Color.FromArgb(54, 54, 54));
+
+            if(areaUnderCursor != null)
+            {
+                if (areaLineMap.ContainsKey(areaUnderCursor))
+                {
+                    PolyLine line = areaLineMap[areaUnderCursor];
+                    FillPolyLine(line, System.Drawing.Color.FromArgb(56, 56, 56));
+                }
+            }
+
 
             // Draw grid lines
             foreach (Line line in data.lines)
@@ -115,6 +126,24 @@ namespace Avant.WTI.Form
         }
 
         /// <summary>
+        ///     Draws a polyline from the Revit model coordinate space onto the canvas
+        /// </summary>
+        /// <param name="polyLine">Model polyline to be drawn</param>
+        /// <param name="c">Color</param>
+        private void FillPolyLine(PolyLine polyLine, System.Drawing.Color c)
+        {
+            IList<XYZ> points = polyLine.GetCoordinates();
+
+            // Map model points to canvas points
+            points = points.Select(p => GeomUtils.PointToScreenPoint(p, bounds, this.canvas.Size)).ToList();
+            if (points.Count < 2) return;
+
+            Brush bb = new SolidBrush(c);
+            PointF[] corners = points.Select(p => new PointF((float)p.X, (float)p.Y)).ToArray();
+            g.FillPolygon(bb, corners);
+        }
+
+        /// <summary>
         ///     Draws a point from the Revit model coordinate space onto the canvas as a dot
         /// </summary>
         /// <param name="point">Point to be drawn</param>
@@ -181,6 +210,25 @@ namespace Avant.WTI.Form
             }
         }
 
+        private void Canvas_mouseclick(object sender, MouseEventArgs e)
+        {
+            if(e.Button == MouseButtons.Right)
+            {
+                Pipe pipe = null;
+                if(data.areapipemap.ContainsKey(areaUnderCursor)) pipe = data.areapipemap[areaUnderCursor];
+                if(pipe == null)
+                {
+                    pipe = Utils.FindClosestPipe(data.pipelines, areaUnderCursor);
+                }
+                else
+                {
+                    pipe = null;
+                }
+                data.areapipemap[areaUnderCursor] = pipe;
+                ReloadPreview();
+            }
+        }
+
         private void Canvas_mouseup(object sender, MouseEventArgs e)
         {
             if (e.Button == PAN_BUTTON)
@@ -193,9 +241,59 @@ namespace Avant.WTI.Form
             }
         }
 
+        private void Canvas_mouseexit(object sender, EventArgs e)
+        {
+            XYZ mouse = new XYZ(previous_mouse_location.X, previous_mouse_location.Y, 0);
+
+            HandleAreaActions(mouse);
+        }
+
         private void Canvas_mousemove(object sender, MouseEventArgs e)
         {
             XYZ mouse = new XYZ(e.X, e.Y, 0);
+            //XYZ mouseModel = GeomUtils.PointToModelPoint(mouse, bounds, this.canvas.Size);
+
+            HandleAreaActions(mouse);
+            HandleValveDrag(mouse);
+            HandlePan(e);
+            
+            // Rerender
+            canvas.Invalidate();
+        }
+
+
+        private void HandlePan(MouseEventArgs e)
+        {
+            // Handle pan
+            if (canvas_panbuttondown)
+            {
+
+                // Calculate mouse dx, dy
+                float dx = previous_mouse_location.X - e.Location.X;
+                float dy = e.Location.Y - previous_mouse_location.Y;
+
+                // Scale dx,dy from canvas to model
+                dx *= this.bounds.Width / this.canvas.Width;
+                dy *= this.bounds.Height / this.canvas.Height;
+
+                this.bounds.Location += new SizeF(dx, dy);
+
+                Canvas_checkBounds();
+
+                previous_mouse_location = e.Location;
+            }
+        }
+
+        private Area areaUnderCursor = null;
+
+        private void HandleAreaActions(XYZ mouse)
+        {
+            XYZ mouseModel = GeomUtils.PointToModelPoint(mouse, bounds, this.canvas.Size);
+            areaUnderCursor = AreaUtils.GetAreaAtPoint(data.areas, mouseModel);
+        }
+
+        private void HandleValveDrag(XYZ mouse)
+        {
             XYZ mouseModel = GeomUtils.PointToModelPoint(mouse, bounds, this.canvas.Size);
 
             // Handle valve point moving
@@ -224,29 +322,6 @@ namespace Avant.WTI.Form
                 if (reload) ReloadPreview();
 
             }
-
-            
-
-            // Handle pan
-            if (canvas_panbuttondown)
-            {
-
-                // Calculate mouse dx, dy
-                float dx = previous_mouse_location.X - e.Location.X;
-                float dy = e.Location.Y - previous_mouse_location.Y;
-
-                // Scale dx,dy from canvas to model
-                dx *= this.bounds.Width / this.canvas.Width;
-                dy *= this.bounds.Height / this.canvas.Height;
-
-                this.bounds.Location += new SizeF(dx, dy);
-
-                Canvas_checkBounds();
-        
-                previous_mouse_location = e.Location;
-            }
-            // Rerender
-            canvas.Invalidate();
         }
 
         private Area GetValvePointAreaUnderCursor(XYZ mousePoint)

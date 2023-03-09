@@ -106,7 +106,9 @@ namespace Avant.WTI.Form
             this.canvas.TabIndex = 1;
             this.canvas.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvas_paint);
             this.canvas.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousedown);
+            this.canvas.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Canvas_mouseclick);
             this.canvas.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousemove);
+            this.canvas.MouseLeave += new System.EventHandler(this.Canvas_mouseexit);
             this.canvas.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Canvas_mouseup);
             this.canvas.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousewheel);
             this.canvas.Resize += new System.EventHandler(this.Canvas_resize);
