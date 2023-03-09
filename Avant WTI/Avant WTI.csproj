@@ -116,7 +116,9 @@
     <Compile Include="Util\AreaUtils.cs" />
     <Compile Include="WTIData.cs" />
     <Compile Include="Generators\DripGenerator.cs" />
-    <Compile Include="Util\ErrorDialog.cs" />
+    <Compile Include="Util\ErrorDialog.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Util\ErrorDialog.Designer.cs">
       <DependentUpon>ErrorDialog.cs</DependentUpon>
     </Compile>

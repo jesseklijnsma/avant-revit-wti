@@ -86,8 +86,10 @@ namespace Avant.WTI.Form
             // titleLabel
             // 
             this.titleLabel.AutoSize = true;
+            this.titleLabel.BackColor = System.Drawing.Color.Transparent;
             this.titleLabel.Font = new System.Drawing.Font("Segoe UI", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.titleLabel.Location = new System.Drawing.Point(7, 19);
+            this.titleLabel.Location = new System.Drawing.Point(7, 16);
+            this.titleLabel.Margin = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.titleLabel.Name = "titleLabel";
             this.titleLabel.Size = new System.Drawing.Size(98, 31);
             this.titleLabel.TabIndex = 0;
@@ -105,10 +107,10 @@ namespace Avant.WTI.Form
             this.canvas.Size = new System.Drawing.Size(921, 844);
             this.canvas.TabIndex = 1;
             this.canvas.Paint += new System.Windows.Forms.PaintEventHandler(this.Canvas_paint);
-            this.canvas.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousedown);
             this.canvas.MouseClick += new System.Windows.Forms.MouseEventHandler(this.Canvas_mouseclick);
-            this.canvas.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousemove);
+            this.canvas.MouseDown += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousedown);
             this.canvas.MouseLeave += new System.EventHandler(this.Canvas_mouseexit);
+            this.canvas.MouseMove += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousemove);
             this.canvas.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Canvas_mouseup);
             this.canvas.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.Canvas_mousewheel);
             this.canvas.Resize += new System.EventHandler(this.Canvas_resize);
