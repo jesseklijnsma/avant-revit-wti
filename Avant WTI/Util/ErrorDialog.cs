@@ -1,17 +1,12 @@
-﻿using Avant.WTI.Drip;
-using Microsoft.Scripting;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Windows.Forms;
-using System.Windows.Interop;
-using System.Windows.Media;
 
 namespace Avant.WTI.Util
 {
-    public partial class ErrorDialog : Form
+    public partial class ErrorDialog : System.Windows.Forms.Form
     {
 
         private List<WTIData.DripErrorMessage> errorMessages;

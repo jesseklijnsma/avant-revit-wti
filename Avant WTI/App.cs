@@ -32,7 +32,7 @@ namespace Avant.WTI
             // BUTTON FOR THE SINGLE-THREADED WPF OPTION
             if (panel.AddItem(
                 new PushButtonData("WTI", "Generate WTI", thisAssemblyPath,
-                    "Avant.WTI.Drip.DripCommand")) is PushButton button)
+                    "Avant.WTI.WTICommand")) is PushButton button)
             {
                 // defines the tooltip displayed when the button is hovered over in Revit's ribbon
                 button.ToolTip = "Visual interface for debugging applications.";
