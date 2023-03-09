@@ -6,6 +6,8 @@ using Avant.WTI.Util;
 using System.Collections.Generic;
 using System.Linq;
 using Autodesk.Revit.DB.Plumbing;
+using Color = System.Drawing.Color;
+using System.Windows;
 
 namespace Avant.WTI.Form
 {
@@ -36,7 +38,6 @@ namespace Avant.WTI.Form
                 }
             }
 
-
             // Draw grid lines
             foreach (Line line in data.lines)
             {
@@ -49,29 +50,49 @@ namespace Avant.WTI.Form
                 DrawPolyLine(polyLine, System.Drawing.Color.Green, true);
             }
 
-            // Draw pipe lines
-            foreach (Line line in pipe_lineMap.Values)
-            {
-                DrawLine(line, System.Drawing.Color.Yellow, false);
-            }
-
-            // Draw preview lines
-            foreach (Line l in data.previewGeometry)
-            {
-                DrawLine(l, System.Drawing.Color.Aqua, false);
-            }
-
             // Draw preview points
             foreach (RenderPoint p in data.previewPoints)
             {
                 DrawPoint(p);
             }
 
+
+            byte dripAlpha = 0x7F;
+            byte drainAlpha = 0x7F;
+
+            switch (ActiveTab)
+            {
+                case Tab.DRIP: dripAlpha = 0xFF; break;
+                case Tab.DRAIN: drainAlpha = 0xFF; break;
+                default: break;
+            }
+
+            #region DRIP
+            // Draw pipe lines
+            foreach (Line line in pipe_lineMap.Values)
+            {
+                DrawLine(line, System.Drawing.Color.Yellow, false, alpha: dripAlpha);
+            }
+
+            // Draw preview lines
+            foreach (Line l in data.previewGeometry)
+            {
+                DrawLine(l, System.Drawing.Color.Aqua, false, alpha: dripAlpha);
+            }
+
             // Draw valve points
             foreach (RenderPoint p in data.valvePoints.Values)
             {
-                DrawPoint(p);
+                DrawPoint(p, alpha: dripAlpha);
             }
+
+            #endregion
+
+            #region DRAIN
+
+
+
+            #endregion
 
             // Render to canvas
             bg.Render();
@@ -86,7 +107,8 @@ namespace Avant.WTI.Form
         /// <param name="line">Model line to be drawn</param>
         /// <param name="c">Color</param>
         /// <param name="dashed">Sets line solid or dashed</param>
-        private void DrawLine(Line line, System.Drawing.Color c, bool dashed = false)
+        /// <param name="alpha">Transparency</param>
+        private void DrawLine(Line line, System.Drawing.Color c, bool dashed = false, byte alpha = 255)
         {
             // Convert model coordinate space to canvas coordinates
             Line screenLine = GeomUtils.LineToScreenLine(line, this.bounds, this.canvas.Size);
@@ -94,7 +116,8 @@ namespace Avant.WTI.Form
 
             XYZ p1 = screenLine.GetEndPoint(0);
             XYZ p2 = screenLine.GetEndPoint(1);
-            Pen pp = new Pen(c);
+            Color color = Color.FromArgb(alpha, c);
+            Pen pp = new Pen(color);
             if (dashed) pp.DashPattern = new float[] { 10, 10 };
             g.DrawLine(pp, (float)p1.X, (float)p1.Y, (float)p2.X, (float)p2.Y);
         }
@@ -105,7 +128,8 @@ namespace Avant.WTI.Form
         /// <param name="polyLine">Model polyline to be drawn</param>
         /// <param name="c">Color</param>
         /// <param name="dashed">Sets line solid or dashed</param>
-        private void DrawPolyLine(PolyLine polyLine, System.Drawing.Color c, bool dashed = false)
+        /// <param name="alpha">Transparency</param>
+        private void DrawPolyLine(PolyLine polyLine, System.Drawing.Color c, bool dashed = false, byte alpha = 255)
         {
             IList<XYZ> points = polyLine.GetCoordinates();
 
@@ -113,7 +137,9 @@ namespace Avant.WTI.Form
             points = points.Select(p => GeomUtils.PointToScreenPoint(p, bounds, this.canvas.Size)).ToList();
             if (points.Count < 2) return;
 
-            Pen pp = new Pen(c);
+            Color color = Color.FromArgb(alpha, c);
+
+            Pen pp = new Pen(color);
             if (dashed) pp.DashPattern = new float[] { 10, 10 };
 
             for (int i = 0; i < points.Count - 1; i++)
@@ -129,7 +155,8 @@ namespace Avant.WTI.Form
         /// </summary>
         /// <param name="polyLine">Model polyline to be drawn</param>
         /// <param name="c">Color</param>
-        private void FillPolyLine(PolyLine polyLine, System.Drawing.Color c)
+        /// <param name="alpha">Transparency</param>
+        private void FillPolyLine(PolyLine polyLine, System.Drawing.Color c, byte alpha = 255)
         {
             IList<XYZ> points = polyLine.GetCoordinates();
 
@@ -137,7 +164,9 @@ namespace Avant.WTI.Form
             points = points.Select(p => GeomUtils.PointToScreenPoint(p, bounds, this.canvas.Size)).ToList();
             if (points.Count < 2) return;
 
-            Brush bb = new SolidBrush(c);
+            Color color = Color.FromArgb(alpha, c);
+
+            Brush bb = new SolidBrush(color);
             PointF[] corners = points.Select(p => new PointF((float)p.X, (float)p.Y)).ToArray();
             g.FillPolygon(bb, corners);
         }
@@ -146,12 +175,16 @@ namespace Avant.WTI.Form
         ///     Draws a point from the Revit model coordinate space onto the canvas as a dot
         /// </summary>
         /// <param name="point">Point to be drawn</param>
-        private void DrawPoint(RenderPoint point)
+        /// <param name="alpha">Transparency</param>
+        private void DrawPoint(RenderPoint point, byte alpha = 255)
         {
             // Convert model coordinate space to canvas coordinates
             XYZ p = GeomUtils.PointToScreenPoint(point.Point, bounds, this.canvas.Size);
             float radius = point.GetPixelRadius(bounds, this.canvas.Size);
-            SolidBrush brush = new SolidBrush(point.Color);
+
+            Color color = Color.FromArgb(alpha, point.Color);
+
+            SolidBrush brush = new SolidBrush(color);
             g.FillEllipse(brush, new RectangleF((float)(p.X - radius), (float)(p.Y - radius), radius * 2, radius * 2));
         }
 
@@ -203,28 +236,34 @@ namespace Avant.WTI.Form
                 canvas_panbuttondown = true;
                 previous_mouse_location = e.Location;
             }
-            if(e.Button == MouseButtons.Left)
+            if(ActiveTab == Tab.DRIP)
             {
-                selectedArea = GetValvePointAreaUnderCursor(new XYZ(e.X, e.Y, 0));
+                if(e.Button == MouseButtons.Left)
+                {
+                    selectedArea = GetValvePointAreaUnderCursor(new XYZ(e.X, e.Y, 0));
+                }
             }
         }
 
         private void Canvas_mouseclick(object sender, MouseEventArgs e)
         {
-            if(e.Button == MouseButtons.Right)
+            if (ActiveTab == Tab.DRIP)
             {
-                Pipe pipe = null;
-                if(data.areapipemap.ContainsKey(areaUnderCursor)) pipe = data.areapipemap[areaUnderCursor];
-                if(pipe == null)
+                if (e.Button == MouseButtons.Right)
                 {
-                    pipe = Utils.FindClosestPipe(data.pipelines, areaUnderCursor);
+                    Pipe pipe = null;
+                    if (data.drip.areapipemap.ContainsKey(areaUnderCursor)) pipe = data.drip.areapipemap[areaUnderCursor];
+                    if (pipe == null)
+                    {
+                        pipe = Utils.FindClosestPipe(data.drip.pipelines, areaUnderCursor);
+                    }
+                    else
+                    {
+                        pipe = null;
+                    }
+                    data.drip.areapipemap[areaUnderCursor] = pipe;
+                    ReloadPreview();
                 }
-                else
-                {
-                    pipe = null;
-                }
-                data.areapipemap[areaUnderCursor] = pipe;
-                ReloadPreview();
             }
         }
 
@@ -251,6 +290,7 @@ namespace Avant.WTI.Form
         {
             XYZ mouse = new XYZ(e.X, e.Y, 0);
             //XYZ mouseModel = GeomUtils.PointToModelPoint(mouse, bounds, this.canvas.Size);
+
 
             HandleAreaActions(mouse);
             HandleValveDrag(mouse);
@@ -287,40 +327,53 @@ namespace Avant.WTI.Form
 
         private void HandleAreaActions(XYZ mouse)
         {
-            XYZ mouseModel = GeomUtils.PointToModelPoint(mouse, bounds, this.canvas.Size);
-            areaUnderCursor = AreaUtils.GetAreaAtPoint(data.areas, mouseModel);
+            if (ActiveTab == Tab.DRIP)
+            {
+                XYZ mouseModel = GeomUtils.PointToModelPoint(mouse, bounds, this.canvas.Size);
+                areaUnderCursor = AreaUtils.GetAreaAtPoint(data.areas, mouseModel);
+            }
+            else
+            {
+                areaUnderCursor = null;
+            }
         }
 
         private void HandleValveDrag(XYZ mouse)
         {
             XYZ mouseModel = GeomUtils.PointToModelPoint(mouse, bounds, this.canvas.Size);
 
-            // Handle valve point moving
-            if (selectedArea == null)
+            if (ActiveTab == Tab.DRIP)
             {
-                Area area = GetValvePointAreaUnderCursor(mouse);
-                if (area == null)
+                if (selectedArea == null)
                 {
-                    Cursor.Current = Cursors.Default;
+                    Area area = GetValvePointAreaUnderCursor(mouse);
+                    if (area == null)
+                    {
+                        Cursor.Current = Cursors.Default;
+                    }
+                    else
+                    {
+                        Cursor.Current = Cursors.Hand;
+                    }
                 }
                 else
                 {
+                    // Dragging
                     Cursor.Current = Cursors.Hand;
+
+                    XYZ valvePointSnap = this.data.columnpoints.OrderBy(p => p.DistanceTo(mouseModel)).FirstOrDefault();
+                    bool reload = data.drip.overrideValvePoints.ContainsKey(selectedArea) && data.drip.overrideValvePoints[selectedArea] != valvePointSnap;
+
+                    data.drip.overrideValvePoints[selectedArea] = valvePointSnap;
+
+                    if (reload) ReloadPreview();
                 }
             }
             else
             {
-                // Dragging
-                Cursor.Current = Cursors.Hand;
-
-                XYZ valvePointSnap = this.data.columnpoints.OrderBy(p => p.DistanceTo(mouseModel)).FirstOrDefault();
-                bool reload = data.overrideValvePoints.ContainsKey(selectedArea) && data.overrideValvePoints[selectedArea] != valvePointSnap;
-
-                data.overrideValvePoints[selectedArea] = valvePointSnap;
-
-                if (reload) ReloadPreview();
-
+                Cursor.Current = Cursors.Default;
             }
+
         }
 
         private Area GetValvePointAreaUnderCursor(XYZ mousePoint)

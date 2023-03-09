@@ -5,8 +5,9 @@ using Avant.WTI.Util;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using static Avant.WTI.Data.WTIData;
 
-namespace Avant.WTI
+namespace Avant.WTI.Data
 {
     /// <summary>
     /// This class serves as all input data for the WTI Form. 
@@ -31,30 +32,11 @@ namespace Avant.WTI
 
         public Level groundLevel;
 
-        // Output data
+
+        // Drip data
         //  All these outputs need to be valid in order to run the drip generator
-        public List<Pipe> pipelines = new List<Pipe>();
-        public Dictionary<Area, Pipe> areapipemap = new Dictionary<Area, Pipe>();
-        public PipeType pipetype = null;
-
-        public Dictionary<Area, XYZ> overrideValvePoints = new Dictionary<Area, XYZ>();
-
-        public PipingSystemType transportSystemType = null;
-        public double transport_diameter = 110;
-        public PipingSystemType distributionSystemType = null;
-        public double distribution_diameter = 75;
-
-        public FamilySymbol valvefamily = null;
-
-        public int valveheight = 0;
-
-        public int transportlineheight = -400;
-        public int distributionlineheight = 0;
-
-        public int intermediateDistance = 1000;
-        public int backwallDistance = 1000;
-        public int valvecolumnDistance = 500;
-        public int pipecolumnDistance = 500;
+        public DripData drip;
+        public DrainData drain;
 
         public bool convertPlaceholders = true;
 
@@ -74,32 +56,37 @@ namespace Avant.WTI
         {
             this.doc = document;
             this.uidoc = uidoc;
+            this.drip = new DripData();
+            this.drain = new DrainData();
         }
 
 
         public void LoadPrevious()
         {
-            pipetype = pipetypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
+            // Drip Settings
+            drip.pipetype = pipetypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousPipeType));
 
-            transportSystemType = systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
-            distributionSystemType = systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
+            drip.transportSystemType = systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousTransportSystem));
+            drip.distributionSystemType = systemtypes.Find(p => p.Name.Equals(Properties.Settings.Default.PreviousDistributionSystem));
 
-            valvefamily = valvefamilies.Find(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
-            valveheight = (int)Properties.Settings.Default.PreviousValveHeight;
+            drip.valvefamily = valvefamilies.Find(f => f.Name.Equals(Properties.Settings.Default.PreviousValveFamily));
+            drip.valveheight = (int)Properties.Settings.Default.PreviousValveHeight;
 
-            intermediateDistance = (int)Properties.Settings.Default.PreviousIntermediateDistance;
-            backwallDistance = (int)Properties.Settings.Default.PreviousBackwallDistance;
+            drip.intermediateDistance = (int)Properties.Settings.Default.PreviousIntermediateDistance;
+            drip.backwallDistance = (int)Properties.Settings.Default.PreviousBackwallDistance;
 
-            valvecolumnDistance = (int)Properties.Settings.Default.PreviousValveColumnDistance;
-            pipecolumnDistance = (int)Properties.Settings.Default.PreviousPipeColumnDistance;
+            drip.valvecolumnDistance = (int)Properties.Settings.Default.PreviousValveColumnDistance;
+            drip.pipecolumnDistance = (int)Properties.Settings.Default.PreviousPipeColumnDistance;
 
-            transportlineheight = (int)Properties.Settings.Default.PreviousTransportHeight;
-            distributionlineheight = (int)Properties.Settings.Default.PreviousDistributionHeight;
+            drip.transportlineheight = (int)Properties.Settings.Default.PreviousTransportHeight;
+            drip.distributionlineheight = (int)Properties.Settings.Default.PreviousDistributionHeight;
+
+            drip.transport_diameter = Properties.Settings.Default.PreviousTransportDiameter;
+            drip.distribution_diameter = Properties.Settings.Default.PreviousDistributionDiameter;
+
+
 
             convertPlaceholders = Properties.Settings.Default.PreviousDoConvertPlaceholders;
-
-            transport_diameter = Properties.Settings.Default.PreviousTransportDiameter;
-            distribution_diameter = Properties.Settings.Default.PreviousDistributionDiameter;
         }
 
         public void refreshErrorMessages(Data d)
@@ -164,31 +151,31 @@ namespace Avant.WTI
             }
             else if (d == Data.OUTPUT)
             {
-                if(pipetype == null)
+                if(drip.pipetype == null)
                 {
                     errorMessages.Add(new DripErrorMessage("No pipe type selected.", DripErrorMessage.Severity.FATAL));
                 }
-                if (transportSystemType == null)
+                if (drip.transportSystemType == null)
                 {
                     errorMessages.Add(new DripErrorMessage("No transport pipe system type selected.", DripErrorMessage.Severity.FATAL));
                 }
-                if (distributionSystemType == null)
+                if (drip.distributionSystemType == null)
                 {
                     errorMessages.Add(new DripErrorMessage("No distribtion pipe system type selected.", DripErrorMessage.Severity.FATAL));
                 }
-                if (valvefamily == null)
+                if (drip.valvefamily == null)
                 {
                     errorMessages.Add(new DripErrorMessage("No valve family selected. Creating dummy connections instead", DripErrorMessage.Severity.WARNING));
                 }
 
-                MEPSystemClassification globalClassification = transportSystemType.SystemClassification;
-                if (globalClassification != distributionSystemType.SystemClassification)
+                MEPSystemClassification globalClassification = drip.transportSystemType.SystemClassification;
+                if (globalClassification != drip.distributionSystemType.SystemClassification)
                 {
                     errorMessages.Add(new DripErrorMessage("System Classification cannot be different between system types.", DripErrorMessage.Severity.FATAL));
                 }
                 else
                 {
-                    foreach(Pipe pipe in pipelines)
+                    foreach(Pipe pipe in drip.pipelines)
                     {
                         PipingSystem ps = (PipingSystem)pipe.MEPSystem;
                         try
@@ -209,6 +196,15 @@ namespace Avant.WTI
             }
 
             errorMessages = errorMessages.OrderByDescending(m => m.severity).ToList();
+        }
+
+        public void PrepareRun()
+        {
+            previewGeometry.Clear();
+            debugLines.Clear();
+            previewPoints.Clear();
+            valvePoints.Clear();
+            errorMessages.Clear();
         }
 
         public enum Data

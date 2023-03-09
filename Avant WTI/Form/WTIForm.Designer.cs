@@ -67,8 +67,22 @@ namespace Avant.WTI.Form
             this.num_transportheight = new System.Windows.Forms.NumericUpDown();
             this.combo_transportdiameter = new System.Windows.Forms.ComboBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.SettingTabControl = new System.Windows.Forms.TabControl();
+            this.DripTab = new System.Windows.Forms.TabPage();
+            this.DrainTab = new System.Windows.Forms.TabPage();
             this.generateButton = new System.Windows.Forms.Button();
             this.button_convertplaceholders = new System.Windows.Forms.CheckBox();
+            this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
+            this.label8 = new System.Windows.Forms.Label();
+            this.button1 = new System.Windows.Forms.Button();
+            this.label9 = new System.Windows.Forms.Label();
+            this.comboBox1 = new System.Windows.Forms.ComboBox();
+            this.groupBox3 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
+            this.label15 = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.numericUpDown5 = new System.Windows.Forms.NumericUpDown();
+            this.comboBox6 = new System.Windows.Forms.ComboBox();
             this.canvas.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -81,6 +95,13 @@ namespace Avant.WTI.Form
             ((System.ComponentModel.ISupportInitialize)(this.num_distributionheight)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.num_transportheight)).BeginInit();
             this.groupBox1.SuspendLayout();
+            this.SettingTabControl.SuspendLayout();
+            this.DripTab.SuspendLayout();
+            this.DrainTab.SuspendLayout();
+            this.flowLayoutPanel2.SuspendLayout();
+            this.groupBox3.SuspendLayout();
+            this.tableLayoutPanel2.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).BeginInit();
             this.SuspendLayout();
             // 
             // titleLabel
@@ -150,10 +171,10 @@ namespace Avant.WTI.Form
             this.flowLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.flowLayoutPanel1.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flowLayoutPanel1.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 26);
+            this.flowLayoutPanel1.Location = new System.Drawing.Point(3, 3);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.flowLayoutPanel1.Size = new System.Drawing.Size(424, 751);
+            this.flowLayoutPanel1.Size = new System.Drawing.Size(410, 709);
             this.flowLayoutPanel1.TabIndex = 2;
             this.flowLayoutPanel1.WrapContents = false;
             // 
@@ -589,7 +610,7 @@ namespace Avant.WTI.Form
             // 
             this.groupBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.groupBox1.Controls.Add(this.flowLayoutPanel1);
+            this.groupBox1.Controls.Add(this.SettingTabControl);
             this.groupBox1.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.groupBox1.Location = new System.Drawing.Point(940, 53);
             this.groupBox1.Name = "groupBox1";
@@ -597,6 +618,41 @@ namespace Avant.WTI.Form
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "WTI Settings";
+            // 
+            // SettingTabControl
+            // 
+            this.SettingTabControl.Controls.Add(this.DripTab);
+            this.SettingTabControl.Controls.Add(this.DrainTab);
+            this.SettingTabControl.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.SettingTabControl.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.SettingTabControl.Location = new System.Drawing.Point(3, 26);
+            this.SettingTabControl.Name = "SettingTabControl";
+            this.SettingTabControl.SelectedIndex = 0;
+            this.SettingTabControl.Size = new System.Drawing.Size(424, 751);
+            this.SettingTabControl.TabIndex = 3;
+            this.SettingTabControl.Selected += new System.Windows.Forms.TabControlEventHandler(this.TabChanged);
+            // 
+            // DripTab
+            // 
+            this.DripTab.Controls.Add(this.flowLayoutPanel1);
+            this.DripTab.Location = new System.Drawing.Point(4, 32);
+            this.DripTab.Name = "DripTab";
+            this.DripTab.Padding = new System.Windows.Forms.Padding(3);
+            this.DripTab.Size = new System.Drawing.Size(416, 715);
+            this.DripTab.TabIndex = 0;
+            this.DripTab.Text = "Drip Irrigation";
+            this.DripTab.UseVisualStyleBackColor = true;
+            // 
+            // DrainTab
+            // 
+            this.DrainTab.Controls.Add(this.flowLayoutPanel2);
+            this.DrainTab.Location = new System.Drawing.Point(4, 32);
+            this.DrainTab.Name = "DrainTab";
+            this.DrainTab.Padding = new System.Windows.Forms.Padding(3);
+            this.DrainTab.Size = new System.Drawing.Size(416, 715);
+            this.DrainTab.TabIndex = 1;
+            this.DrainTab.Text = "Drain Collection";
+            this.DrainTab.UseVisualStyleBackColor = true;
             // 
             // generateButton
             // 
@@ -622,6 +678,156 @@ namespace Avant.WTI.Form
             this.button_convertplaceholders.Text = "Convert placeholders";
             this.button_convertplaceholders.UseVisualStyleBackColor = true;
             this.button_convertplaceholders.CheckedChanged += new System.EventHandler(this.CheckBox1_CheckedChanged);
+            // 
+            // flowLayoutPanel2
+            // 
+            this.flowLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.flowLayoutPanel2.Controls.Add(this.label8);
+            this.flowLayoutPanel2.Controls.Add(this.button1);
+            this.flowLayoutPanel2.Controls.Add(this.label9);
+            this.flowLayoutPanel2.Controls.Add(this.comboBox1);
+            this.flowLayoutPanel2.Controls.Add(this.groupBox3);
+            this.flowLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flowLayoutPanel2.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
+            this.flowLayoutPanel2.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.flowLayoutPanel2.Location = new System.Drawing.Point(3, 3);
+            this.flowLayoutPanel2.Name = "flowLayoutPanel2";
+            this.flowLayoutPanel2.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.flowLayoutPanel2.Size = new System.Drawing.Size(410, 709);
+            this.flowLayoutPanel2.TabIndex = 3;
+            this.flowLayoutPanel2.WrapContents = false;
+            // 
+            // label8
+            // 
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(7, 5);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(281, 23);
+            this.label8.TabIndex = 0;
+            this.label8.Text = "Select main pipelines (placeholders)";
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(7, 31);
+            this.button1.MinimumSize = new System.Drawing.Size(100, 30);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(100, 30);
+            this.button1.TabIndex = 1;
+            this.button1.Text = "Select";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // label9
+            // 
+            this.label9.AutoSize = true;
+            this.label9.Location = new System.Drawing.Point(7, 69);
+            this.label9.Margin = new System.Windows.Forms.Padding(3, 5, 3, 0);
+            this.label9.Name = "label9";
+            this.label9.Size = new System.Drawing.Size(92, 23);
+            this.label9.TabIndex = 2;
+            this.label9.Text = "Pipe Type: ";
+            // 
+            // comboBox1
+            // 
+            this.comboBox1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.comboBox1.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox1.FormattingEnabled = true;
+            this.comboBox1.Location = new System.Drawing.Point(7, 95);
+            this.comboBox1.Name = "comboBox1";
+            this.comboBox1.Size = new System.Drawing.Size(387, 31);
+            this.comboBox1.TabIndex = 3;
+            // 
+            // groupBox3
+            // 
+            this.groupBox3.AutoSize = true;
+            this.groupBox3.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.groupBox3.Controls.Add(this.tableLayoutPanel2);
+            this.groupBox3.Location = new System.Drawing.Point(7, 144);
+            this.groupBox3.Margin = new System.Windows.Forms.Padding(3, 15, 3, 3);
+            this.groupBox3.Name = "groupBox3";
+            this.groupBox3.Padding = new System.Windows.Forms.Padding(3, 3, 5, 3);
+            this.groupBox3.Size = new System.Drawing.Size(387, 126);
+            this.groupBox3.TabIndex = 10;
+            this.groupBox3.TabStop = false;
+            this.groupBox3.Text = "Dimensions";
+            // 
+            // tableLayoutPanel2
+            // 
+            this.tableLayoutPanel2.AutoSize = true;
+            this.tableLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
+            this.tableLayoutPanel2.ColumnCount = 2;
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel2.Controls.Add(this.label15, 0, 1);
+            this.tableLayoutPanel2.Controls.Add(this.label19, 0, 0);
+            this.tableLayoutPanel2.Controls.Add(this.numericUpDown5, 1, 0);
+            this.tableLayoutPanel2.Controls.Add(this.comboBox6, 1, 1);
+            this.tableLayoutPanel2.Location = new System.Drawing.Point(6, 24);
+            this.tableLayoutPanel2.MinimumSize = new System.Drawing.Size(322, 0);
+            this.tableLayoutPanel2.Name = "tableLayoutPanel2";
+            this.tableLayoutPanel2.RowCount = 2;
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(373, 73);
+            this.tableLayoutPanel2.TabIndex = 0;
+            // 
+            // label15
+            // 
+            this.label15.AutoSize = true;
+            this.label15.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label15.Location = new System.Drawing.Point(3, 36);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(193, 37);
+            this.label15.TabIndex = 12;
+            this.label15.Text = "Transport Line Diameter";
+            this.label15.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.BackColor = System.Drawing.Color.Transparent;
+            this.label19.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.label19.Location = new System.Drawing.Point(3, 0);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(193, 36);
+            this.label19.TabIndex = 0;
+            this.label19.Text = "Intermediate Distance";
+            this.label19.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            // 
+            // numericUpDown5
+            // 
+            this.numericUpDown5.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.numericUpDown5.Location = new System.Drawing.Point(202, 3);
+            this.numericUpDown5.Maximum = new decimal(new int[] {
+            10000000,
+            0,
+            0,
+            0});
+            this.numericUpDown5.Name = "numericUpDown5";
+            this.numericUpDown5.Size = new System.Drawing.Size(168, 30);
+            this.numericUpDown5.TabIndex = 1;
+            this.numericUpDown5.Value = new decimal(new int[] {
+            1000,
+            0,
+            0,
+            0});
+            // 
+            // comboBox6
+            // 
+            this.comboBox6.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.comboBox6.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.comboBox6.FormattingEnabled = true;
+            this.comboBox6.Location = new System.Drawing.Point(202, 39);
+            this.comboBox6.Name = "comboBox6";
+            this.comboBox6.Size = new System.Drawing.Size(168, 31);
+            this.comboBox6.TabIndex = 11;
             // 
             // WTIForm
             // 
@@ -655,6 +861,16 @@ namespace Avant.WTI.Form
             ((System.ComponentModel.ISupportInitialize)(this.num_distributionheight)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.num_transportheight)).EndInit();
             this.groupBox1.ResumeLayout(false);
+            this.SettingTabControl.ResumeLayout(false);
+            this.DripTab.ResumeLayout(false);
+            this.DrainTab.ResumeLayout(false);
+            this.flowLayoutPanel2.ResumeLayout(false);
+            this.flowLayoutPanel2.PerformLayout();
+            this.groupBox3.ResumeLayout(false);
+            this.groupBox3.PerformLayout();
+            this.tableLayoutPanel2.ResumeLayout(false);
+            this.tableLayoutPanel2.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.numericUpDown5)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -703,6 +919,20 @@ namespace Avant.WTI.Form
         private NumericUpDown num_valveheight;
         private Label label7;
         private Label label_previewwarning;
+        private TabControl SettingTabControl;
+        private TabPage DripTab;
+        private TabPage DrainTab;
+        private FlowLayoutPanel flowLayoutPanel2;
+        private Label label8;
+        private Button button1;
+        private Label label9;
+        private ComboBox comboBox1;
+        private GroupBox groupBox3;
+        private TableLayoutPanel tableLayoutPanel2;
+        private Label label15;
+        private Label label19;
+        private NumericUpDown numericUpDown5;
+        private ComboBox comboBox6;
     }
 }
 

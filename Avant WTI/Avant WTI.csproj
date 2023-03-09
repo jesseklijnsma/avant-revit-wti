@@ -111,10 +111,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.cs" />
+    <Compile Include="Data\DrainData.cs" />
+    <Compile Include="Data\DripData.cs" />
+    <Compile Include="Generators\DrainGenerator.cs" />
     <Compile Include="Generators\Generator.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Util\AreaUtils.cs" />
-    <Compile Include="WTIData.cs" />
+    <Compile Include="Data\WTIData.cs" />
     <Compile Include="Generators\DripGenerator.cs" />
     <Compile Include="Util\ErrorDialog.cs">
       <SubType>Form</SubType>

@@ -1,6 +1,5 @@
 ﻿using Autodesk.Revit.DB;
 using System.Collections.Generic;
-using static Avant.WTI.WTIData;
 
 namespace Avant.WTI.Util
 {

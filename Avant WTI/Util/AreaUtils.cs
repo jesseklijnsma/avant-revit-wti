@@ -1,12 +1,8 @@
 ﻿using Autodesk.Revit.DB;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.SymbolStore;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static Avant.WTI.WTIData;
 
 namespace Avant.WTI.Util
 {

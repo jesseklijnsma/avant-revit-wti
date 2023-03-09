@@ -9,11 +9,12 @@ using System.Windows.Forms;
 using Avant.WTI.Data;
 using static Avant.WTI.Util.PipeUtils;
 
+
 namespace Avant.WTI.Generators
 {
-    internal class DripGenerator : Generator
+    internal class DrainGenerator : Generator
     {
-        public DripGenerator(WTIData data) : base(data)
+        public DrainGenerator(WTIData data) : base(data)
         {
         }
 
@@ -21,10 +22,13 @@ namespace Avant.WTI.Generators
         {
             // Preview doesn't need any input validation
 
-            
-
-
+            data.previewGeometry.Clear();
+            data.debugLines.Clear();
+            data.previewPoints.Clear();
             data.previewPoints.AddRange(data.columnpoints.Select(p => new RenderPoint(p, System.Drawing.Color.Gray, 3, RenderPoint.RenderUnits.PX)));
+            data.valvePoints.Clear();
+
+            data.errorMessages.Clear();
 
             foreach (Area area in data.areas)
             {
@@ -50,7 +54,7 @@ namespace Avant.WTI.Generators
 
             // Create transaction
             Transaction t = new Transaction(data.doc);
-            t.Start("Drip generation");
+            t.Start("Drain generation");
 
             // Set Revit model errors to non blocking dialogs
             FailureHandlingOptions fho = t.GetFailureHandlingOptions();

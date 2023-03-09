@@ -1,6 +1,7 @@
 ﻿using Autodesk.Revit.DB.Plumbing;
 using Autodesk.Revit.DB;
 using System;
+using System.Windows.Forms;
 
 namespace Avant.WTI.Form
 {
@@ -9,6 +10,29 @@ namespace Avant.WTI.Form
 
 
         private bool isLoading = false;
+        private Tab ActiveTab = Tab.DRIP;
+
+
+        #region Tabs
+
+        private void TabChanged(object sender, TabControlEventArgs e)
+        {
+            switch (e.TabPage.Name)
+            {
+                case "DripTab":
+                    ActiveTab = Tab.DRIP;
+                    break;
+                case "DrainTab":
+                    ActiveTab = Tab.DRAIN;
+                    break;
+                default:
+                    break;
+            }
+            canvas.Invalidate();
+        }
+
+        #endregion
+
 
         #region Input controls value changed events
 
@@ -18,8 +42,8 @@ namespace Avant.WTI.Form
             PipeType pt = (PipeType)combo_pipetype.SelectedValue;
 
             // Make sure it really changed, so UpdateSizes will not reset the size input
-            if (data.pipetype == pt) return;
-            data.pipetype = pt;
+            if (data.drip.pipetype == pt) return;
+            data.drip.pipetype = pt;
             UpdateSizes();
             if (pt != null) Properties.Settings.Default.PreviousPipeType = pt.Name;
         }
@@ -30,7 +54,7 @@ namespace Avant.WTI.Form
         {
             if (isLoading) return;
             PipingSystemType pst = (PipingSystemType)combo_transportsystem.SelectedValue;
-            data.transportSystemType = pst;
+            data.drip.transportSystemType = pst;
             if(pst != null) Properties.Settings.Default.PreviousTransportSystem = pst.Name;
         }
 
@@ -38,7 +62,7 @@ namespace Avant.WTI.Form
         {
             if (isLoading) return;
             PipingSystemType pst = (PipingSystemType)combo_distributionsystem.SelectedValue;
-            data.distributionSystemType = pst;
+            data.drip.distributionSystemType = pst;
             if (pst != null) Properties.Settings.Default.PreviousDistributionSystem = pst.Name;
         }
 
@@ -46,14 +70,14 @@ namespace Avant.WTI.Form
         {
             if (isLoading) return;
             FamilySymbol valve = (FamilySymbol)combo_valvefamily.SelectedValue;
-            data.valvefamily = valve;
+            data.drip.valvefamily = valve;
             if (valve != null) Properties.Settings.Default.PreviousValveFamily = valve.Name;
         }
 
         private void Num_interdistance_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            data.intermediateDistance = (int)num_interdistance.Value;
+            data.drip.intermediateDistance = (int)num_interdistance.Value;
             ReloadPreview();
             Properties.Settings.Default.PreviousIntermediateDistance = (int)num_interdistance.Value;
         }
@@ -61,7 +85,7 @@ namespace Avant.WTI.Form
         private void Num_backwalldistance_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            data.backwallDistance = (int)num_backwalldistance.Value;
+            data.drip.backwallDistance = (int)num_backwalldistance.Value;
             ReloadPreview();
             Properties.Settings.Default.PreviousBackwallDistance = (int)num_backwalldistance.Value;
         }
@@ -69,7 +93,7 @@ namespace Avant.WTI.Form
         private void Num_valvecolumndistance_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            data.valvecolumnDistance = (int)num_valvecolumndistance.Value;
+            data.drip.valvecolumnDistance = (int)num_valvecolumndistance.Value;
             ReloadPreview();
             Properties.Settings.Default.PreviousValveColumnDistance = (int)num_valvecolumndistance.Value;
         }
@@ -77,7 +101,7 @@ namespace Avant.WTI.Form
         private void Num_pipecolumndistance_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            data.pipecolumnDistance = (int)num_pipecolumndistance.Value;
+            data.drip.pipecolumnDistance = (int)num_pipecolumndistance.Value;
             ReloadPreview();
             Properties.Settings.Default.PreviousPipeColumnDistance = (int)num_pipecolumndistance.Value;
         }
@@ -85,14 +109,14 @@ namespace Avant.WTI.Form
         private void num_valveheight_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            data.valveheight = (int)num_valveheight.Value;
+            data.drip.valveheight = (int)num_valveheight.Value;
             Properties.Settings.Default.PreviousValveHeight = (int)num_valveheight.Value;
         }
 
         private void Num_transportheight_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            data.transportlineheight = (int)num_transportheight.Value;
+            data.drip.transportlineheight = (int)num_transportheight.Value;
             Properties.Settings.Default.PreviousTransportHeight = (int)num_transportheight.Value;
         }
 
@@ -101,7 +125,7 @@ namespace Avant.WTI.Form
             if (isLoading) return;
             if (this.combo_transportdiameter.SelectedValue == null) return;
             double size = (double)combo_transportdiameter.SelectedValue;
-            data.transport_diameter = size;
+            data.drip.transport_diameter = size;
             Properties.Settings.Default.PreviousTransportDiameter = size;
 
         }
@@ -109,7 +133,7 @@ namespace Avant.WTI.Form
         private void Num_distributionheight_ValueChanged(object sender, EventArgs e)
         {
             if (isLoading) return;
-            data.distributionlineheight = (int)num_distributionheight.Value;
+            data.drip.distributionlineheight = (int)num_distributionheight.Value;
             Properties.Settings.Default.PreviousDistributionHeight = (int)num_distributionheight.Value;
         }
 
@@ -118,7 +142,7 @@ namespace Avant.WTI.Form
             if (isLoading) return;
             if (this.combo_distributiondiameter.SelectedValue == null) return;
             double size = (double)combo_distributiondiameter.SelectedValue;
-            data.distribution_diameter = size;
+            data.drip.distribution_diameter = size;
             Properties.Settings.Default.PreviousDistributionDiameter = size;
         }
         private void CheckBox1_CheckedChanged(object sender, EventArgs e)
