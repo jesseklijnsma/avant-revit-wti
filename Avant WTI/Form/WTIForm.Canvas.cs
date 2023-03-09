@@ -23,7 +23,6 @@ namespace Avant.WTI.Form
             BufferedGraphicsContext bgm = BufferedGraphicsManager.Current;
             BufferedGraphics bg = bgm.Allocate(gr, rect);
             g = bg.Graphics;
-            //g.SetClip(new RectangleF(new PointF(), this.canvas.Size));
 
             // Fill with background color
             g.Clear(System.Drawing.Color.FromArgb(54, 54, 54));

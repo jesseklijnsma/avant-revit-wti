@@ -73,8 +73,9 @@ namespace Avant.WTI
 
 #if DEBUG
                 throw;
-#endif
+#else
                 return Result.Failed;
+#endif
             }
         }
 

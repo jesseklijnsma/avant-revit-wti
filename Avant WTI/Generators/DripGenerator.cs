@@ -214,7 +214,7 @@ namespace Avant.WTI.Generators
                 sourceToLine = VectorUtils.Vector_setZ((linePoint - source), 0).Normalize();
             }
 
-            Line newLine = (Line)preferredLine.CreateTransformed(Transform.CreateTranslation(sourceToLine.Multiply(paddingft + 0.0000001)));
+            Line newLine = (Line)preferredLine.CreateTransformed(Transform.CreateTranslation(sourceToLine.Multiply(paddingft + 0.5/304.8)));
 
             return FindBestCenterLine(source, newLine, columns, paddingft);
         }
