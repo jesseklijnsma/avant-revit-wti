@@ -2,6 +2,7 @@
 using Autodesk.Revit.DB;
 using System;
 using System.Windows.Forms;
+using Avant.WTI.Util;
 
 namespace Avant.WTI.Form
 {
@@ -14,16 +15,20 @@ namespace Avant.WTI.Form
 
 
         #region Tabs
-
-        private void TabChanged(object sender, TabControlEventArgs e)
+        
+    private void TabChanged(object sender, TabControlEventArgs e)
         {
             switch (e.TabPage.Name)
             {
                 case "DripTab":
                     ActiveTab = Tab.DRIP;
+                    dripAlpha = 0xFF;
+                    drainAlpha = 0x7F;
                     break;
                 case "DrainTab":
                     ActiveTab = Tab.DRAIN;
+                    dripAlpha = 0x7F;
+                    drainAlpha = 0xFF;
                     break;
                 default:
                     break;
@@ -153,6 +158,24 @@ namespace Avant.WTI.Form
         }
 
         #endregion
+
+        private void ToggleDrainCollector(object sender, System.EventArgs e)
+        {
+            Button button = (Button)sender;
+            if (button.Text.Equals("Add"))
+            {
+                button.Text = "Remove";
+                data.drain.enabled = true;
+                data.drain.collectorPoint = GeomUtils.RectangleGetCenter(bounds);
+            }
+            else
+            {
+                data.drain.enabled = false;
+                button.Text = "Add";
+            }
+            canvas.Invalidate();
+        }
+
 
         #region Button click events
 

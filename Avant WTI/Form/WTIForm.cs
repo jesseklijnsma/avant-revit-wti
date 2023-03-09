@@ -71,6 +71,9 @@ namespace Avant.WTI.Form
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
             ).SetValue(this.canvas, true, null);
 
+
+            ReloadPreview(all: true);
+
         }
 
         /// <summary>
@@ -138,15 +141,23 @@ namespace Avant.WTI.Form
         /// <summary>
         /// Generates and renders new preview lines
         /// </summary>
-        public void ReloadPreview()
+        public void ReloadPreview(bool all = false)
         {
             data.PrepareRun();
 
-            switch (ActiveTab)
+            if (all)
             {
-                case Tab.DRIP: dripGenerator.GeneratePreview(); break;
-                case Tab.DRAIN: drainGenerator.GeneratePreview(); break;
-                default: break;
+                dripGenerator.GeneratePreview();
+                drainGenerator.GeneratePreview();
+            }
+            else
+            {
+                switch (ActiveTab)
+                {
+                    case Tab.DRIP: dripGenerator.GeneratePreview(); break;
+                    case Tab.DRAIN: drainGenerator.GeneratePreview(); break;
+                    default: break;
+                }
             }
 
             if(data.errorMessages.Count == 0)

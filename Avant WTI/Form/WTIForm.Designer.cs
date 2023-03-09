@@ -70,8 +70,6 @@ namespace Avant.WTI.Form
             this.SettingTabControl = new System.Windows.Forms.TabControl();
             this.DripTab = new System.Windows.Forms.TabPage();
             this.DrainTab = new System.Windows.Forms.TabPage();
-            this.generateButton = new System.Windows.Forms.Button();
-            this.button_convertplaceholders = new System.Windows.Forms.CheckBox();
             this.flowLayoutPanel2 = new System.Windows.Forms.FlowLayoutPanel();
             this.label8 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -83,6 +81,8 @@ namespace Avant.WTI.Form
             this.label19 = new System.Windows.Forms.Label();
             this.numericUpDown5 = new System.Windows.Forms.NumericUpDown();
             this.comboBox6 = new System.Windows.Forms.ComboBox();
+            this.generateButton = new System.Windows.Forms.Button();
+            this.button_convertplaceholders = new System.Windows.Forms.CheckBox();
             this.canvas.SuspendLayout();
             this.flowLayoutPanel1.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -654,31 +654,6 @@ namespace Avant.WTI.Form
             this.DrainTab.Text = "Drain Collection";
             this.DrainTab.UseVisualStyleBackColor = true;
             // 
-            // generateButton
-            // 
-            this.generateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.generateButton.Location = new System.Drawing.Point(1212, 839);
-            this.generateButton.Name = "generateButton";
-            this.generateButton.Size = new System.Drawing.Size(158, 58);
-            this.generateButton.TabIndex = 2;
-            this.generateButton.Text = "Generate";
-            this.generateButton.UseVisualStyleBackColor = true;
-            this.generateButton.Click += new System.EventHandler(this.GenerateButton_Click);
-            // 
-            // button_convertplaceholders
-            // 
-            this.button_convertplaceholders.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button_convertplaceholders.AutoSize = true;
-            this.button_convertplaceholders.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button_convertplaceholders.Location = new System.Drawing.Point(950, 870);
-            this.button_convertplaceholders.Margin = new System.Windows.Forms.Padding(5);
-            this.button_convertplaceholders.Name = "button_convertplaceholders";
-            this.button_convertplaceholders.Size = new System.Drawing.Size(193, 27);
-            this.button_convertplaceholders.TabIndex = 1;
-            this.button_convertplaceholders.Text = "Convert placeholders";
-            this.button_convertplaceholders.UseVisualStyleBackColor = true;
-            this.button_convertplaceholders.CheckedChanged += new System.EventHandler(this.CheckBox1_CheckedChanged);
-            // 
             // flowLayoutPanel2
             // 
             this.flowLayoutPanel2.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
@@ -702,19 +677,20 @@ namespace Avant.WTI.Form
             this.label8.AutoSize = true;
             this.label8.Location = new System.Drawing.Point(7, 5);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(281, 23);
+            this.label8.Size = new System.Drawing.Size(131, 23);
             this.label8.TabIndex = 0;
-            this.label8.Text = "Select main pipelines (placeholders)";
+            this.label8.Text = "Collection point";
             // 
             // button1
             // 
             this.button1.Location = new System.Drawing.Point(7, 31);
             this.button1.MinimumSize = new System.Drawing.Size(100, 30);
             this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(100, 30);
+            this.button1.Size = new System.Drawing.Size(131, 30);
             this.button1.TabIndex = 1;
-            this.button1.Text = "Select";
+            this.button1.Text = "Add";
             this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.ToggleDrainCollector);
             // 
             // label9
             // 
@@ -828,6 +804,31 @@ namespace Avant.WTI.Form
             this.comboBox6.Name = "comboBox6";
             this.comboBox6.Size = new System.Drawing.Size(168, 31);
             this.comboBox6.TabIndex = 11;
+            // 
+            // generateButton
+            // 
+            this.generateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.generateButton.Location = new System.Drawing.Point(1212, 839);
+            this.generateButton.Name = "generateButton";
+            this.generateButton.Size = new System.Drawing.Size(158, 58);
+            this.generateButton.TabIndex = 2;
+            this.generateButton.Text = "Generate";
+            this.generateButton.UseVisualStyleBackColor = true;
+            this.generateButton.Click += new System.EventHandler(this.GenerateButton_Click);
+            // 
+            // button_convertplaceholders
+            // 
+            this.button_convertplaceholders.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button_convertplaceholders.AutoSize = true;
+            this.button_convertplaceholders.Font = new System.Drawing.Font("Segoe UI", 10.2F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.button_convertplaceholders.Location = new System.Drawing.Point(950, 870);
+            this.button_convertplaceholders.Margin = new System.Windows.Forms.Padding(5);
+            this.button_convertplaceholders.Name = "button_convertplaceholders";
+            this.button_convertplaceholders.Size = new System.Drawing.Size(193, 27);
+            this.button_convertplaceholders.TabIndex = 1;
+            this.button_convertplaceholders.Text = "Convert placeholders";
+            this.button_convertplaceholders.UseVisualStyleBackColor = true;
+            this.button_convertplaceholders.CheckedChanged += new System.EventHandler(this.CheckBox1_CheckedChanged);
             // 
             // WTIForm
             // 

@@ -20,12 +20,6 @@ namespace Avant.WTI.Generators
         public override void GeneratePreview()
         {
             // Preview doesn't need any input validation
-
-            
-
-
-            data.previewPoints.AddRange(data.columnpoints.Select(p => new RenderPoint(p, System.Drawing.Color.Gray, 3, RenderPoint.RenderUnits.PX)));
-
             foreach (Area area in data.areas)
             {
                 // Try to get corresponding type to area

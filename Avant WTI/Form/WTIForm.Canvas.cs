@@ -14,9 +14,14 @@ namespace Avant.WTI.Form
     partial class WTIForm
     {
 
-        #region Rendering
+    #region Rendering
 
-        private void Canvas_paint(object sender, PaintEventArgs e)
+
+    byte dripAlpha = 0x7F;
+    byte drainAlpha = 0x7F;
+
+            
+    private void Canvas_paint(object sender, PaintEventArgs e)
         {
             Graphics gr = e.Graphics;
 
@@ -57,15 +62,7 @@ namespace Avant.WTI.Form
             }
 
 
-            byte dripAlpha = 0x7F;
-            byte drainAlpha = 0x7F;
-
-            switch (ActiveTab)
-            {
-                case Tab.DRIP: dripAlpha = 0xFF; break;
-                case Tab.DRAIN: drainAlpha = 0xFF; break;
-                default: break;
-            }
+            
 
             #region DRIP
             // Draw pipe lines
@@ -90,7 +87,10 @@ namespace Avant.WTI.Form
 
             #region DRAIN
 
-
+            if (data.drain.enabled)
+            {
+                RenderCollector();
+            }
 
             #endregion
 
@@ -99,6 +99,57 @@ namespace Avant.WTI.Form
             // Delete graphics buffer
             bg.Dispose();
         }
+
+
+        private XYZ DrainHandle = null;
+
+        private void RenderCollector()
+        {
+            float hw = 2000.0f;
+            float hb = 200.0f;
+
+            hw /= 304.8f;
+            hb /= 304.8f;
+
+            XYZ p = data.drain.collectorPoint;
+            XYZ v = data.drain.collectorDirection.Normalize();
+
+            XYZ pv = v.CrossProduct(XYZ.BasisZ).Normalize();
+
+            XYZ p1 = p + pv * hw;
+            XYZ p2 = p - pv * hw;
+
+            //DrawPoint(new RenderPoint(p1, System.Drawing.Color.Yellow, hb, RenderPoint.RenderUnits.MM), alpha: drainAlpha);
+            //DrawPoint(new RenderPoint(p2, System.Drawing.Color.Yellow, hb, RenderPoint.RenderUnits.MM), alpha: drainAlpha);
+
+            XYZ p1t = p1 + v * hb;
+            XYZ p1b = p1 - v * hb;
+            XYZ p2t = p2 + v * hb;
+            XYZ p2b = p2 - v * hb;
+
+
+            IList<XYZ> points = new List<XYZ> { p1t, p2t, p2b, p1b };
+
+            PolyLine pl = PolyLine.Create(points);
+            FillPolyLine(pl, System.Drawing.Color.Yellow, alpha: drainAlpha);
+
+            // Arrow
+            XYZ arrowpoint = p + v * hw;
+            XYZ arrowsource = p - v * hw;
+            XYZ arrow1 = arrowpoint - v * hw * 0.4 - pv * hw * 0.3;
+            XYZ arrow2 = arrowpoint - v * hw * 0.4 + pv * hw * 0.3;
+
+            //IList<XYZ> arrowpoints = new List<XYZ> { p1t, p2t, p2b, p1b };
+            //PolyLine arrowpl = PolyLine.Create(points);
+            DrawLine(Line.CreateBound(arrowsource, arrowpoint), System.Drawing.Color.Yellow, alpha: drainAlpha);
+            DrawLine(Line.CreateBound(arrowpoint, arrow1), System.Drawing.Color.Yellow, alpha: drainAlpha);
+            DrawLine(Line.CreateBound(arrowpoint, arrow2), System.Drawing.Color.Yellow, alpha: drainAlpha);
+
+            DrawPoint(new RenderPoint(arrowpoint, Color.White, 5, RenderPoint.RenderUnits.PX), alpha: (byte)(drainAlpha / 2));
+
+            DrainHandle = arrowpoint;
+        }
+
 
 
         /// <summary>
@@ -228,9 +279,11 @@ namespace Avant.WTI.Form
         private System.Drawing.Point previous_mouse_location = new System.Drawing.Point();
 
         private Area selectedArea = null;
+        private bool HandleActive = false;
 
         private void Canvas_mousedown(object sender, MouseEventArgs e)
         {
+            XYZ mouse = new XYZ(e.X, e.Y, 0);
             if (e.Button == PAN_BUTTON)
             {
                 canvas_panbuttondown = true;
@@ -240,9 +293,18 @@ namespace Avant.WTI.Form
             {
                 if(e.Button == MouseButtons.Left)
                 {
-                    selectedArea = GetValvePointAreaUnderCursor(new XYZ(e.X, e.Y, 0));
+                    selectedArea = GetValvePointAreaUnderCursor(mouse);
                 }
             }
+            if(ActiveTab == Tab.DRAIN)
+            {
+                if(e.Button == MouseButtons.Left)
+                {
+                    HandleActive = CursorAboveHandle(mouse);
+                }
+            }
+
+
         }
 
         private void Canvas_mouseclick(object sender, MouseEventArgs e)
@@ -276,6 +338,7 @@ namespace Avant.WTI.Form
             if (e.Button == MouseButtons.Left)
             {
                 selectedArea = null;
+                HandleActive = false;
             }
         }
 
@@ -295,11 +358,52 @@ namespace Avant.WTI.Form
             HandleAreaActions(mouse);
             HandleValveDrag(mouse);
             HandlePan(e);
+            HandleDrainCollector(mouse);
             
             // Rerender
             canvas.Invalidate();
         }
 
+        private List<XYZ> AvailableCollectorDirections = new List<XYZ> { XYZ.BasisX, -XYZ.BasisX, XYZ.BasisY, -XYZ.BasisY };
+
+        private void HandleDrainCollector(XYZ mouseScreen)
+        {
+            if(HandleActive)
+            {
+                Cursor.Current = Cursors.SizeAll;
+
+                XYZ collectorScreen = GeomUtils.PointToScreenPoint(data.drain.collectorPoint, bounds, this.canvas.Size);
+
+
+                XYZ dir = VectorUtils.Vector_setZ(mouseScreen - collectorScreen, 0).Normalize();
+                XYZ newDir = AvailableCollectorDirections.OrderBy(v => v.AngleTo(dir)).First();
+
+                data.drain.collectorDirection = new XYZ(newDir.X, -newDir.Y, 0);
+            }
+            else
+            {
+                if (CursorAboveHandle(mouseScreen))
+                {
+                    Cursor.Current = Cursors.SizeAll;
+                }
+                else
+                {
+                    Cursor.Current = Cursors.Default;
+                }
+            }
+        }
+
+        private bool CursorAboveHandle(XYZ mouse)
+        {
+            if (DrainHandle == null) return false;
+
+            XYZ handle = GeomUtils.PointToScreenPoint(DrainHandle, bounds, canvas.Size);
+
+            double grabDist = 10.0;
+
+            if (handle.DistanceTo(mouse) < grabDist) return true;
+            return false;
+        }
 
         private void HandlePan(MouseEventArgs e)
         {

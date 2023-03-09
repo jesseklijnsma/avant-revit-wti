@@ -205,6 +205,7 @@ namespace Avant.WTI.Data
             previewPoints.Clear();
             valvePoints.Clear();
             errorMessages.Clear();
+            previewPoints.AddRange(columnpoints.Select(p => new RenderPoint(p, System.Drawing.Color.Gray, 3, RenderPoint.RenderUnits.PX)));
         }
 
         public enum Data

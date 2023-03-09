@@ -22,13 +22,6 @@ namespace Avant.WTI.Generators
         {
             // Preview doesn't need any input validation
 
-            data.previewGeometry.Clear();
-            data.debugLines.Clear();
-            data.previewPoints.Clear();
-            data.previewPoints.AddRange(data.columnpoints.Select(p => new RenderPoint(p, System.Drawing.Color.Gray, 3, RenderPoint.RenderUnits.PX)));
-            data.valvePoints.Clear();
-
-            data.errorMessages.Clear();
 
             foreach (Area area in data.areas)
             {
